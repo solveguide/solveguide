@@ -15,21 +15,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     
-    final currentWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
         backgroundColor: Colors.orange[50],
-        title: Text("Home  $currentWidth"),
+        title: Text("Home"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: ListView(
             children: [
               Center(
-                child: Expanded(
+                child: Expanded( 
                   child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: 1000,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.lightBlue[200],
                       borderRadius: BorderRadius.circular(20),
@@ -77,7 +78,6 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: Container(
                   width: 500,
-                  height: 800,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
