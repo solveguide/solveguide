@@ -24,114 +24,104 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(15.0),
         child: ListView(
           children: [
-            Expanded(
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: 1000,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.lightBlue[200],
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 5, color: Colors.black),
-                ),
-                padding: EdgeInsets.all(25),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 75,
-                          child: Transform(
-                            transform: Matrix4.rotationY(pi),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.psychology_outlined,
-                              size: 75,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                            width: 75,
-                            child: Icon(
-                              Icons.psychology_alt,
-                              size: 75,
-                            ))
-                      ],
-                    ),
-                    const SizedBox(
-                        height: 50), // Adds space between image and text
-                    const Text(
-                      'Resolve conflicts faster, for good',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                        height: 50), // Adds space between image and text
-                    const Text(
-                        'Are you tired of rehashing the same issues with the people in your life?\n\n'
-                        'Do you feel like you get caught in the least important aspects of a conflict while the obvious root of the issue goes ignored and unresolved?\n\n'
-                        'Do you feel like shared facts keep slipping into contested territory, causing debates to go in circles?\n\n'
-                        'SolveGuide is a friendly tool that will guide you to solutions that last. You can use SolveGuide alone or with others to make progress on issues in your relationship, in the workplace or anywhere else you are struggling.\n\n'),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-              height: 10,
-            ),
-            Center(
-              child: Container(
-                width: 500,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 5, color: Colors.black),
-                ),
-                padding: EdgeInsets.all(25),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      'Solve an Issue',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Describe an Issue, Problem or Conflict you are facing in one sentence.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    TextField(),
-                    Container(
-                      color: Colors.red,
-                      height: 30,
-                      width: 100,
-                    ),
-                    Text(
-                      '- Keep it simple. We will break it down next.\n'
-                      '- Try to describe the issue as a negative experience, not as the absent solution.\n'
-                      '- Be as factual as possible, but remember that observations, emotional experiences, thoughts\n',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
+            _buildMainContainer(),
+            SizedBox(height: 10), // Adjusted for clarity
+            _buildCenterContainer(),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildMainContainer() {
+    return Container(
+      constraints: BoxConstraints(maxWidth: 1000),
+      decoration: _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
+      padding: EdgeInsets.all(25),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          _buildIconRow(),
+          SizedBox(height: 50),
+          _buildMainText(),
+          SizedBox(height: 50),
+          _buildDetailedText(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCenterContainer() {
+    return Center(
+      child: Container(
+        width: 500,
+        decoration: _containerDecoration(Colors.white),
+        padding: EdgeInsets.all(25),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildHeaderText('Solve an Issue'),
+            _buildNormalText('Describe an Issue, Problem or Conflict you are facing in one sentence.'),
+            TextField(),
+            MaterialButton(
+              onPressed: beginDemo,
+              color: Colors.red,
+              child: Text("Solve it!"),
+              ),
+            _buildFooterText(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void beginDemo(){}
+
+  BoxDecoration _containerDecoration(Color color) {
+    return BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(width: 5, color: Colors.black),
+    );
+  }
+
+  Widget _buildIconRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Transform(
+          transform: Matrix4.rotationY(pi),
+          alignment: Alignment.center,
+          child: Icon(Icons.psychology_outlined, size: 75),
+        ),
+        Icon(Icons.psychology_alt, size: 75),
+      ],
+    );
+  }
+
+  Widget _buildMainText() => const Text(
+        'Resolve conflicts faster, for good',
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      );
+
+  Widget _buildDetailedText() => const Text(
+        'Are you tired of rehashing the same issues with the people in your life? \n\nDo you feel like you get caught in the least important aspects of a conflict while the obvious root of the issue goes ignored and unresolved? \n\nDo you feel like shared facts keep slipping into contested territory, causing debates to go in circles? \n\nSolveGuide is a friendly tool that will guide you to solutions that last. You can use SolveGuide alone or with others to make progress on issues in your relationship, in the workplace or anywhere else you are struggling.\n\n',
+      );
+
+  Widget _buildHeaderText(String text) => Text(
+        text,
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      );
+
+  Widget _buildNormalText(String text) => Text(
+        text,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+      );
+
+  Widget _buildFooterText() => Text(
+        '- Keep it simple. We will break it down next.\n'
+        '- Try to describe the issue as a negative experience, not as the absent solution.\n'
+        '- Be as factual as possible, but remember that observations, emotional experiences, thoughts\n',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
+      );
 }
