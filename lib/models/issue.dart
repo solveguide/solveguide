@@ -1,9 +1,9 @@
-import 'package:guide_solve/models/root_theory.dart';
+import 'package:guide_solve/models/hypothesis.dart';
 
 class Issue {
   final String label;
-  final String root;
-  final List<RootTheory> rootTheories;
+  final String root = "I can't accept that it must be this way.";
+  final List<Hypothesis> hypotheses;
 
-  Issue({required this.label, required this.root, required this.rootTheories});
+  Issue({required this.label, required this.hypotheses});
 }

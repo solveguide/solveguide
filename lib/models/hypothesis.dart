@@ -1,13 +1,13 @@
-class RootTheory {
+class Hypothesis {
   final String desc;
   bool isRoot;
   bool isSpinoffIssue;
   int rank;
 
-  RootTheory({
+  Hypothesis({
     required this.desc,
     this.isRoot = false,
     this.isSpinoffIssue = false,
-    required this.rank,
+    this.rank = 0,
   });
 }

@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 
-class DemoPage extends StatelessWidget {
-  const DemoPage({super.key});
+class DemoPage extends StatefulWidget {
+  final String demoIssue;
+  const DemoPage({super.key, required this.demoIssue});
 
   @override
+  State<DemoPage> createState() => _DemoPageState();
+}
+
+class _DemoPageState extends State<DemoPage> {
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Find the Root'),
+      ),
+      body: ListView.builder(
+        itemBuilder: (context, index) => ListTile(
+          title: Text(widget.demoIssue),
+        ),
+      ),
+    );
   }
 }

@@ -3,6 +3,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:guide_solve/data/issue_data.dart';
+import 'package:guide_solve/pages/demo_page.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +15,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final demoIssueLabel = TextEditingController();
+
+// start the demo
+  void goToDemo(String demoIssueLabel) {
+    createDemoIssue();
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DemoPage(demoIssue: demoIssueLabel),
+        ));
+  }
+
+  // create the demo issue
+  void createDemoIssue() {
+    Provider.of<IssueData>(context, listen: false)
+        .addIssue(demoIssueLabel.text);
+  }
+
+  //UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,21 +83,22 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildHeaderText('Solve an Issue'),
-            _buildNormalText('Describe an Issue, Problem or Conflict you are facing in one sentence.'),
-            TextField(),
+            _buildNormalText(
+                'Describe an Issue, Problem or Conflict you are facing in one sentence.'),
+            TextField(
+              controller: demoIssueLabel,
+            ),
             MaterialButton(
-              onPressed: beginDemo,
+              onPressed: () => goToDemo(demoIssueLabel.text),
               color: Colors.red,
               child: Text("Solve it!"),
-              ),
+            ),
             _buildFooterText(),
           ],
         ),
       ),
     );
   }
-
-  void beginDemo(){}
 
   BoxDecoration _containerDecoration(Color color) {
     return BoxDecoration(
