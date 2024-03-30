@@ -83,15 +83,19 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildHeaderText('Solve an Issue'),
+            SizedBox(height:10),
             _buildNormalText(
                 'Describe an Issue, Problem or Conflict you are facing in one sentence.'),
             TextField(
               controller: demoIssueLabel,
             ),
-            MaterialButton(
-              onPressed: () => goToDemo(demoIssueLabel.text),
-              color: Colors.red,
-              child: Text("Solve it!"),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MaterialButton(
+                onPressed: () => goToDemo(demoIssueLabel.text),
+                color: Colors.red,
+                child: Text("Solve it!"),
+              ),
             ),
             _buildFooterText(),
           ],

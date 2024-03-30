@@ -25,6 +25,17 @@ List<Issue> getIssueList() {
   return issueList;
 }
 
+// get list of hypotheses
+List<Hypothesis> getHypothesisList(Issue issue){
+  return issue.hypotheses;
+}
+
+// get number of hypothesis in issue
+int numberOfHypothesesInIssue(String issueLabel){
+  Issue relevantIssue = getRelevantIssue(issueLabel);
+  return relevantIssue.hypotheses.length;
+}
+
 // add a new Issue
 void addIssue(String label){
   //add a new issue with a blank list of root theories
