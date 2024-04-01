@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
+import 'package:guide_solve/models/solution.dart';
 
 class IssueData extends ChangeNotifier{
 
@@ -26,8 +27,8 @@ List<Issue> getIssueList() {
 }
 
 // get list of hypotheses
-List<Hypothesis> getHypothesisList(Issue issue){
-  return issue.hypotheses;
+List<Hypothesis> getHypothesisList(String issue){
+  return getRelevantIssue(issue).hypotheses;
 }
 
 // get number of hypothesis in issue
@@ -61,9 +62,45 @@ relevantHypothesis.isRoot = !relevantHypothesis.isRoot;
 notifyListeners();
 }
 
-// prioritize Issues
+// add a solution to an Issue
+void addSolution(String issueLabel, String desc){
+  //find the relevant Issue
+  Issue relevantIssue = getRelevantIssue(issueLabel);
 
-// Solve an Issue
+  relevantIssue.solutions.add(Solution(desc: desc));
+  notifyListeners();
+}
+
+// get list of hypotheses
+List<Solution> getSolutionList(String issue){
+  return getRelevantIssue(issue).solutions;
+}
+
+// get number of solutions in issue
+int numberOfSolutionsInIssue(String issueLabel){
+  Issue relevantIssue = getRelevantIssue(issueLabel);
+  return relevantIssue.solutions.length;
+}
+
+// set the root theory
+void setRoot(String issueLabel, String rootTheory){
+Issue relevantIssue = getRelevantIssue(issueLabel);
+relevantIssue.root = rootTheory;
+}
+
+// set the root solve
+void setSolve(String issueLabel, String solution){
+Issue relevantIssue = getRelevantIssue(issueLabel);
+relevantIssue.solve = solution;
+}
+
+//build solve statement
+String buildSolveStatement(String issueLabel){
+  String solveStatement = 'default';
+  Issue relevantIssue = getRelevantIssue(issueLabel);
+  solveStatement = 'You will ' + relevantIssue.solve + '. Which will stop ' + relevantIssue.root + '. And make it so that you never ' + relevantIssue.label;
+  return solveStatement;
+}
 
 // Mark an Issue as Solved
 
