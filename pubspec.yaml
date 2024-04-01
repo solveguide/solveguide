@@ -36,6 +36,7 @@ dependencies:
   firebase_storage: ^11.6.0 # For using Firebase Cloud Storage.
   firebase_messaging: ^14.7.10 # For Firebase Cloud Messaging (FCM) for push notifications.
   firebase_analytics: ^10.8.0 # For Firebase Analytics to collect app usage and user behavior data.
+  url_launcher: ^6.0.9
 
 
   # The following adds the Cupertino Icons font to your application.

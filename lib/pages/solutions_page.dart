@@ -85,7 +85,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
           padding: const EdgeInsets.all(15.0),
           child: Column(
             children: [
-              buildBlueContainer('Root Issue', widget.demoIssue),
+              buildBlueContainer('Root Issue', value.getRelevantIssue(widget.demoIssue).root),
               Expanded(
                     child: ListView.builder(
                       itemCount:

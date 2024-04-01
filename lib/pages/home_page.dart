@@ -2,10 +2,12 @@
 
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/pages/demo_page.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +18,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
+  bool isButtonEnabled = false; // Tracks whether the start button should be enabled
+
+  @override
+  void initState() {
+    super.initState();
+    // Add listener to text controller to enable button when text is entered
+    demoIssueLabel.addListener(() {
+      final isTextEntered = demoIssueLabel.text.isNotEmpty;
+      setState(() {
+        isButtonEnabled = isTextEntered;
+      });
+    });
+  }
 
 // start the demo
   void goToDemo(String demoIssueLabel) {
@@ -64,9 +79,9 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           _buildIconRow(),
-          SizedBox(height: 50),
+          SizedBox(height: 30),
           _buildMainText(),
-          SizedBox(height: 50),
+          SizedBox(height: 30),
           _buildDetailedText(),
         ],
       ),
@@ -82,22 +97,33 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildHeaderText('Solve an Issue'),
+            _buildHeaderText('Try Solve Guide'),
             SizedBox(height:10),
             _buildNormalText(
-                'Describe an Issue, Problem or Conflict you are facing in one sentence.'),
+                'Start by narrowing in on a single, specific issue you are experiencing:'),
+            SizedBox(height:10),
             TextField(
               controller: demoIssueLabel,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: MaterialButton(
-                onPressed: () => goToDemo(demoIssueLabel.text),
-                color: Colors.red,
-                child: Text("Solve it!"),
+              keyboardType: TextInputType.multiline, // Enables line breaks
+              maxLines: null,
+              decoration: InputDecoration(
+                hintText: "Your Issue Here.",
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green, width: 2.0),
+                ),
               ),
             ),
-            _buildFooterText(),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: MaterialButton(
+                onPressed: isButtonEnabled ? () => goToDemo(demoIssueLabel.text) : null,
+                color: Colors.red,
+                disabledColor: Colors.grey,
+                child: Text("Start!", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
+           // _buildFooterText(),
           ],
         ),
       ),
@@ -127,13 +153,51 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildMainText() => const Text(
-        'Resolve conflicts faster, for good',
+        'Solve Guide',
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       );
 
-  Widget _buildDetailedText() => const Text(
-        'Are you tired of rehashing the same issues with the people in your life? \n\nDo you feel like you get caught in the least important aspects of a conflict while the obvious root of the issue goes ignored and unresolved? \n\nDo you feel like shared facts keep slipping into contested territory, causing debates to go in circles? \n\nSolveGuide is a friendly tool that will guide you to solutions that last. You can use SolveGuide alone or with others to make progress on issues in your relationship, in the workplace or anywhere else you are struggling.\n\n',
-      );
+  Widget _buildDetailedText() => Column(
+    children: [
+      RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(text: 'Solving issues is difficult because it requires you to switch between two very different modes of thinking.\n\n'),
+                TextSpan(
+                  text: 'Widening ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: 'is creative; imagining possibilities without judgement.\n\n'),
+                TextSpan(
+                  text: 'Narrowing ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: 'is critical; choosing the best available path forward.\n\n',
+                ),
+                TextSpan(text: 'The best outcomes arise when you can be creative towards observing reality, and critical towards your plan to navigate it. Solve Guide is intended to help you achieve that balance.\n'),
+              ],
+            ),
+          ),
+        RichText(
+          textAlign: TextAlign.center,
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(
+                  text: 'Learn more about solve guide here.',
+                  style: TextStyle(color: Colors.blueGrey, decoration: TextDecoration.underline, fontSize: 10),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      launchUrl(Uri.parse('https://about.solve.guide'));
+                    },
+                ),
+              ],
+            ),
+          ),
+    ],
+  );
 
   Widget _buildHeaderText(String text) => Text(
         text,
@@ -145,10 +209,10 @@ class _HomePageState extends State<HomePage> {
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
       );
 
-  Widget _buildFooterText() => Text(
+/*  Widget _buildFooterText() => Text(
         '- Keep it simple. We will break it down next.\n'
-        '- Try to describe the issue as a negative experience, not as the absent solution.\n'
-        '- Be as factual as possible, but remember that observations, emotional experiences, thoughts\n',
+        '- Try to describe the issue in terms of your negative experience; do not include the absent solution.\n',
         style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
       );
+*/
 }
