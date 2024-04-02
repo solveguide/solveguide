@@ -44,11 +44,11 @@ class _DemoPageState extends State<DemoPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Possible Root Issue:"),
+          title: Text("Possible Root Theory:"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text('Widen your thinking to come up with possible root causes.'),
+              Text('Widen your thinking to come up with possible root causes. Try Exercises like 5 Why\'s or Negative Brainstorming. Do not judge quality or likelihood at this point.'),
               SizedBox(height: 20), // Adds spacing
               TextFormField(
                 controller: newHypothesisDescController,
@@ -57,7 +57,7 @@ class _DemoPageState extends State<DemoPage> {
                 //textInputAction: TextInputAction.done,
                 onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
                 decoration: InputDecoration(
-                  hintText: "Enter root cause here.",
+                  hintText: "Possible root theory",
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -112,12 +112,12 @@ class _DemoPageState extends State<DemoPage> {
         backgroundColor: Colors.orange[50],
         appBar: AppBar(
           backgroundColor: Colors.orange[50],
-          title: const Text('Find the Root'),
+          title: const Text('Identify the Issue'),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewHypothesis,
           backgroundColor: Colors.red,
-          tooltip: 'Add a possible root issue',
+          tooltip: 'Widen root issues',
           child: const Icon(Icons.add),
         ),
         body: Padding(
@@ -126,20 +126,31 @@ class _DemoPageState extends State<DemoPage> {
             children: [
               buildBlueContainer('Current Issue', widget.demoIssue),
               Expanded(
-                    child: ListView.builder(
+                    child: ReorderableListView.builder(
                       itemCount: value.numberOfHypothesesInIssue(widget.demoIssue),
                       itemBuilder: (context, index) => Card(
-                        elevation: 4.0, // Adds a shadow
+                        key: ValueKey(value.getRelevantIssue(widget.demoIssue).hypotheses[index]),
+                        elevation: 2.0, // Adds a shadow
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
                         child: ListTile(
                           title: Text(value.getRelevantIssue(widget.demoIssue).hypotheses[index].desc),
-                          leading: Icon(Icons.menu),
-                          trailing: IconButton(
-                            icon: Icon(Icons.arrow_forward),
-                            onPressed: () => goToSolutionsPage(widget.demoIssue, value.getHypothesisList(widget.demoIssue)[index].desc),
-                          ),
+                          onTap: () => goToSolutionsPage(widget.demoIssue, value.getHypothesisList(widget.demoIssue)[index].desc),
                         ),
                       ),
+                        onReorder: (int oldIndex, int newIndex) {
+                        // Implement reordering logic here
+                        setState(() {
+                          if (newIndex > oldIndex) {
+                            newIndex -= 1;
+                          }
+                          final item = value.getRelevantIssue(widget.demoIssue).hypotheses.removeAt(oldIndex);
+                          value.getRelevantIssue(widget.demoIssue).hypotheses.insert(newIndex, item);
+                        });
+                      },
+                        proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                        // Return the child directly without any additional decoration
+                        return child;
+                      },
                     ),
                   ),
                 ],

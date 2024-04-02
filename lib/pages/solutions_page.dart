@@ -125,28 +125,38 @@ class _SolutionsPageState extends State<SolutionsPage> {
             children: [
               buildBlueContainer('Root Issue', value.getRelevantIssue(widget.demoIssue).root),
               Expanded(
-                    child: ListView.builder(
+                    child: ReorderableListView.builder(
                       itemCount:
                           value.numberOfSolutionsInIssue(widget.demoIssue),
                       itemBuilder: (context, index) => Card(
-                        elevation: 4.0, // Adds a shadow
+                        key: ValueKey(value.getRelevantIssue(widget.demoIssue).solutions[index]),
+                        elevation: 2.0, // Adds a shadow
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
                         child: ListTile(
-                        title: Text(value
-                            .getRelevantIssue(widget.demoIssue)
-                            .solutions[index]
-                            .desc),
-                            leading: Icon(Icons.menu),
-                            trailing: IconButton(
-                              icon: Icon(Icons.arrow_forward),
-                              onPressed: () => goToSolvePage(widget.demoIssue,value.getSolutionList(widget.demoIssue)[index].desc)
-                      ),
+                        title: Text(value.getRelevantIssue(widget.demoIssue).solutions[index].desc),
+                        onTap: () => goToSolvePage(widget.demoIssue,value.getSolutionList(widget.demoIssue)[index].desc),
+                        ),
                     ),
-              ),),),
-            ],
+                    onReorder: (int oldIndex, int newIndex) {
+                        // Implement reordering logic here
+                        setState(() {
+                          if (newIndex > oldIndex) {
+                            newIndex -= 1;
+                          }
+                          final item = value.getRelevantIssue(widget.demoIssue).solutions.removeAt(oldIndex);
+                          value.getRelevantIssue(widget.demoIssue).solutions.insert(newIndex, item);
+                        });
+                      },
+                        proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                        // Return the child directly without any additional decoration
+                        return child;
+                      },
+                    ),
+                  ),
+                ],
                 ),
               ),
-      ) 
+       ) 
       );
   }
 }
