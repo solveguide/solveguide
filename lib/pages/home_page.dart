@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
 
 // start the demo
   void goToDemo(String demoIssueLabel) {
-    createDemoIssue();
+    createDemoIssue(demoIssueLabel);
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -43,9 +43,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   // create the demo issue
-  void createDemoIssue() {
+  void createDemoIssue(String demoIssueLabel) {
     Provider.of<IssueData>(context, listen: false)
-        .addIssue(demoIssueLabel.text);
+        .addIssue(demoIssueLabel);
   }
 
   //UI
@@ -104,8 +104,9 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height:10),
             TextField(
               controller: demoIssueLabel,
-              keyboardType: TextInputType.multiline, // Enables line breaks
-              maxLines: null,
+              onSubmitted: (String value)  {goToDemo(value);},
+             // keyboardType: TextInputType.multiline, // Enables line breaks
+              //maxLines: null,
               decoration: InputDecoration(
                 hintText: "Your Issue Here.",
                 border: OutlineInputBorder(),
@@ -186,7 +187,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
                 TextSpan(
-                  text: 'Learn more about solve guide here.',
+                  text: 'Visit about.solve.guide to learn more.',
                   style: TextStyle(color: Colors.blueGrey, decoration: TextDecoration.underline, fontSize: 10),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {

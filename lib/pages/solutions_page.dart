@@ -16,6 +16,27 @@ class SolutionsPage extends StatefulWidget {
 class _SolutionsPageState extends State<SolutionsPage> {
   //text controller
   final newSolutionNameController = TextEditingController();
+  //focus node
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Access your condition here using your context-dependent logic.
+      // For example:
+      final issueData = Provider.of<IssueData>(context, listen: false);
+      if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 2) {
+        createNewSolution(); // This should show the AlertDialog.
+      }
+    });
+  }
 
   // create a new solution for this issue
   void createNewSolution() {
@@ -23,9 +44,25 @@ class _SolutionsPageState extends State<SolutionsPage> {
       context: context,
       builder: (context) => AlertDialog(
           title: Text("Possible Solution:"),
-          content: TextField(
-            controller: newSolutionNameController,
+          content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('Widen your thinking to come up with possible solutions.'),
+              SizedBox(height: 20), // Adds spacing
+              TextFormField(
+                controller: newSolutionNameController,
+                focusNode: _focusNode,
+                autofocus: true,
+                //textInputAction: TextInputAction.done,
+                onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
+                decoration: InputDecoration(
+                  hintText: "Enter possible solution here",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
+        ),
           actions: [
             //save button
             MaterialButton(
@@ -36,7 +73,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
             //cancel button
             MaterialButton(
               onPressed: cancel,
-              child: Text("cancel"),
+              child: Text("Done"),
             ),
           ]),
     );
@@ -48,6 +85,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
     Provider.of<IssueData>(context, listen: false)
         .addSolution(widget.demoIssue, newSolutionDesc);
         clear();
+        _focusNode.requestFocus();
   }
 
   //stop adding Solutions
@@ -90,18 +128,21 @@ class _SolutionsPageState extends State<SolutionsPage> {
                     child: ListView.builder(
                       itemCount:
                           value.numberOfSolutionsInIssue(widget.demoIssue),
-                      itemBuilder: (context, index) => ListTile(
+                      itemBuilder: (context, index) => Card(
+                        elevation: 4.0, // Adds a shadow
+                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
+                        child: ListTile(
                         title: Text(value
                             .getRelevantIssue(widget.demoIssue)
                             .solutions[index]
                             .desc),
-                            leading: Icon(Icons.format_list_numbered),
+                            leading: Icon(Icons.menu),
                             trailing: IconButton(
                               icon: Icon(Icons.arrow_forward),
                               onPressed: () => goToSolvePage(widget.demoIssue,value.getSolutionList(widget.demoIssue)[index].desc)
                       ),
                     ),
-                  ),),
+              ),),),
             ],
                 ),
               ),

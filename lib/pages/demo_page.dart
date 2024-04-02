@@ -14,8 +14,30 @@ class DemoPage extends StatefulWidget {
 
 //UI
 class _DemoPageState extends State<DemoPage> {
-//text controller
+  //text controller
   final newHypothesisDescController = TextEditingController();
+  //focus node
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Access your condition here using your context-dependent logic.
+      // For example:
+      final issueData = Provider.of<IssueData>(context, listen: false);
+      if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 2) {
+        createNewHypothesis(); // This should show the AlertDialog.
+      }
+    });
+  }
+
 
   // create a new hypothesis for this issue
   void createNewHypothesis() {
@@ -23,9 +45,25 @@ class _DemoPageState extends State<DemoPage> {
       context: context,
       builder: (context) => AlertDialog(
           title: Text("Possible Root Issue:"),
-          content: TextField(
-            controller: newHypothesisDescController,
+          content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('Widen your thinking to come up with possible root causes.'),
+              SizedBox(height: 20), // Adds spacing
+              TextFormField(
+                controller: newHypothesisDescController,
+                focusNode: _focusNode,
+                autofocus: true,
+                //textInputAction: TextInputAction.done,
+                onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
+                decoration: InputDecoration(
+                  hintText: "Enter root cause here.",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
+        ),
           actions: [
             //save button
             MaterialButton(
@@ -36,7 +74,7 @@ class _DemoPageState extends State<DemoPage> {
             //cancel button
             MaterialButton(
               onPressed: cancel,
-              child: Text("cancel"),
+              child: Text("Done"),
             ),
           ]),
     );
@@ -48,6 +86,7 @@ class _DemoPageState extends State<DemoPage> {
     Provider.of<IssueData>(context, listen: false)
         .addHypothesis(widget.demoIssue, newHypothesisDesc);
         clear();
+        _focusNode.requestFocus();
   }
 
   //cancel Hypothesis
@@ -88,23 +127,24 @@ class _DemoPageState extends State<DemoPage> {
               buildBlueContainer('Current Issue', widget.demoIssue),
               Expanded(
                     child: ListView.builder(
-                      itemCount:
-                          value.numberOfHypothesesInIssue(widget.demoIssue),
-                      itemBuilder: (context, index) => ListTile(
-                        title: Text(value
-                            .getRelevantIssue(widget.demoIssue)
-                            .hypotheses[index]
-                            .desc),
-                            leading: Icon(Icons.format_list_numbered),
-                            trailing: IconButton(
-                              icon: Icon(Icons.arrow_forward),
-                              onPressed: () => goToSolutionsPage(widget.demoIssue,value.getHypothesisList(widget.demoIssue)[index].desc)
+                      itemCount: value.numberOfHypothesesInIssue(widget.demoIssue),
+                      itemBuilder: (context, index) => Card(
+                        elevation: 4.0, // Adds a shadow
+                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
+                        child: ListTile(
+                          title: Text(value.getRelevantIssue(widget.demoIssue).hypotheses[index].desc),
+                          leading: Icon(Icons.menu),
+                          trailing: IconButton(
+                            icon: Icon(Icons.arrow_forward),
+                            onPressed: () => goToSolutionsPage(widget.demoIssue, value.getHypothesisList(widget.demoIssue)[index].desc),
+                          ),
+                        ),
                       ),
                     ),
-                  ),),
-            ],
-                ),
+                  ),
+                ],
               ),
+            ),
           ),
         );
   }
