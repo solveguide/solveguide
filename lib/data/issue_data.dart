@@ -98,7 +98,7 @@ relevantIssue.solve = solution;
 String buildSolveStatement(String issueLabel){
   String solveStatement = 'default';
   Issue relevantIssue = getRelevantIssue(issueLabel);
-  solveStatement = 'You will ' + relevantIssue.solve + '. Which will stop ' + relevantIssue.root + '. And make it so that you never ' + relevantIssue.label;
+  solveStatement = 'You will: ' + relevantIssue.solve + '.\n\n Because it addresses: ' + relevantIssue.root + '.\n\n Which is the root issue driving: ' + relevantIssue.label;
   return solveStatement;
 }
 

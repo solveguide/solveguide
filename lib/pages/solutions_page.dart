@@ -98,6 +98,36 @@ class _SolutionsPageState extends State<SolutionsPage> {
     newSolutionNameController.clear();
   }
 
+   //Confirm Issue-Root Relationship
+  void confirmChosenSolution(String chosenSolution) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text("Confirm Chosen Solution"),
+          content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              SizedBox(height: 20), // Adds spacing
+              Text(chosenSolution + ' is the best way to address the fact that: ' + Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root),
+            ],
+          ),
+        ),
+          actions: [
+            //save button
+            MaterialButton(
+              onPressed: () => goToSolvePage(widget.demoIssue, chosenSolution),
+              child: Text("Confirm"),
+            ),
+
+            //cancel button
+            MaterialButton(
+              onPressed: cancel,
+              child: Text("Go Back"),
+            ),
+          ]),
+    );
+  }
+
   //goToSolvePage
   void goToSolvePage(String issue, String solution){
     Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
@@ -111,7 +141,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
         backgroundColor: Colors.orange[50],
         appBar: AppBar(
           backgroundColor: Colors.orange[50],
-          title: const Text('List Possible Solutions'),
+          title: const Text('Select the Solution'),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewSolution,
@@ -134,11 +164,10 @@ class _SolutionsPageState extends State<SolutionsPage> {
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
                         child: ListTile(
                         title: Text(value.getRelevantIssue(widget.demoIssue).solutions[index].desc),
-                        onTap: () => goToSolvePage(widget.demoIssue,value.getSolutionList(widget.demoIssue)[index].desc),
+                        onTap: () => confirmChosenSolution(value.getSolutionList(widget.demoIssue)[index].desc),
                         ),
                     ),
                     onReorder: (int oldIndex, int newIndex) {
-                        // Implement reordering logic here
                         setState(() {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;

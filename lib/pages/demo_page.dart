@@ -99,6 +99,36 @@ class _DemoPageState extends State<DemoPage> {
     newHypothesisDescController.clear();
   }
 
+  //Confirm Issue-Root Relationship
+  void confirmRootTheory(String chosenHypothesis) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text("Confirm Root Theory"),
+          content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              SizedBox(height: 20), // Adds spacing
+              Text(chosenHypothesis + ' is the root issue underlying: ' + widget.demoIssue),
+            ],
+          ),
+        ),
+          actions: [
+            //save button
+            MaterialButton(
+              onPressed: () => goToSolutionsPage(widget.demoIssue, chosenHypothesis),
+              child: Text("Confirm"),
+            ),
+
+            //cancel button
+            MaterialButton(
+              onPressed: cancel,
+              child: Text("Go Back"),
+            ),
+          ]),
+    );
+  }
+
   //goToSolutionsPage
   void goToSolutionsPage(String issue, String theory){
     Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
@@ -134,11 +164,10 @@ class _DemoPageState extends State<DemoPage> {
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
                         child: ListTile(
                           title: Text(value.getRelevantIssue(widget.demoIssue).hypotheses[index].desc),
-                          onTap: () => goToSolutionsPage(widget.demoIssue, value.getHypothesisList(widget.demoIssue)[index].desc),
+                          onTap: () => confirmRootTheory(value.getHypothesisList(widget.demoIssue)[index].desc),
                         ),
                       ),
                         onReorder: (int oldIndex, int newIndex) {
-                        // Implement reordering logic here
                         setState(() {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;
