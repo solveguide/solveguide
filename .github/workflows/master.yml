@@ -40,4 +40,7 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=${{ github.workspace }}/firebase-service-account.json" >> $GITHUB_ENV
       
       - name: Deploy to Firebase
-        run: firebase deploy --only hosting
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=${{ github.workspace }}/firebase-service-account.json
+          firebase deploy --only hosting
+        
