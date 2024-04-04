@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-      - 12-deploy-actions
-      - develop
 
 jobs:
   build:
