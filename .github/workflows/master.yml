@@ -26,7 +26,12 @@ jobs:
         run: flutter pub get
       - name: Build Web
         run: flutter build web
-      - name: Deploy to Firebase
-        run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
+      - name: Setup Firebase Service Account
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
         env:
-          FIREBASE_CLI_PREVIEWS: true
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}      
+      - name: Deploy to Firebase
+        run: firebase deploy --only hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        
