@@ -44,19 +44,19 @@ class _DemoPageState extends State<DemoPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Possible Root Theory:"),
+          title: const Text("Possible Root Theory:"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text('Widen your thinking to come up with possible root causes. Try Exercises like 5 Why\'s or Negative Brainstorming. Do not judge quality or likelihood at this point.'),
-              SizedBox(height: 20), // Adds spacing
+              const Text('Widen your thinking to come up with possible root causes. Try Exercises like 5 Why\'s or Negative Brainstorming. Do not judge quality or likelihood at this point.'),
+              const SizedBox(height: 20), // Adds spacing
               TextFormField(
                 controller: newHypothesisDescController,
                 focusNode: _focusNode,
                 autofocus: true,
                 //textInputAction: TextInputAction.done,
                 onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Possible root theory",
                   border: OutlineInputBorder(),
                 ),
@@ -68,13 +68,13 @@ class _DemoPageState extends State<DemoPage> {
             //save button
             MaterialButton(
               onPressed: save,
-              child: Text("Add"),
+              child: const Text("Add"),
             ),
 
             //cancel button
             MaterialButton(
               onPressed: cancel,
-              child: Text("Done"),
+              child: const Text("Done"),
             ),
           ]),
     );
@@ -104,12 +104,12 @@ class _DemoPageState extends State<DemoPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Confirm Root Theory"),
+          title: const Text("Confirm Root Theory"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              SizedBox(height: 20), // Adds spacing
-              Text(chosenHypothesis + ' is the root issue underlying: ' + widget.demoIssue),
+              const SizedBox(height: 20), // Adds spacing
+              Text('$chosenHypothesis is the root issue underlying: ${widget.demoIssue}'),
             ],
           ),
         ),
@@ -117,13 +117,13 @@ class _DemoPageState extends State<DemoPage> {
             //save button
             MaterialButton(
               onPressed: () => goToSolutionsPage(widget.demoIssue, chosenHypothesis),
-              child: Text("Confirm"),
+              child: const Text("Confirm"),
             ),
 
             //cancel button
             MaterialButton(
               onPressed: cancel,
-              child: Text("Go Back"),
+              child: const Text("Go Back"),
             ),
           ]),
     );
