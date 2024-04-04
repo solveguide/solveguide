@@ -5,12 +5,12 @@ Widget buildBlueContainer(String header, String text) {
     child: Container(
       width: 500,
       decoration: _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
-      padding: EdgeInsets.all(15),
+      padding: const EdgeInsets.all(15),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           _buildHeaderText(header),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildNormalText(text),
         ],
       ),
@@ -20,12 +20,12 @@ Widget buildBlueContainer(String header, String text) {
 
 Widget _buildHeaderText(String text) => Text(
       text,
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
     );
 
 Widget _buildNormalText(String text) => Text(
       text,
-      style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
     );
 
 BoxDecoration _containerDecoration(Color color) {

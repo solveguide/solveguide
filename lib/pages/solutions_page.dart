@@ -43,19 +43,19 @@ class _SolutionsPageState extends State<SolutionsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Possible Solution:"),
+          title: const Text("Possible Solution:"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text('Widen your thinking to come up with possible solutions.'),
-              SizedBox(height: 20), // Adds spacing
+              const Text('Widen your thinking to come up with possible solutions.'),
+              const SizedBox(height: 20), // Adds spacing
               TextFormField(
                 controller: newSolutionNameController,
                 focusNode: _focusNode,
                 autofocus: true,
                 //textInputAction: TextInputAction.done,
                 onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Enter possible solution here",
                   border: OutlineInputBorder(),
                 ),
@@ -67,13 +67,13 @@ class _SolutionsPageState extends State<SolutionsPage> {
             //save button
             MaterialButton(
               onPressed: save,
-              child: Text("Add"),
+              child: const Text("Add"),
             ),
 
             //cancel button
             MaterialButton(
               onPressed: cancel,
-              child: Text("Done"),
+              child: const Text("Done"),
             ),
           ]),
     );
@@ -103,12 +103,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Confirm Chosen Solution"),
+          title: const Text("Confirm Chosen Solution"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              SizedBox(height: 20), // Adds spacing
-              Text(chosenSolution + ' is the best way to address the fact that: ' + Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root),
+              const SizedBox(height: 20), // Adds spacing
+              Text('$chosenSolution is the best way to address the fact that: ${Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root}'),
             ],
           ),
         ),
@@ -116,13 +116,13 @@ class _SolutionsPageState extends State<SolutionsPage> {
             //save button
             MaterialButton(
               onPressed: () => goToSolvePage(widget.demoIssue, chosenSolution),
-              child: Text("Confirm"),
+              child: const Text("Confirm"),
             ),
 
             //cancel button
             MaterialButton(
               onPressed: cancel,
-              child: Text("Go Back"),
+              child: const Text("Go Back"),
             ),
           ]),
     );

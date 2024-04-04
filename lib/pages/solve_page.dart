@@ -26,7 +26,7 @@ String getSolveStatement(String issueLabel){
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SignupPage(),
+          builder: (context) => const SignupPage(),
         ));
   }
 
@@ -44,14 +44,14 @@ String getSolveStatement(String issueLabel){
           child: Column(
             children: [
               buildBlueContainer('Your Solve:', getSolveStatement(widget.demoIssue)),
-              SizedBox(height:20),
-              Text("Do you like what you see? Create an Account to save this solve and more."),
+              const SizedBox(height:20),
+              const Text("Do you like what you see? Create an Account to save this solve and more."),
               Padding(
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () => goToSignupPage(),
                 color: Colors.red,
-                child: Text("Create an Account"),
+                child: const Text("Create an Account"),
               ),
             )
             ],
