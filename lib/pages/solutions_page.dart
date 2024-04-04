@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/solutions_page.dart';
+import 'package:guide_solve/pages/solve_page.dart';
 import 'package:provider/provider.dart';
 
-class DemoPage extends StatefulWidget {
+class SolutionsPage extends StatefulWidget {
   final String demoIssue;
-  const DemoPage({super.key, required this.demoIssue});
+  final String rootTheoryDesc;
+  const SolutionsPage({super.key, required this.demoIssue, required this.rootTheoryDesc});
 
   @override
-  State<DemoPage> createState() => _DemoPageState();
+  State<SolutionsPage> createState() => _SolutionsPageState();
 }
 
-//UI
-class _DemoPageState extends State<DemoPage> {
+class _SolutionsPageState extends State<SolutionsPage> {
   //text controller
-  final newHypothesisDescController = TextEditingController();
+  final newSolutionNameController = TextEditingController();
   //focus node
   final FocusNode _focusNode = FocusNode();
 
@@ -32,32 +32,31 @@ class _DemoPageState extends State<DemoPage> {
       // Access your condition here using your context-dependent logic.
       // For example:
       final issueData = Provider.of<IssueData>(context, listen: false);
-      if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 2) {
-        createNewHypothesis(); // This should show the AlertDialog.
+      if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 2) {
+        createNewSolution(); // This should show the AlertDialog.
       }
     });
   }
 
-
-  // create a new hypothesis for this issue
-  void createNewHypothesis() {
+  // create a new solution for this issue
+  void createNewSolution() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Possible Root Theory:"),
+          title: Text("Possible Solution:"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text('Widen your thinking to come up with possible root causes. Try Exercises like 5 Why\'s or Negative Brainstorming. Do not judge quality or likelihood at this point.'),
+              Text('Widen your thinking to come up with possible solutions.'),
               SizedBox(height: 20), // Adds spacing
               TextFormField(
-                controller: newHypothesisDescController,
+                controller: newSolutionNameController,
                 focusNode: _focusNode,
                 autofocus: true,
                 //textInputAction: TextInputAction.done,
                 onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
                 decoration: InputDecoration(
-                  hintText: "Possible root theory",
+                  hintText: "Enter possible solution here",
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -80,43 +79,43 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  //save Hypothesis
+  // add solution to list
   void save() {
-    String newHypothesisDesc = newHypothesisDescController.text;
+    String newSolutionDesc = newSolutionNameController.text;
     Provider.of<IssueData>(context, listen: false)
-        .addHypothesis(widget.demoIssue, newHypothesisDesc);
+        .addSolution(widget.demoIssue, newSolutionDesc);
         clear();
         _focusNode.requestFocus();
   }
 
-  //cancel Hypothesis
+  //stop adding Solutions
   void cancel() {
     Navigator.pop(context);
   }
 
   //clear controllers
   void clear(){
-    newHypothesisDescController.clear();
+    newSolutionNameController.clear();
   }
 
-  //Confirm Issue-Root Relationship
-  void confirmRootTheory(String chosenHypothesis) {
+   //Confirm Issue-Root Relationship
+  void confirmChosenSolution(String chosenSolution) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text("Confirm Root Theory"),
+          title: Text("Confirm Chosen Solution"),
           content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
               SizedBox(height: 20), // Adds spacing
-              Text(chosenHypothesis + ' is the root issue underlying: ' + widget.demoIssue),
+              Text(chosenSolution + ' is the best way to address the fact that: ' + Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root),
             ],
           ),
         ),
           actions: [
             //save button
             MaterialButton(
-              onPressed: () => goToSolutionsPage(widget.demoIssue, chosenHypothesis),
+              onPressed: () => goToSolvePage(widget.demoIssue, chosenSolution),
               child: Text("Confirm"),
             ),
 
@@ -129,10 +128,10 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
-  //goToSolutionsPage
-  void goToSolutionsPage(String issue, String theory){
-    Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SolutionsPage(demoIssue: issue, rootTheoryDesc:  theory),));
+  //goToSolvePage
+  void goToSolvePage(String issue, String solution){
+    Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SolvePage(demoIssue: issue, solve:  solution),));
   }
 
   @override
@@ -142,38 +141,39 @@ class _DemoPageState extends State<DemoPage> {
         backgroundColor: Colors.orange[50],
         appBar: AppBar(
           backgroundColor: Colors.orange[50],
-          title: const Text('Identify the Issue'),
+          title: const Text('Select the Solution'),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: createNewHypothesis,
+          onPressed: createNewSolution,
           backgroundColor: Colors.red,
-          tooltip: 'Widen root issues',
+          tooltip: 'Add a possible solution',
           child: const Icon(Icons.add),
         ),
         body: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Column(
             children: [
-              buildBlueContainer('Current Issue', widget.demoIssue),
+              buildBlueContainer('Root Issue', value.getRelevantIssue(widget.demoIssue).root),
               Expanded(
                     child: ReorderableListView.builder(
-                      itemCount: value.numberOfHypothesesInIssue(widget.demoIssue),
+                      itemCount:
+                          value.numberOfSolutionsInIssue(widget.demoIssue),
                       itemBuilder: (context, index) => Card(
-                        key: ValueKey(value.getRelevantIssue(widget.demoIssue).hypotheses[index]),
+                        key: ValueKey(value.getRelevantIssue(widget.demoIssue).solutions[index]),
                         elevation: 2.0, // Adds a shadow
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
                         child: ListTile(
-                          title: Text(value.getRelevantIssue(widget.demoIssue).hypotheses[index].desc),
-                          onTap: () => confirmRootTheory(value.getHypothesisList(widget.demoIssue)[index].desc),
+                        title: Text(value.getRelevantIssue(widget.demoIssue).solutions[index].desc),
+                        onTap: () => confirmChosenSolution(value.getSolutionList(widget.demoIssue)[index].desc),
                         ),
-                      ),
-                        onReorder: (int oldIndex, int newIndex) {
+                    ),
+                    onReorder: (int oldIndex, int newIndex) {
                         setState(() {
                           if (newIndex > oldIndex) {
                             newIndex -= 1;
                           }
-                          final item = value.getRelevantIssue(widget.demoIssue).hypotheses.removeAt(oldIndex);
-                          value.getRelevantIssue(widget.demoIssue).hypotheses.insert(newIndex, item);
+                          final item = value.getRelevantIssue(widget.demoIssue).solutions.removeAt(oldIndex);
+                          value.getRelevantIssue(widget.demoIssue).solutions.insert(newIndex, item);
                         });
                       },
                         proxyDecorator: (Widget child, int index, Animation<double> animation) {
@@ -183,9 +183,9 @@ class _DemoPageState extends State<DemoPage> {
                     ),
                   ),
                 ],
+                ),
               ),
-            ),
-          ),
-        );
+       ) 
+      );
   }
 }

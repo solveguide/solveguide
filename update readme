@@ -1,0 +1,12 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 70a4a34..c69ebb7 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -4,3 +4,7 @@[m [mA web app that guides individuals and groups through the conflict resolution pro[m
+ [m
+ ## Getting Started[m
+ [m
+[32m+[m[32mYou can demo basic solve guide functionality by visiting [solve.guide](solve.guide) now.[m
+[32m+[m
+[32m+[m[32mYou can learn about [my motivations for building Solve Guide here.](https://about.solve.guide/101/2024/03/10/What-is-a-Solve-Guide.html)[m
+[32m+[m

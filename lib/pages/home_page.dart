@@ -2,7 +2,12 @@
 
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:guide_solve/data/issue_data.dart';
+import 'package:guide_solve/pages/demo_page.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +17,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final demoIssueLabel = TextEditingController();
+  bool isButtonEnabled = false; // Tracks whether the start button should be enabled
+
+  @override
+  void initState() {
+    super.initState();
+    // Add listener to text controller to enable button when text is entered
+    demoIssueLabel.addListener(() {
+      final isTextEntered = demoIssueLabel.text.isNotEmpty;
+      setState(() {
+        isButtonEnabled = isTextEntered;
+      });
+    });
+  }
+
+// start the demo
+  void goToDemo(String demoIssueLabel) {
+    createDemoIssue(demoIssueLabel);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DemoPage(demoIssue: demoIssueLabel),
+        ));
+  }
+
+  // create the demo issue
+  void createDemoIssue(String demoIssueLabel) {
+    Provider.of<IssueData>(context, listen: false)
+        .addIssue(demoIssueLabel);
+  }
+
+  //UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,114 +61,159 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(15.0),
         child: ListView(
           children: [
-            Expanded(
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: 1000,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.lightBlue[200],
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 5, color: Colors.black),
-                ),
-                padding: EdgeInsets.all(25),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 75,
-                          child: Transform(
-                            transform: Matrix4.rotationY(pi),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.psychology_outlined,
-                              size: 75,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                            width: 75,
-                            child: Icon(
-                              Icons.psychology_alt,
-                              size: 75,
-                            ))
-                      ],
-                    ),
-                    const SizedBox(
-                        height: 50), // Adds space between image and text
-                    const Text(
-                      'Resolve conflicts faster, for good',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                        height: 50), // Adds space between image and text
-                    const Text(
-                        'Are you tired of rehashing the same issues with the people in your life?\n\n'
-                        'Do you feel like you get caught in the least important aspects of a conflict while the obvious root of the issue goes ignored and unresolved?\n\n'
-                        'Do you feel like shared facts keep slipping into contested territory, causing debates to go in circles?\n\n'
-                        'SolveGuide is a friendly tool that will guide you to solutions that last. You can use SolveGuide alone or with others to make progress on issues in your relationship, in the workplace or anywhere else you are struggling.\n\n'),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-              height: 10,
-            ),
-            Center(
-              child: Container(
-                width: 500,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 5, color: Colors.black),
-                ),
-                padding: EdgeInsets.all(25),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      'Solve an Issue',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Describe an Issue, Problem or Conflict you are facing in one sentence.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    TextField(),
-                    Container(
-                      color: Colors.red,
-                      height: 30,
-                      width: 100,
-                    ),
-                    Text(
-                      '- Keep it simple. We will break it down next.\n'
-                      '- Try to describe the issue as a negative experience, not as the absent solution.\n'
-                      '- Be as factual as possible, but remember that observations, emotional experiences, thoughts\n',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
+            _buildMainContainer(),
+            SizedBox(height: 10), // Adjusted for clarity
+            _buildCenterContainer(),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildMainContainer() {
+    return Container(
+      constraints: BoxConstraints(maxWidth: 1000),
+      decoration: _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
+      padding: EdgeInsets.all(25),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          _buildIconRow(),
+          SizedBox(height: 30),
+          _buildMainText(),
+          SizedBox(height: 30),
+          _buildDetailedText(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCenterContainer() {
+    return Center(
+      child: Container(
+        width: 500,
+        decoration: _containerDecoration(Colors.white),
+        padding: EdgeInsets.all(25),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildHeaderText('Try Solve Guide'),
+            SizedBox(height:10),
+            _buildNormalText(
+                'Start by narrowing in on a single, specific issue you are experiencing:'),
+            SizedBox(height:10),
+            TextField(
+              controller: demoIssueLabel,
+              onSubmitted: (String value)  {goToDemo(value);},
+             // keyboardType: TextInputType.multiline, // Enables line breaks
+              //maxLines: null,
+              decoration: InputDecoration(
+                hintText: "Your Issue Here.",
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green, width: 2.0),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: MaterialButton(
+                onPressed: isButtonEnabled ? () => goToDemo(demoIssueLabel.text) : null,
+                color: Colors.red,
+                disabledColor: Colors.grey,
+                child: Text("Start!", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
+           // _buildFooterText(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _containerDecoration(Color color) {
+    return BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(width: 5, color: Colors.black),
+    );
+  }
+
+  Widget _buildIconRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Transform(
+          transform: Matrix4.rotationY(pi),
+          alignment: Alignment.center,
+          child: Icon(Icons.psychology_outlined, size: 75),
+        ),
+        Icon(Icons.psychology_alt, size: 75),
+      ],
+    );
+  }
+
+  Widget _buildMainText() => const Text(
+        'Solve Guide',
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      );
+
+  Widget _buildDetailedText() => Column(
+    children: [
+      RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(text: 'Solving issues is difficult because it requires you to switch between two very different modes of thinking.\n\n'),
+                TextSpan(
+                  text: 'Widening ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: 'is creative; imagining possibilities without judgement.\n\n'),
+                TextSpan(
+                  text: 'Narrowing ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: 'is critical; choosing the best available path forward.\n\n',
+                ),
+                TextSpan(text: 'The best outcomes arise when you can be creative towards observing reality, and critical towards your plan to navigate it. Solve Guide is intended to help you achieve that balance.\n'),
+              ],
+            ),
+          ),
+        RichText(
+          textAlign: TextAlign.center,
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(
+                  text: 'Visit about.solve.guide to learn more.',
+                  style: TextStyle(color: Colors.blueGrey, decoration: TextDecoration.underline, fontSize: 10),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      launchUrl(Uri.parse('https://about.solve.guide'));
+                    },
+                ),
+              ],
+            ),
+          ),
+    ],
+  );
+
+  Widget _buildHeaderText(String text) => Text(
+        text,
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      );
+
+  Widget _buildNormalText(String text) => Text(
+        text,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+      );
+
+/*  Widget _buildFooterText() => Text(
+        '- Keep it simple. We will break it down next.\n'
+        '- Try to describe the issue in terms of your negative experience; do not include the absent solution.\n',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
+      );
+*/
 }

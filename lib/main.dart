@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/pages/home_page.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -18,9 +20,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider(
+      create: (context) => IssueData(),
+      child: const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
+    )
     );
   }
 }
