@@ -15,6 +15,10 @@ jobs:
         with:
           java-version: '17.x'
           distribution: 'temurin'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Use a version compatible with Firebase CLI
+      - run: npm install -g firebase-tools
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.2'
