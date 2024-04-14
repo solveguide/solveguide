@@ -95,11 +95,22 @@ relevantIssue.solve = solution;
 }
 
 //build solve statement
-String buildSolveStatement(String issueLabel){
-  String solveStatement = 'default';
+RichText buildSolveStatement(String issueLabel) {
   Issue relevantIssue = getRelevantIssue(issueLabel);
-  solveStatement = 'You will: ${relevantIssue.solve}.\n\n Because it addresses: ${relevantIssue.root}.\n\n Which is the root issue driving: ${relevantIssue.label}';
-  return solveStatement;
+  return RichText(
+    text: TextSpan(
+      // Default text style for all spans
+      style: TextStyle(fontSize: 16, color: Colors.black),
+      children: [
+        TextSpan(text: 'You will: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: '${relevantIssue.solve}.\n\n', style: TextStyle(fontWeight: FontWeight.normal)),
+        TextSpan(text: 'Because it addresses: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: '${relevantIssue.root}.\n\n', style: TextStyle(fontWeight: FontWeight.normal)),
+        TextSpan(text: 'Which is the root issue driving: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: '${relevantIssue.label}', style: TextStyle(fontWeight: FontWeight.normal)),
+      ],
+    ),
+  );
 }
 
 // Mark an Issue as Solved
