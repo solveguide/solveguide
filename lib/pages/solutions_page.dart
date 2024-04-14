@@ -176,7 +176,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
               children: <Widget>[
                 const SizedBox(height: 20), // Adds spacing
                 Text(
-                    '$chosenSolution \n\n is the best way to make:\n\n ${Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root} \n\n go away for good!'),
+                    '$chosenSolution \n\n will resolve:\n\n ${Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root}'),
               ],
             ),
           ),

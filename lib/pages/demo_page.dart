@@ -136,7 +136,7 @@ void showInstructionsDialog(BuildContext context) {
           child: ListBody(
             children: <Widget>[
               const SizedBox(height: 20), // Adds spacing
-              Text('$chosenHypothesis \n\n is the best way to address:\n\n ${widget.demoIssue}'),
+              Text('$chosenHypothesis \n\n is causing:\n\n ${widget.demoIssue}'),
             ],
           ),
         ),
