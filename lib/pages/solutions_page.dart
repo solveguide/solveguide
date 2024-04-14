@@ -8,9 +8,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SolutionsPage extends StatefulWidget {
   final String demoIssue;
-  final String rootTheoryDesc;
+  final String root;
   const SolutionsPage(
-      {super.key, required this.demoIssue, required this.rootTheoryDesc});
+      {super.key, required this.demoIssue, required this.root});
 
   @override
   State<SolutionsPage> createState() => _SolutionsPageState();
@@ -189,7 +189,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
 
             //save button
             MaterialButton(
-              onPressed: () => goToSolvePage(widget.demoIssue, chosenSolution),
+              onPressed: () => goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
               child: const Text("Confirm"),
             ),
           ]),
@@ -197,12 +197,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
   }
 
   //goToSolvePage
-  void goToSolvePage(String issue, String solution) {
+  void goToSolvePage(String issue, String root, String solution) {
     Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SolvePage(demoIssue: issue, solve: solution),
+          builder: (context) => SolvePage(demoIssue: issue, root: root, solve: solution),
         ));
   }
 

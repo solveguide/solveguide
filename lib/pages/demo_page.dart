@@ -159,7 +159,7 @@ void showInstructionsDialog(BuildContext context) {
   //goToSolutionsPage
   void goToSolutionsPage(String issue, String theory){
     Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SolutionsPage(demoIssue: issue, rootTheoryDesc:  theory),));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SolutionsPage(demoIssue: issue, root:  theory),));
   }
 
   @override
