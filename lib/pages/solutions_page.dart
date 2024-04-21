@@ -9,8 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 class SolutionsPage extends StatefulWidget {
   final String demoIssue;
   final String root;
-  const SolutionsPage(
-      {super.key, required this.demoIssue, required this.root});
+  const SolutionsPage({super.key, required this.demoIssue, required this.root});
 
   @override
   State<SolutionsPage> createState() => _SolutionsPageState();
@@ -189,7 +188,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
 
             //save button
             MaterialButton(
-              onPressed: () => goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
+              onPressed: () =>
+                  goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
               child: const Text("Confirm"),
             ),
           ]),
@@ -198,12 +198,30 @@ class _SolutionsPageState extends State<SolutionsPage> {
 
   //goToSolvePage
   void goToSolvePage(String issue, String root, String solution) {
+    Navigator.pop(context);
     Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SolvePage(demoIssue: issue, root: root, solve: solution),
+          builder: (context) =>
+              SolvePage(demoIssue: issue, root: root, solve: solution),
         ));
+  }
+
+  //edit solution item
+  void editItem(int index, String solutionDesc) {
+    // Set text in TextEditingController to the solution description
+    newSolutionNameController.text = solutionDesc;
+
+    // Remove the solution from the list in your data model
+    Provider.of<IssueData>(context, listen: false)
+        .removeSolution(widget.demoIssue, index);
+
+    // Request focus for the text input field
+    FocusScope.of(context).requestFocus(_focusNode);
+
+    // Optional: You might want to handle state update here if needed
+    setState(() {});
   }
 
   @override
@@ -217,73 +235,83 @@ class _SolutionsPageState extends State<SolutionsPage> {
               ),
               body: Padding(
                 padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  children: [
-                    buildBlueContainer('Root Issue',
-                        value.getRelevantIssue(widget.demoIssue).root),
-                    SizedBox(height: 5),
-                    TextFormField(
-                      controller: newSolutionNameController,
-                      focusNode: _focusNode,
-                      autofocus: true,
-                      onFieldSubmitted: (value) => save(),
-                      decoration: const InputDecoration(
-                        hintText: "Enter possible solutions here.",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    Expanded(
-                      child: ReorderableListView.builder(
-                        itemCount:
-                            value.numberOfSolutionsInIssue(widget.demoIssue),
-                        itemBuilder: (context, index) => Card(
-                          key: ValueKey(value
-                              .getRelevantIssue(widget.demoIssue)
-                              .solutions[index]),
-                          elevation: 2.0, // Adds a shadow
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0,
-                              horizontal: 5.0), // Margin around each card
-                          child: ListTile(
-                            title: Text(value
-                                .getRelevantIssue(widget.demoIssue)
-                                .solutions[index]
-                                .desc),
-                            onTap: () => confirmChosenSolution(value
-                                .getSolutionList(widget.demoIssue)[index]
-                                .desc),
+                child: Center(
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: 1000),
+                    child: Column(
+                      children: [
+                        buildBlueContainer('Root Issue',
+                            value.getRelevantIssue(widget.demoIssue).root),
+                        SizedBox(height: 5),
+                        TextFormField(
+                          controller: newSolutionNameController,
+                          focusNode: _focusNode,
+                          autofocus: true,
+                          onFieldSubmitted: (value) => save(),
+                          decoration: const InputDecoration(
+                            hintText: "Enter possible solutions here.",
+                            border: OutlineInputBorder(),
                           ),
                         ),
-                        onReorder: (int oldIndex, int newIndex) {
-                          setState(() {
-                            if (newIndex > oldIndex) {
-                              newIndex -= 1;
-                            }
-                            final item = value
-                                .getRelevantIssue(widget.demoIssue)
-                                .solutions
-                                .removeAt(oldIndex);
-                            value
-                                .getRelevantIssue(widget.demoIssue)
-                                .solutions
-                                .insert(newIndex, item);
-                          });
-                        },
-                        proxyDecorator: (Widget child, int index,
-                            Animation<double> animation) {
-                          // Return the child directly without any additional decoration
-                          return child;
-                        },
-                      ),
+                        Expanded(
+                          child: ReorderableListView.builder(
+                            itemCount: value
+                                .numberOfSolutionsInIssue(widget.demoIssue),
+                            itemBuilder: (context, index) => Card(
+                              key: ValueKey(value
+                                  .getRelevantIssue(widget.demoIssue)
+                                  .solutions[index]),
+                              elevation: 2.0, // Adds a shadow
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 5.0), // Margin around each card
+                              child: ListTile(
+                                leading: IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    editItem(index, value.getSolutionList(widget.demoIssue)[index].desc); 
+                                  },
+                                ),
+                                title: Text(value
+                                    .getRelevantIssue(widget.demoIssue)
+                                    .solutions[index]
+                                    .desc),
+                                onTap: () => confirmChosenSolution(value
+                                    .getSolutionList(widget.demoIssue)[index]
+                                    .desc),
+                              ),
+                            ),
+                            onReorder: (int oldIndex, int newIndex) {
+                              setState(() {
+                                if (newIndex > oldIndex) {
+                                  newIndex -= 1;
+                                }
+                                final item = value
+                                    .getRelevantIssue(widget.demoIssue)
+                                    .solutions
+                                    .removeAt(oldIndex);
+                                value
+                                    .getRelevantIssue(widget.demoIssue)
+                                    .solutions
+                                    .insert(newIndex, item);
+                              });
+                            },
+                            proxyDecorator: (Widget child, int index,
+                                Animation<double> animation) {
+                              // Return the child directly without any additional decoration
+                              return child;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
               floatingActionButton: FloatingActionButton(
                 onPressed: () => showInstructionsDialog(context),
-                child: Icon(Icons.help_outline), // Adds the '?' icon
-                backgroundColor:
-                    Colors.lightBlue[200], // Optional: customize the button color
+                backgroundColor: Colors.lightBlue[200],
+                child: Icon(Icons.help_outline),
               ),
             ));
   }

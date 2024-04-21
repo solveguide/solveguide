@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:guide_solve/components/narrow_wide.dart';
 import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/pages/demo_page.dart';
 import 'package:provider/provider.dart';
@@ -70,8 +71,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMainContainer() {
-    return Container(
+Widget _buildMainContainer() {
+  return Align(
+    alignment: Alignment.center,
+    child: Container(
+      width: double.infinity,
       constraints: BoxConstraints(maxWidth: 1000),
       decoration: _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
       padding: EdgeInsets.all(25),
@@ -85,8 +89,10 @@ class _HomePageState extends State<HomePage> {
           _buildDetailedText(),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildCenterContainer() {
     return Center(
@@ -99,8 +105,9 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildHeaderText('Try Solve Guide'),
             SizedBox(height:10),
-            _buildNormalText(
-                'Start by narrowing in on a single, specific issue you are experiencing:'),
+            narrowInstructionText('Narrow in on a single issue.'),
+            SizedBox(height:6),
+            Text('Try using a recent example of a personal experience you\'d like to avoid in the future.', textAlign: TextAlign.center,softWrap: true, style: TextStyle(fontSize: 12),),
             SizedBox(height:10),
             TextField(
               controller: demoIssueLabel,
@@ -108,7 +115,7 @@ class _HomePageState extends State<HomePage> {
              // keyboardType: TextInputType.multiline, // Enables line breaks
               //maxLines: null,
               decoration: InputDecoration(
-                hintText: "Your Issue Here.",
+                hintText: "I feel bad, when...because... ",
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.green, width: 2.0),
@@ -164,20 +171,23 @@ class _HomePageState extends State<HomePage> {
             text: TextSpan(
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
-                TextSpan(text: 'Solving issues is difficult because it requires you to switch between two very different modes of thinking.\n\n'),
-                TextSpan(
-                  text: 'Widening ',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextSpan(text: 'is creative; imagining possibilities without judgement.\n\n'),
-                TextSpan(
-                  text: 'Narrowing ',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextSpan(
-                  text: 'is critical; choosing the best available path forward.\n\n',
-                ),
-                TextSpan(text: 'The best outcomes arise when you can be creative towards observing reality, and critical towards your plan to navigate it. Solve Guide is intended to help you achieve that balance.\n'),
+                TextSpan(text: 'Issues persist because solving them requires us to efficiently alternate between two very different modes of thinking, in precise coordination with others.\n\n'),
+                TextSpan(text: 'Getting out of sync with others while solving issues together will cause distractions that have little to do with the issue at hand. '),
+                TextSpan(text: 'But they will prevent you from solving it!\n\n', style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: 'Solve Guide is a project intended to orchestrate your thinkin in concert with the people in your life to solve issues for good. For now, you can try Solve Guide on your own.\n\n'),
+                TextSpan(text: 'The two modes of thinking are:\n'),
+
+              ],
+            ),
+          ),
+          widenInstructionText('Widening', text:'is creative; imagining possibilities without judgement.'),
+          SizedBox(height: 8),
+          narrowInstructionText('Narrowing', text:'is critical; choosing the best available path forward.'),
+          RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(text: '\nYou will solve more issues for good if you can observe reality creatively, and navigate it critically.\n'),
               ],
             ),
           ),
