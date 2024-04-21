@@ -9,8 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 class SolutionsPage extends StatefulWidget {
   final String demoIssue;
   final String root;
-  const SolutionsPage(
-      {super.key, required this.demoIssue, required this.root});
+  const SolutionsPage({super.key, required this.demoIssue, required this.root});
 
   @override
   State<SolutionsPage> createState() => _SolutionsPageState();
@@ -189,7 +188,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
 
             //save button
             MaterialButton(
-              onPressed: () => goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
+              onPressed: () =>
+                  goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
               child: const Text("Confirm"),
             ),
           ]),
@@ -203,8 +203,25 @@ class _SolutionsPageState extends State<SolutionsPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SolvePage(demoIssue: issue, root: root, solve: solution),
+          builder: (context) =>
+              SolvePage(demoIssue: issue, root: root, solve: solution),
         ));
+  }
+
+  //edit solution item
+  void editItem(int index, String solutionDesc) {
+    // Set text in TextEditingController to the solution description
+    newSolutionNameController.text = solutionDesc;
+
+    // Remove the solution from the list in your data model
+    Provider.of<IssueData>(context, listen: false)
+        .removeSolution(widget.demoIssue, index);
+
+    // Request focus for the text input field
+    FocusScope.of(context).requestFocus(_focusNode);
+
+    // Optional: You might want to handle state update here if needed
+    setState(() {});
   }
 
   @override
@@ -238,8 +255,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
                         ),
                         Expanded(
                           child: ReorderableListView.builder(
-                            itemCount:
-                                value.numberOfSolutionsInIssue(widget.demoIssue),
+                            itemCount: value
+                                .numberOfSolutionsInIssue(widget.demoIssue),
                             itemBuilder: (context, index) => Card(
                               key: ValueKey(value
                                   .getRelevantIssue(widget.demoIssue)
@@ -249,6 +266,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                   vertical: 8.0,
                                   horizontal: 5.0), // Margin around each card
                               child: ListTile(
+                                leading: IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    editItem(index, value.getSolutionList(widget.demoIssue)[index].desc); 
+                                  },
+                                ),
                                 title: Text(value
                                     .getRelevantIssue(widget.demoIssue)
                                     .solutions[index]
@@ -287,9 +310,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
               ),
               floatingActionButton: FloatingActionButton(
                 onPressed: () => showInstructionsDialog(context),
-                backgroundColor:
-                    Colors.lightBlue[200],
-                    child: Icon(Icons.help_outline), 
+                backgroundColor: Colors.lightBlue[200],
+                child: Icon(Icons.help_outline),
               ),
             ));
   }

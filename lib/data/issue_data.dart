@@ -52,6 +52,12 @@ void addHypothesis(String issueLabel, String desc){
   relevantIssue.hypotheses.add(Hypothesis(desc: desc));
   notifyListeners();
 }
+void removeHypothesis(String issueLabel, int index) {
+  Issue relevantIssue = getRelevantIssue(issueLabel);
+  relevantIssue.hypotheses.removeAt(index);
+  notifyListeners();  // If using Provider and want to auto-update listening widgets
+}
+
 
 // mark one hypothesis as the root
 void selectRoot(String issueLabel, String hypothesisDesc){
@@ -69,6 +75,11 @@ void addSolution(String issueLabel, String desc){
 
   relevantIssue.solutions.add(Solution(desc: desc));
   notifyListeners();
+}
+void removeSolution(String issueLabel, int index) {
+  Issue relevantIssue = getRelevantIssue(issueLabel);
+  relevantIssue.solutions.removeAt(index);
+  notifyListeners();  // If using Provider and want to auto-update listening widgets
 }
 
 // get list of hypotheses
