@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/models/hypothesis.dart';
-import 'package:guide_solve/models/solution.dart';
 import 'package:guide_solve/pages/signup_page.dart';
 import 'package:provider/provider.dart';
 
@@ -26,8 +24,7 @@ class _SolvePageState extends State<SolvePage> {
         context,
         MaterialPageRoute(
           builder: (context) => const SignupPage(),
-        )
-      );
+        ));
   }
 
   @override
@@ -45,44 +42,54 @@ class _SolvePageState extends State<SolvePage> {
             children: [
               buildSummaryContainer(context),
               const SizedBox(height: 20),
-              //buildDualListContainer(issueData),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text("Root Theories Considered:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                        ]
-                      
-                    )
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300] ?? Colors.orange,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(width: 5, color: Colors.black),
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text("Solutions Considered:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: issueData.numberOfSolutionsInIssue(widget.demoIssue),
-                            itemBuilder: (context, index) => ListTile(
-                              title: Text(issueData.getSolutionList(widget.demoIssue)[index].desc),
+                  padding: const EdgeInsets.all(15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text("Root Theories Considered:",
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold)),
                             ),
+                            ...issueData
+                                  .getHypothesisList(widget.demoIssue).map((item) => ListTile(title: Text(item.desc))).toList(),
+                          ]
+                          )
                           ),
-                        )
-                        ]
-                    )
-                  )
-                ],
+                      Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text("Solutions Considered:",
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                            ),
+                            ...issueData
+                                  .getSolutionList(widget.demoIssue).map((item) => ListTile(title: Text(item.desc))).toList(),
+                          ]
+                          )
+                          )
+                    ],
+                  ),
                 ),
+              ),
               const SizedBox(height: 20),
-              Text("Do you like what you see? Create an Account to save this solve and more.", textAlign: TextAlign.center),
+              Text(
+                  "Do you like what you see? Create an Account to save this solve and more.",
+                  textAlign: TextAlign.center),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MaterialButton(
@@ -146,63 +153,4 @@ class _SolvePageState extends State<SolvePage> {
       ),
     );
   }
-
-// Widget buildDualListContainer(IssueData issueData) {
-//   return Row(
-//     children: [
-//       Expanded(
-//         child: buildHypothesisList<Hypothesis>("Root Theories", issueData.getHypothesisList(widget.demoIssue)),
-//       ),
-//       Expanded(
-//         child: buildSolutionList<Solution>("Solutions", issueData.getSolutionList(widget.demoIssue)), 
-//       ),
-//     ],
-//   );
-// }
-
-// Widget buildHypothesisList<Hypothesis>(String title, List<Hypothesis> items) {
-//   return Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 8.0),
-//         child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//       ),
-//       Expanded(
-//         child: ListView.builder(
-//           itemCount: items.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             var item = items[index];
-//             return ListTile(
-//               title: Text(items[index].desc),  // Cast to dynamic to access 'desc'. Alternatively, define a common interface.
-//             );
-//             },
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   Widget buildSolutionList<Solution>(String title, List<Solution> items) {
-//   return Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 8.0),
-//         child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//       ),
-//       Expanded(
-//         child: ListView.builder(
-//           itemCount: items.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             var item = items[index];
-//             return ListTile(
-//               title: Text((item as dynamic).desc),  // Cast to dynamic to access 'desc'. Alternatively, define a common interface.
-//             );
-//             },
-//           ),
-//         ),
-//       ],
-//     );
-//   }
 }
