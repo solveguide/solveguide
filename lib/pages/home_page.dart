@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:guide_solve/components/narrow_wide.dart';
 import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/pages/demo_page.dart';
 import 'package:provider/provider.dart';
@@ -99,8 +100,11 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildHeaderText('Try Solve Guide'),
             SizedBox(height:10),
-            _buildNormalText(
-                'Start by narrowing in on a single, specific issue you are experiencing:'),
+            narrowInstructionText('Describe an issue.'),
+            SizedBox(height:6),
+            Text('Try using a real example of a recent, personal experience.', softWrap: true,),
+           // _buildNormalText(
+          //      'Start by narrowing in on a single, specific issue you are experiencing:'),
             SizedBox(height:10),
             TextField(
               controller: demoIssueLabel,
@@ -165,19 +169,17 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
                 TextSpan(text: 'Solving issues is difficult because it requires you to switch between two very different modes of thinking.\n\n'),
-                TextSpan(
-                  text: 'Widening ',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextSpan(text: 'is creative; imagining possibilities without judgement.\n\n'),
-                TextSpan(
-                  text: 'Narrowing ',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextSpan(
-                  text: 'is critical; choosing the best available path forward.\n\n',
-                ),
-                TextSpan(text: 'The best outcomes arise when you can be creative towards observing reality, and critical towards your plan to navigate it. Solve Guide is intended to help you achieve that balance.\n'),
+              ],
+            ),
+          ),
+          narrowInstructionText('Narrowing', text:'is critical; choosing the best available path forward.'),
+          SizedBox(height: 8),
+          widenInstructionText('Widening', text:'is creative; imagining possibilities without judgement.'),
+          RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(text: '\n\nThe best outcomes arise when you can be creative towards observing reality, and critical towards your plan to navigate it. Solve Guide is intended to help you achieve that balance.\n'),
               ],
             ),
           ),

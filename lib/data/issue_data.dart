@@ -107,7 +107,7 @@ RichText buildSolveStatement(String issueLabel) {
         TextSpan(text: 'Because it addresses: ', style: TextStyle(fontWeight: FontWeight.bold)),
         TextSpan(text: '${relevantIssue.root}.\n\n', style: TextStyle(fontWeight: FontWeight.normal)),
         TextSpan(text: 'Which is the root issue driving: ', style: TextStyle(fontWeight: FontWeight.bold)),
-        TextSpan(text: '${relevantIssue.label}', style: TextStyle(fontWeight: FontWeight.normal)),
+        TextSpan(text: relevantIssue.label, style: TextStyle(fontWeight: FontWeight.normal)),
       ],
     ),
   );

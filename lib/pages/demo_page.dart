@@ -219,10 +219,10 @@ void showInstructionsDialog(BuildContext context) {
               ),
             ),
             floatingActionButton: FloatingActionButton(
-                onPressed: () => showInstructionsDialog(context),
-                child: Icon(Icons.help_outline), // Adds the '?' icon
+                onPressed: () => showInstructionsDialog(context), 
                 backgroundColor:
-                    Colors.lightBlue[200], // Optional: customize the button color
+                    Colors.lightBlue[200],
+                    child: Icon(Icons.help_outline), 
               ),
           ),
         );

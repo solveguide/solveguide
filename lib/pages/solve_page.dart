@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/pages/signup_page.dart';
 import 'package:provider/provider.dart';
@@ -77,7 +75,7 @@ class _SolvePageState extends State<SolvePage> {
                             TextSpan(text: '\n\nBecause it addresses: ', style: TextStyle(fontWeight: FontWeight.bold)),
                             TextSpan(text: '${widget.root}.', style: TextStyle(fontWeight: FontWeight.normal)),
                             TextSpan(text: '\n\nWhich is the root issue driving: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                            TextSpan(text: '${widget.demoIssue}', style: TextStyle(fontWeight: FontWeight.normal)),
+                            TextSpan(text: widget.demoIssue, style: TextStyle(fontWeight: FontWeight.normal)),
                           ],
                         ),
                       )
