@@ -158,6 +158,7 @@ void showInstructionsDialog(BuildContext context) {
 
   //goToSolutionsPage
   void goToSolutionsPage(String issue, String theory){
+    Navigator.pop(context);
     Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
     Navigator.push(context, MaterialPageRoute(builder: (context) => SolutionsPage(demoIssue: issue, root:  theory),));
   }
@@ -169,54 +170,59 @@ void showInstructionsDialog(BuildContext context) {
         backgroundColor: Colors.orange[50],
         appBar: AppBar(
           backgroundColor: Colors.orange[50],
-          title: const Text('Identify the Root'),
+          title: const Text('Get to the Root'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(15.0),
-          child: Column(
-            children: [
-              buildBlueContainer('Current Issue', widget.demoIssue),
-              SizedBox(height: 5),
-              TextFormField(
-                controller: newHypothesisDescController,
-                focusNode: _focusNode,
-                autofocus: true,
-                //textInputAction: TextInputAction.done,
-                onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
-                decoration: const InputDecoration(
-                  hintText: "Enter possible root theories here.",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              Expanded(
-                    child: ReorderableListView.builder(
-                      itemCount: value.numberOfHypothesesInIssue(widget.demoIssue),
-                      itemBuilder: (context, index) => Card(
-                        key: ValueKey(value.getRelevantIssue(widget.demoIssue).hypotheses[index]),
-                        elevation: 2.0, // Adds a shadow
-                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
-                        child: ListTile(
-                          title: Text(value.getRelevantIssue(widget.demoIssue).hypotheses[index].desc),
-                          onTap: () => confirmRootTheory(value.getHypothesisList(widget.demoIssue)[index].desc),
-                        ),
-                      ),
-                        onReorder: (int oldIndex, int newIndex) {
-                        setState(() {
-                          if (newIndex > oldIndex) {
-                            newIndex -= 1;
-                          }
-                          final item = value.getRelevantIssue(widget.demoIssue).hypotheses.removeAt(oldIndex);
-                          value.getRelevantIssue(widget.demoIssue).hypotheses.insert(newIndex, item);
-                        });
-                      },
-                        proxyDecorator: (Widget child, int index, Animation<double> animation) {
-                        // Return the child directly without any additional decoration
-                        return child;
-                      },
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: 1000),
+              child: Column(
+                children: [
+                  buildBlueContainer('Current Issue', widget.demoIssue),
+                  SizedBox(height: 5),
+                  TextFormField(
+                    controller: newHypothesisDescController,
+                    focusNode: _focusNode,
+                    autofocus: true,
+                    //textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (value) => save(), // Assuming 'save' is defined
+                    decoration: const InputDecoration(
+                      hintText: "Enter possible root theories here.",
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                ],
-              ),
+                  Expanded(
+                        child: ReorderableListView.builder(
+                          itemCount: value.numberOfHypothesesInIssue(widget.demoIssue),
+                          itemBuilder: (context, index) => Card(
+                            key: ValueKey(value.getRelevantIssue(widget.demoIssue).hypotheses[index]),
+                            elevation: 2.0, // Adds a shadow
+                            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0), // Margin around each card
+                            child: ListTile(
+                              title: Text(value.getRelevantIssue(widget.demoIssue).hypotheses[index].desc),
+                              onTap: () => confirmRootTheory(value.getHypothesisList(widget.demoIssue)[index].desc),
+                            ),
+                          ),
+                            onReorder: (int oldIndex, int newIndex) {
+                            setState(() {
+                              if (newIndex > oldIndex) {
+                                newIndex -= 1;
+                              }
+                              final item = value.getRelevantIssue(widget.demoIssue).hypotheses.removeAt(oldIndex);
+                              value.getRelevantIssue(widget.demoIssue).hypotheses.insert(newIndex, item);
+                            });
+                          },
+                            proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                            // Return the child directly without any additional decoration
+                            return child;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+            ),
+          ),
             ),
             floatingActionButton: FloatingActionButton(
                 onPressed: () => showInstructionsDialog(context), 

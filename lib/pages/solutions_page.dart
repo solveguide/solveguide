@@ -198,6 +198,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
 
   //goToSolvePage
   void goToSolvePage(String issue, String root, String solution) {
+    Navigator.pop(context);
     Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
     Navigator.push(
         context,
@@ -217,66 +218,71 @@ class _SolutionsPageState extends State<SolutionsPage> {
               ),
               body: Padding(
                 padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  children: [
-                    buildBlueContainer('Root Issue',
-                        value.getRelevantIssue(widget.demoIssue).root),
-                    SizedBox(height: 5),
-                    TextFormField(
-                      controller: newSolutionNameController,
-                      focusNode: _focusNode,
-                      autofocus: true,
-                      onFieldSubmitted: (value) => save(),
-                      decoration: const InputDecoration(
-                        hintText: "Enter possible solutions here.",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    Expanded(
-                      child: ReorderableListView.builder(
-                        itemCount:
-                            value.numberOfSolutionsInIssue(widget.demoIssue),
-                        itemBuilder: (context, index) => Card(
-                          key: ValueKey(value
-                              .getRelevantIssue(widget.demoIssue)
-                              .solutions[index]),
-                          elevation: 2.0, // Adds a shadow
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0,
-                              horizontal: 5.0), // Margin around each card
-                          child: ListTile(
-                            title: Text(value
-                                .getRelevantIssue(widget.demoIssue)
-                                .solutions[index]
-                                .desc),
-                            onTap: () => confirmChosenSolution(value
-                                .getSolutionList(widget.demoIssue)[index]
-                                .desc),
+                child: Center(
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: 1000),
+                    child: Column(
+                      children: [
+                        buildBlueContainer('Root Issue',
+                            value.getRelevantIssue(widget.demoIssue).root),
+                        SizedBox(height: 5),
+                        TextFormField(
+                          controller: newSolutionNameController,
+                          focusNode: _focusNode,
+                          autofocus: true,
+                          onFieldSubmitted: (value) => save(),
+                          decoration: const InputDecoration(
+                            hintText: "Enter possible solutions here.",
+                            border: OutlineInputBorder(),
                           ),
                         ),
-                        onReorder: (int oldIndex, int newIndex) {
-                          setState(() {
-                            if (newIndex > oldIndex) {
-                              newIndex -= 1;
-                            }
-                            final item = value
-                                .getRelevantIssue(widget.demoIssue)
-                                .solutions
-                                .removeAt(oldIndex);
-                            value
-                                .getRelevantIssue(widget.demoIssue)
-                                .solutions
-                                .insert(newIndex, item);
-                          });
-                        },
-                        proxyDecorator: (Widget child, int index,
-                            Animation<double> animation) {
-                          // Return the child directly without any additional decoration
-                          return child;
-                        },
-                      ),
+                        Expanded(
+                          child: ReorderableListView.builder(
+                            itemCount:
+                                value.numberOfSolutionsInIssue(widget.demoIssue),
+                            itemBuilder: (context, index) => Card(
+                              key: ValueKey(value
+                                  .getRelevantIssue(widget.demoIssue)
+                                  .solutions[index]),
+                              elevation: 2.0, // Adds a shadow
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 5.0), // Margin around each card
+                              child: ListTile(
+                                title: Text(value
+                                    .getRelevantIssue(widget.demoIssue)
+                                    .solutions[index]
+                                    .desc),
+                                onTap: () => confirmChosenSolution(value
+                                    .getSolutionList(widget.demoIssue)[index]
+                                    .desc),
+                              ),
+                            ),
+                            onReorder: (int oldIndex, int newIndex) {
+                              setState(() {
+                                if (newIndex > oldIndex) {
+                                  newIndex -= 1;
+                                }
+                                final item = value
+                                    .getRelevantIssue(widget.demoIssue)
+                                    .solutions
+                                    .removeAt(oldIndex);
+                                value
+                                    .getRelevantIssue(widget.demoIssue)
+                                    .solutions
+                                    .insert(newIndex, item);
+                              });
+                            },
+                            proxyDecorator: (Widget child, int index,
+                                Animation<double> animation) {
+                              // Return the child directly without any additional decoration
+                              return child;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
               floatingActionButton: FloatingActionButton(

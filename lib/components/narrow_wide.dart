@@ -20,36 +20,52 @@ Widget widenIcon() {
 
 // Function for displaying narrow instruction with text
 Widget narrowInstructionText(String boldText,{String? text}) {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      narrowIcon(),
-      SizedBox(width: 16), // Spacing between icon and text
-      Text(boldText, style: TextStyle(fontWeight: FontWeight.bold)),
-      if (text != null) ...[
-        SizedBox(width: 6),
-        Expanded(
-          child: Text(text, softWrap: true,),
+  return RichText(
+    text: TextSpan(
+      children: [
+        WidgetSpan(
+          child: Padding(
+            padding: EdgeInsets.only(right: 16),  // Space after the icon
+            child: narrowIcon(),
+          ),
         ),
+        TextSpan(
+          text: boldText,
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),  // Ensure text color is set
+        ),
+        if (text != null) ...[
+          TextSpan(
+            text: ' $text', // Added space for separation
+            style: TextStyle(color: Colors.black),  // Ensure text color is set
+          ),
+        ],
       ],
-    ],
+    ),
   );
 }
 
 // Function for displaying widen instruction with text
-Widget widenInstructionText(String boldText,{String? text}) {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      widenIcon(),
-      SizedBox(width: 16), // Spacing between icon and text
-      Text(boldText, style: TextStyle(fontWeight: FontWeight.bold)),
-      if (text != null) ...[ 
-       SizedBox(width: 6),
-        Expanded(
-          child: Text(text, softWrap: true,),
+Widget widenInstructionText(String boldText, {String? text}) {
+  return RichText(
+    text: TextSpan(
+      children: [
+        WidgetSpan(
+          child: Padding(
+            padding: EdgeInsets.only(right: 16),  // Space after the icon
+            child: widenIcon(),
+          ),
         ),
+        TextSpan(
+          text: boldText,
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),  // Ensure text color is set
+        ),
+        if (text != null) ...[
+          TextSpan(
+            text: ' $text', // Added space for separation
+            style: TextStyle(color: Colors.black),  // Ensure text color is set
+          ),
+        ],
       ],
-    ],
+    ),
   );
 }
