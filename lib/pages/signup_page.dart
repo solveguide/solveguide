@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
+import 'package:guide_solve/components/plain_textfield.dart';
 import 'package:guide_solve/data/issue_data.dart';
 import 'package:provider/provider.dart';
 
@@ -30,6 +31,7 @@ class _SignupPageState extends State<SignupPage> {
               //welcome back message
 
               //email text field
+              PlainTextField(hintText: "email")
 
               //send link button
 
