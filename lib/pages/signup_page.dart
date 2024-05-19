@@ -23,8 +23,16 @@ class _SignupPageState extends State<SignupPage> {
         body: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               buildBlueContainer('Sorry', 'This page isn\'t ready yet'),
+              
+              //welcome back message
+
+              //email text field
+
+              //send link button
+
             ]
           )
         )
