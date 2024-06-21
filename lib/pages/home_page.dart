@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/narrow_wide.dart';
@@ -46,11 +47,21 @@ class _HomePageState extends State<HomePage> {
   }
 
 // go to signup page
-  void goToSignupPage() {
+  void _goToSignupPage(BuildContext context) {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SignupPage(),
+          builder: (context) => SignInScreen(
+            providers: [
+              EmailAuthProvider(),
+            ],
+            actions: [
+              AuthStateChangeAction<SignedIn>((context, state) {
+                Navigator.of(context).pop();
+                Navigator.pushReplacementNamed(context, '/dashboard');
+                  }),
+            ],
+          ),
         ));
   }
 
@@ -101,7 +112,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
-                onPressed: goToSignupPage,
+                onPressed: () => _goToSignupPage(context),
                 color: Colors.red,
                 child: Text("Login",
                     style:
