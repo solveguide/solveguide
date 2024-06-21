@@ -1,7 +1,8 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:math';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui_auth;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/narrow_wide.dart';
@@ -19,7 +20,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
-  bool isButtonEnabled = false; // Tracks whether the start button should be enabled
+  bool isButtonEnabled =
+      false; // Tracks whether the start button should be enabled
 
   @override
   void initState() {
@@ -43,10 +45,34 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
+// go to signup page
+  void goToSignupPage(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => firebase_ui_auth.SignInScreen(
+            providers: [
+              firebase_ui_auth.EmailAuthProvider(),
+            ],
+            actions: [
+              firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>((context, state) {
+                Navigator.of(context).pop();
+                Navigator.pushReplacementNamed(context, '/dashboard');
+              }),
+            ],
+          ),
+        ));
+    }
+  }
+
   // create the demo issue
   void createDemoIssue(String demoIssueLabel) {
-    Provider.of<IssueData>(context, listen: false)
-        .addIssue(demoIssueLabel);
+    Provider.of<IssueData>(context, listen: false).addIssue(demoIssueLabel);
   }
 
   //UI
@@ -63,7 +89,7 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: [
             _buildMainContainer(),
-            SizedBox(height: 10), // Adjusted for clarity
+            SizedBox(height: 10),
             _buildCenterContainer(),
           ],
         ),
@@ -71,28 +97,38 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Widget _buildMainContainer() {
-  return Align(
-    alignment: Alignment.center,
-    child: Container(
-      width: double.infinity,
-      constraints: BoxConstraints(maxWidth: 1000),
-      decoration: _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
-      padding: EdgeInsets.all(25),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          _buildIconRow(),
-          SizedBox(height: 30),
-          _buildMainText(),
-          SizedBox(height: 30),
-          _buildDetailedText(),
-        ],
+  Widget _buildMainContainer() {
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        width: double.infinity,
+        constraints: BoxConstraints(maxWidth: 1000),
+        decoration:
+            _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
+        padding: EdgeInsets.all(25),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _buildIconRow(),
+            SizedBox(height: 30),
+            _buildMainText(),
+            SizedBox(height: 30),
+            _buildDetailedText(),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: MaterialButton(
+                onPressed: () => goToSignupPage(context),
+                color: Colors.red,
+                child: Text("Login",
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildCenterContainer() {
     return Center(
@@ -104,18 +140,25 @@ Widget _buildMainContainer() {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildHeaderText('Try Solve Guide'),
-            SizedBox(height:10),
+            SizedBox(height: 10),
             narrowInstructionText('Narrow in on a single issue.'),
-            SizedBox(height:6),
-            Text('Try using a recent example of a personal experience you\'d like to avoid in the future.', textAlign: TextAlign.center,softWrap: true, style: TextStyle(fontSize: 12),),
-            SizedBox(height:10),
+            SizedBox(height: 6),
+            Text(
+              'Try using a recent example of a personal experience you\'d like to avoid in the future.',
+              textAlign: TextAlign.center,
+              softWrap: true,
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 10),
             TextField(
               controller: demoIssueLabel,
-              onSubmitted: (String value)  {goToDemo(value);},
-             // keyboardType: TextInputType.multiline, // Enables line breaks
+              onSubmitted: (String value) {
+                goToDemo(value);
+              },
+              // keyboardType: TextInputType.multiline, // Enables line breaks
               //maxLines: null,
               decoration: InputDecoration(
-                hintText: "I feel bad, when...because... ",
+                hintText: "I feel concerned/hurt when... ",
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.green, width: 2.0),
@@ -125,13 +168,16 @@ Widget _buildMainContainer() {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
-                onPressed: isButtonEnabled ? () => goToDemo(demoIssueLabel.text) : null,
+                onPressed: isButtonEnabled
+                    ? () => goToDemo(demoIssueLabel.text)
+                    : null,
                 color: Colors.red,
                 disabledColor: Colors.grey,
-                child: Text("Start!", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text("Start!",
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
-           // _buildFooterText(),
           ],
         ),
       ),
@@ -166,39 +212,53 @@ Widget _buildMainContainer() {
       );
 
   Widget _buildDetailedText() => Column(
-    children: [
-      RichText(
-            text: TextSpan(
-              style: TextStyle(color: Colors.black), // Default text style
-              children: <TextSpan>[
-                TextSpan(text: 'Issues persist because solving them requires us to efficiently alternate between two very different modes of thinking, in precise coordination with others.\n\n'),
-                TextSpan(text: 'Getting out of sync with others while solving issues together will cause distractions that have little to do with the issue at hand. '),
-                TextSpan(text: 'But they will prevent you from solving it!\n\n', style: TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: 'Solve Guide is a project intended to orchestrate your thinkin in concert with the people in your life to solve issues for good. For now, you can try Solve Guide on your own.\n\n'),
-                TextSpan(text: 'The two modes of thinking are:\n'),
-
-              ],
-            ),
-          ),
-          widenInstructionText('Widening', text:'is creative; imagining possibilities without judgement.'),
-          SizedBox(height: 8),
-          narrowInstructionText('Narrowing', text:'is critical; choosing the best available path forward.'),
+        children: [
           RichText(
             text: TextSpan(
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
-                TextSpan(text: '\nYou will solve more issues for good if you can observe reality creatively, and navigate it critically.\n'),
+                TextSpan(
+                    text:
+                        'Issues persist because solving them requires us to efficiently alternate between two very different modes of thinking, in precise coordination with others.\n\n'),
+                TextSpan(
+                    text:
+                        'Getting out of sync with others while solving issues together will cause distractions that have little to do with the issue at hand. '),
+                TextSpan(
+                    text: 'But they will prevent you from solving it!\n\n',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(
+                    text:
+                        'Solve Guide is a project intended to orchestrate your thinkin in concert with the people in your life to solve issues for good. For now, you can try Solve Guide on your own.\n\n'),
+                TextSpan(text: 'The two modes of thinking are:\n'),
               ],
             ),
           ),
-        RichText(
-          textAlign: TextAlign.center,
+          widenInstructionText('Widening',
+              text: 'is creative; imagining possibilities without judgement.'),
+          SizedBox(height: 8),
+          narrowInstructionText('Narrowing',
+              text: 'is critical; choosing the best available path forward.'),
+          RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.black), // Default text style
+              children: <TextSpan>[
+                TextSpan(
+                    text:
+                        '\nYou will solve more issues for good if you can observe reality creatively, and navigate it critically.\n'),
+              ],
+            ),
+          ),
+          RichText(
+            textAlign: TextAlign.center,
             text: TextSpan(
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
                 TextSpan(
                   text: 'Visit about.solve.guide to learn more.',
-                  style: TextStyle(color: Colors.blueGrey, decoration: TextDecoration.underline, fontSize: 10),
+                  style: TextStyle(
+                      color: Colors.blueGrey,
+                      decoration: TextDecoration.underline,
+                      fontSize: 10),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(Uri.parse('https://about.solve.guide'));
@@ -207,8 +267,8 @@ Widget _buildMainContainer() {
               ],
             ),
           ),
-    ],
-  );
+        ],
+      );
 
   Widget _buildHeaderText(String text) => Text(
         text,
@@ -219,11 +279,4 @@ Widget _buildMainContainer() {
         text,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
       );
-
-/*  Widget _buildFooterText() => Text(
-        '- Keep it simple. We will break it down next.\n'
-        '- Try to describe the issue in terms of your negative experience; do not include the absent solution.\n',
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
-      );
-*/
 }
