@@ -1,14 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:math';
-
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui_auth;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/narrow_wide.dart';
 import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/pages/demo_page.dart';
-import 'package:guide_solve/pages/signup_page.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -47,22 +46,28 @@ class _HomePageState extends State<HomePage> {
   }
 
 // go to signup page
-  void _goToSignupPage(BuildContext context) {
+  void goToSignupPage(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SignInScreen(
+          builder: (context) => firebase_ui_auth.SignInScreen(
             providers: [
-              EmailAuthProvider(),
+              firebase_ui_auth.EmailAuthProvider(),
             ],
             actions: [
-              AuthStateChangeAction<SignedIn>((context, state) {
+              firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>((context, state) {
                 Navigator.of(context).pop();
                 Navigator.pushReplacementNamed(context, '/dashboard');
-                  }),
+              }),
             ],
           ),
         ));
+    }
   }
 
   // create the demo issue
@@ -112,7 +117,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
-                onPressed: () => _goToSignupPage(context),
+                onPressed: () => goToSignupPage(context),
                 color: Colors.red,
                 child: Text("Login",
                     style:
