@@ -33,10 +33,10 @@ class _SolutionsPageState extends State<SolutionsPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Access your condition here using your context-dependent logic.
       // For example:
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 1) {
-        showInstructionsDialog(context); // This should show the AlertDialog.
-      }
+      //final issueData = Provider.of<IssueData>(context, listen: false);
+      // if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 1) {
+      //   showInstructionsDialog(context); // This should show the AlertDialog.
+      // }
     });
   }
 
@@ -240,17 +240,21 @@ class _SolutionsPageState extends State<SolutionsPage> {
                     constraints: const BoxConstraints(maxWidth: 1000),
                     child: Column(
                       children: [
-                        buildBlueContainer('Root Issue',
-                            value.getRelevantIssue(widget.demoIssue).root),
+                        buildBlueContainer(
+                            context,
+                            value.getRelevantIssue(widget.demoIssue),
+                            TestSubject.solution),
                         const SizedBox(height: 5),
                         TextFormField(
                           controller: newSolutionNameController,
                           focusNode: _focusNode,
                           autofocus: true,
                           onFieldSubmitted: (value) => save(),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: "Enter possible solutions here.",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Theme.of(context).colorScheme.tertiary,
                           ),
                         ),
                         Expanded(
@@ -266,6 +270,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                   vertical: 8.0,
                                   horizontal: 5.0), // Margin around each card
                               child: ListTile(
+                                tileColor:
+                                    Theme.of(context).colorScheme.tertiary,
                                 leading: IconButton(
                                   icon: const Icon(Icons.edit),
                                   onPressed: () {

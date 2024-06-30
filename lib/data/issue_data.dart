@@ -46,7 +46,7 @@ ISSUE DATA STRUCTURE
     //find the relevant Issue
     Issue relevantIssue = getRelevantIssue(issueLabel);
 
-    relevantIssue.hypotheses.add(Hypothesis(desc: desc));
+    relevantIssue.hypotheses.insert(0, Hypothesis(desc: desc));
     notifyListeners();
   }
 
@@ -71,7 +71,7 @@ ISSUE DATA STRUCTURE
     //find the relevant Issue
     Issue relevantIssue = getRelevantIssue(issueLabel);
 
-    relevantIssue.solutions.add(Solution(desc: desc));
+    relevantIssue.solutions.insert(0, Solution(desc: desc));
     notifyListeners();
   }
 

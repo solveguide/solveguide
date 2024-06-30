@@ -71,7 +71,6 @@ class _DashboardPageState extends State<DashboardPage> {
       body: StreamBuilder<QuerySnapshot>(
         stream: firestoreService.getIssuesStream(),
         builder: (context, snapshot) {
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
