@@ -36,8 +36,7 @@ class _SignupPageState extends State<SignupPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Sign Up'),
-                    ]
-                    ),
+                    ]),
               ),
             )));
   }

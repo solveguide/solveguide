@@ -57,8 +57,7 @@ class _SolvePageState extends State<SolvePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                             const Padding(
-                              padding:
-                                  EdgeInsets.symmetric(vertical: 8.0),
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Root Theories Considered:",
                                   style: TextStyle(
                                       fontSize: 18,
@@ -66,25 +65,22 @@ class _SolvePageState extends State<SolvePage> {
                             ),
                             ...issueData
                                 .getHypothesisList(widget.demoIssue)
-                                .map((item) => ListTile(title: Text(item.desc)))
-                                ,
+                                .map(
+                                    (item) => ListTile(title: Text(item.desc))),
                           ])),
                       Expanded(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                             const Padding(
-                              padding:
-                                  EdgeInsets.symmetric(vertical: 8.0),
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Solutions Considered:",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                             ),
-                            ...issueData
-                                .getSolutionList(widget.demoIssue)
-                                .map((item) => ListTile(title: Text(item.desc)))
-                                ,
+                            ...issueData.getSolutionList(widget.demoIssue).map(
+                                (item) => ListTile(title: Text(item.desc))),
                           ]))
                     ],
                   ),
