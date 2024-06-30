@@ -4,10 +4,9 @@ import 'package:guide_solve/models/issue.dart';
 
 enum TestSubject { hypothesis, solution }
 
-var _overlayController = OverlayPortalController();
-
 Widget buildBlueContainer(
     BuildContext context, Issue issue, TestSubject testSubject) {
+      var overlayController = OverlayPortalController();
   return Center(
     child: Container(
       width: 500,
@@ -30,13 +29,13 @@ Widget buildBlueContainer(
             ),
           ),
           ElevatedButton(
-              onPressed: _overlayController.toggle,
+              onPressed: overlayController.toggle,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     Theme.of(context).colorScheme.tertiaryContainer,
               ),
               child: OverlayPortal(
-                controller: _overlayController,
+                controller: overlayController,
                 overlayChildBuilder: (context) {
                   return Positioned(
                     top: 200,
