@@ -20,10 +20,10 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -33,9 +33,9 @@ class _MyAppState extends State<MyApp> {
         theme: lightMode,
         initialRoute: '/',
         routes: {
-          '/': (context) => AuthWrapper(),
-          '/dashboard': (context) => DashboardPage(),
-          '/demo': (context) => HomePage(),
+          '/': (context) => const AuthWrapper(),
+          '/dashboard': (context) => const DashboardPage(),
+          '/demo': (context) => const HomePage(),
         },
       ),
     );
@@ -43,19 +43,21 @@ class _MyAppState extends State<MyApp> {
 }
 
 class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         } else if (snapshot.hasData) {
-          return DashboardPage(); // User is logged in, show Dashboard
+          return const DashboardPage(); // User is logged in, show Dashboard
         } else {
-          return HomePage(); // User is not logged in, show Demo
+          return const HomePage(); // User is not logged in, show Demo
         }
       },
     );

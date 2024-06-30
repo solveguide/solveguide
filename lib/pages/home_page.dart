@@ -48,25 +48,26 @@ class _HomePageState extends State<HomePage> {
 // go to signup page
   void goToSignupPage(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user != null) {
       Navigator.pushReplacementNamed(context, '/dashboard');
     } else {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => firebase_ui_auth.SignInScreen(
-            providers: [
-              firebase_ui_auth.EmailAuthProvider(),
-            ],
-            actions: [
-              firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>((context, state) {
-                Navigator.of(context).pop();
-                Navigator.pushReplacementNamed(context, '/dashboard');
-              }),
-            ],
-          ),
-        ));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => firebase_ui_auth.SignInScreen(
+              providers: [
+                firebase_ui_auth.EmailAuthProvider(),
+              ],
+              actions: [
+                firebase_ui_auth.AuthStateChangeAction<
+                    firebase_ui_auth.SignedIn>((context, state) {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/dashboard');
+                }),
+              ],
+            ),
+          ));
     }
   }
 
@@ -273,10 +274,5 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHeaderText(String text) => Text(
         text,
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      );
-
-  Widget _buildNormalText(String text) => Text(
-        text,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
       );
 }

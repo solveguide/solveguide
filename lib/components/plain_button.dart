@@ -6,10 +6,10 @@ class PlainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.red,
       ),
-      child: Center(
+      child: const Center(
         child: Text(
           "Submit",
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

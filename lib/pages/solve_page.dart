@@ -23,7 +23,7 @@ class _SolvePageState extends State<SolvePage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SignupPage(),
+          builder: (context) => const SignupPage(),
         ));
   }
 
@@ -56,38 +56,42 @@ class _SolvePageState extends State<SolvePage> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            const Padding(
+                              padding:
+                                  EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Root Theories Considered:",
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
                             ),
                             ...issueData
-                                  .getHypothesisList(widget.demoIssue).map((item) => ListTile(title: Text(item.desc))).toList(),
-                          ]
-                          )
-                          ),
+                                .getHypothesisList(widget.demoIssue)
+                                .map((item) => ListTile(title: Text(item.desc)))
+                                ,
+                          ])),
                       Expanded(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            const Padding(
+                              padding:
+                                  EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Solutions Considered:",
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
                             ),
                             ...issueData
-                                  .getSolutionList(widget.demoIssue).map((item) => ListTile(title: Text(item.desc))).toList(),
-                          ]
-                          )
-                          )
+                                .getSolutionList(widget.demoIssue)
+                                .map((item) => ListTile(title: Text(item.desc)))
+                                ,
+                          ]))
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                   "Do you like what you see? Create an Account to save this solve and more.",
                   textAlign: TextAlign.center),
               Padding(
@@ -118,33 +122,33 @@ class _SolvePageState extends State<SolvePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               'Your Solve:',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             RichText(
               text: TextSpan(
-                style: TextStyle(fontSize: 16, color: Colors.black),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
                 children: [
-                  TextSpan(
+                  const TextSpan(
                       text: 'You will: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${widget.solve}.',
-                      style: TextStyle(fontWeight: FontWeight.normal)),
-                  TextSpan(
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                  const TextSpan(
                       text: '\n\nTo address this root: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${widget.root}.',
-                      style: TextStyle(fontWeight: FontWeight.normal)),
-                  TextSpan(
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                  const TextSpan(
                       text: '\n\nTo solve this issue: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: widget.demoIssue,
-                      style: TextStyle(fontWeight: FontWeight.normal)),
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
                 ],
               ),
             )

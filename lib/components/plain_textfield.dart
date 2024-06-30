@@ -21,7 +21,7 @@ class PlainTextField extends StatelessWidget {
           hintText: hintText,
           fillColor: Theme.of(context).colorScheme.secondary,
           filled: true,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.tertiary, width: 2.0),

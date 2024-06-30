@@ -52,53 +52,53 @@ class _SolutionsPageState extends State<SolutionsPage> {
               children: <Widget>[
                 RichText(
                   text: TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black,
                         fontSize: 16), // Default text style
                     children: <TextSpan>[
-                      TextSpan(
+                      const TextSpan(
                           text: 'Instructions\n',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 2)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Now that you've narrowed on a single root cause, it's time to widen again. Here’s the steps you will follow: \n\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "1. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Widen your thinking by entering as many ways as you can imagine to make your root issue go away. Don't worry about quality, just widen!\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "2. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Drag to re-order your solutions with the most effective, easiest and fastest ones at the top.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "3. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Click on the top solution to test it against your root issue.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "4. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "If it makes sense, accept the solution and get ready to take action!\n\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "Issues you may encounter:\n",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 2)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "- If your root issue doesn't seem to have any solutions than you may have picked a root that you are not able to influence. Go back and pick a root cause you can affect.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "- If you are having trouble coming up with possible solutions, "),
                       TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),
                         text:
@@ -109,12 +109,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                 mode: LaunchMode.externalApplication);
                           },
                       ),
-                      TextSpan(text: ".\n"),
-                      TextSpan(
+                      const TextSpan(text: ".\n"),
+                      const TextSpan(
                           text:
                               "- If you are having trouble picking the right solution, "),
                       TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),
                         text:
@@ -125,7 +125,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                 mode: LaunchMode.externalApplication);
                           },
                       ),
-                      TextSpan(text: ".\n"),
+                      const TextSpan(text: ".\n"),
                     ],
                   ),
                 )
@@ -137,7 +137,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -237,12 +237,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
                 padding: const EdgeInsets.all(15.0),
                 child: Center(
                   child: Container(
-                    constraints: BoxConstraints(maxWidth: 1000),
+                    constraints: const BoxConstraints(maxWidth: 1000),
                     child: Column(
                       children: [
                         buildBlueContainer('Root Issue',
                             value.getRelevantIssue(widget.demoIssue).root),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         TextFormField(
                           controller: newSolutionNameController,
                           focusNode: _focusNode,
@@ -267,9 +267,14 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                   horizontal: 5.0), // Margin around each card
                               child: ListTile(
                                 leading: IconButton(
-                                  icon: Icon(Icons.edit),
+                                  icon: const Icon(Icons.edit),
                                   onPressed: () {
-                                    editItem(index, value.getSolutionList(widget.demoIssue)[index].desc); 
+                                    editItem(
+                                        index,
+                                        value
+                                            .getSolutionList(
+                                                widget.demoIssue)[index]
+                                            .desc);
                                   },
                                 ),
                                 title: Text(value
@@ -311,7 +316,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
               floatingActionButton: FloatingActionButton(
                 onPressed: () => showInstructionsDialog(context),
                 backgroundColor: Colors.lightBlue[200],
-                child: Icon(Icons.help_outline),
+                child: const Icon(Icons.help_outline),
               ),
             ));
   }
