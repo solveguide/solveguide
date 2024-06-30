@@ -17,6 +17,15 @@ projects: 1
 
 ---
 
+### BDD Scenario
+```gherkin
+Scenario: [Title]
+  Given [context]
+  And [some more context]...
+  When [event]
+  Then [outcome]
+  And [another outcome]...
+
 ## Description
 Briefly describe the feature. What problem does it solve?
 
@@ -38,15 +47,3 @@ If design is required, add initial design notes here or attach files.
 
 ### Copy Details
 If copywriting is needed, specify the text or content changes here.
-
-## BDD Specs
-- [ ] Are BDD specifications defined for this feature? (yes/no)
-
-### BDD Scenario
-```gherkin
-Scenario: [Title]
-  Given [context]
-  And [some more context]...
-  When [event]
-  Then [outcome]
-  And [another outcome]...
