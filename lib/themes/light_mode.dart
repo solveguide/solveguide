@@ -8,7 +8,7 @@ ThemeData lightMode = ThemeData(
     primaryContainer: Colors.white,
     secondaryContainer: Colors.grey.shade300,
     tertiaryContainer: Colors.lightBlue.shade200,
-    surface: Colors.white,
+    surface: Colors.orange.shade50,
     onSurface: Colors.black,
   ),
 );

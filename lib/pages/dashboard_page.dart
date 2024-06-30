@@ -1,8 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:guide_solve/services/firestore.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final FirestoreService firestoreService = FirestoreService();
+  final TextEditingController textController = TextEditingController();
+
+  void _addIssue() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: TextField(
+          controller: textController,
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              firestoreService.addIssue(textController.text);
+              textController.clear();
+              Navigator.pop(context);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +64,47 @@ class DashboardPage extends StatelessWidget {
         ],
         automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              'Welcome!',
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/demo');
-              },
-              child: const Text('Return to Demo'),
-            ),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addIssue,
+        child: const Icon(Icons.add),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: firestoreService.getIssuesStream(),
+        builder: (context, snapshot) {
+          print('Connection state: ${snapshot.connectionState}');
+          
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            print('Error: ${snapshot.error}');
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+              List<DocumentSnapshot> issuesList = snapshot.data!.docs;
+              return ListView.builder(
+                itemCount: issuesList.length,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot document = issuesList[index];
+                  String docID = document.id;
+
+                  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                  String label = data['label'];
+                  Timestamp timestamp = data['timestamp'];
+                  DateTime dateTime = timestamp.toDate();
+
+                  return ListTile(
+                    title: Text(label),
+                    subtitle: Text(dateTime.toString()),
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text("Congratulations, you have no issues"));
+            }
+          } else {
+            return const Center(child: Text("No data available"));
+          }
+        },
       ),
     );
   }

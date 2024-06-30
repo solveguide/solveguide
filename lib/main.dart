@@ -45,19 +45,31 @@ class MyAppState extends State<MyApp> {
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        print('Auth state changed: ${snapshot.connectionState}');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         } else if (snapshot.hasData) {
-          return const DashboardPage(); // User is logged in, show Dashboard
+          print('User is logged in');
+          // Navigate to dashboard
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Navigator.pushReplacementNamed(context, '/dashboard');
+          });
+          return Container(); // Return an empty container while navigation happens
         } else {
-          return const HomePage(); // User is not logged in, show Demo
+          print('User is not logged in');
+          // Navigate to home
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Navigator.pushReplacementNamed(context, '/demo');
+          });
+          return Container(); // Return an empty container while navigation happens
         }
       },
     );
