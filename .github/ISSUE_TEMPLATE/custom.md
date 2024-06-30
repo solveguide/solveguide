@@ -25,6 +25,7 @@ Scenario: [Title]
   When [event]
   Then [outcome]
   And [another outcome]...
+  ```
 
 ## Description
 Briefly describe the feature. What problem does it solve?
