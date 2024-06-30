@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+#flutter analyze
+printf "\e[33;1m%s\e[0m\n" 'Running flutter analyze'
+result=$(flutter analyze)
+
+if [ $? -ne 0 ]; then
+  echo -e "$result \n"
+  printf "\e[31;1m%s\e[0m\n" 'Flutter analyze found the above issues, please fix them before pushing'
+  exit 1
+fi
+
+echo "$result"
+printf "\e[32;1m%s\e[0m\n" 'Finished running Flutter analyze with 0 issues'
+
+# flutter test
+printf "\e[33;1m%s\e[0m\n" 'Running flutter test'
+result=$(flutter test)
+
+if [ $? -ne 0 ]; then
+  echo -e "$result \n"
+  printf "\e[31;1m%s\e[0m\n" '1 or more test(s) failed'
+  exit 1
+fi
+
+echo "$result"
+printf "\e[32;1m%s\e[0m\n" 'Finished running flutter test'
