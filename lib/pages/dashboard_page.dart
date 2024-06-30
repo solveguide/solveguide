@@ -71,23 +71,23 @@ class _DashboardPageState extends State<DashboardPage> {
       body: StreamBuilder<QuerySnapshot>(
         stream: firestoreService.getIssuesStream(),
         builder: (context, snapshot) {
-          print('Connection state: ${snapshot.connectionState}');
-          
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            print('Error: ${snapshot.error}');
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.done) {
+          } else if (snapshot.connectionState == ConnectionState.active ||
+              snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
               List<DocumentSnapshot> issuesList = snapshot.data!.docs;
               return ListView.builder(
                 itemCount: issuesList.length,
                 itemBuilder: (context, index) {
                   DocumentSnapshot document = issuesList[index];
-                  String docID = document.id;
+                  //String docID = document.id;
 
-                  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                  Map<String, dynamic> data =
+                      document.data() as Map<String, dynamic>;
                   String label = data['label'];
                   Timestamp timestamp = data['timestamp'];
                   DateTime dateTime = timestamp.toDate();
@@ -99,7 +99,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
               );
             } else {
-              return const Center(child: Text("Congratulations, you have no issues"));
+              return const Center(
+                  child: Text("Congratulations, you have no issues"));
             }
           } else {
             return const Center(child: Text("No data available"));
