@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
-                onPressed: () => goToSignupPage(context),
+                onPressed: () => {},//goToSignupPage(context),
                 color: Colors.red,
                 child: Text("Login",
                     style:

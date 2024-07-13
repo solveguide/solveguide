@@ -64,7 +64,7 @@ class _SignupPageState extends State<SignupPage> {
                     children: [
                       const Text('Sign up to create multiple issues and track your progress'),
                       MaterialButton(
-                onPressed: () => goToSignupPage(context),
+                onPressed: () => {},//goToSignupPage(context),
                 color: Colors.red,
                 child: const Text("Login",
                     style:
