@@ -51,43 +51,68 @@ class _SolvePageState extends State<SolvePage> {
                   ),
                   padding: const EdgeInsets.all(15),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Root Theories Considered:",
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
                             ),
-                            ...issueData
-                                  .getHypothesisList(widget.demoIssue).map((item) => ListTile(title: Text(item.desc))).toList(),
-                          ]
-                          )
-                          ),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: issueData
+                                    .getHypothesisList(widget.demoIssue)
+                                    .map((item) => ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Text(item.desc),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       Expanded(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Solutions Considered:",
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
                             ),
-                            ...issueData
-                                  .getSolutionList(widget.demoIssue).map((item) => ListTile(title: Text(item.desc))).toList(),
-                          ]
-                          )
-                          )
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: issueData
+                                    .getSolutionList(widget.demoIssue)
+                                    .map((item) => ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Text(item.desc),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                   "Do you like what you see? Create an Account to save this solve and more.",
                   textAlign: TextAlign.center),
               Padding(
@@ -97,7 +122,7 @@ class _SolvePageState extends State<SolvePage> {
                   color: Colors.red,
                   child: const Text("Create an Account"),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -118,33 +143,33 @@ class _SolvePageState extends State<SolvePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               'Your Solve:',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             RichText(
               text: TextSpan(
-                style: TextStyle(fontSize: 16, color: Colors.black),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
                 children: [
-                  TextSpan(
-                      text: 'You will: ',
+                  const TextSpan(
+                      text: 'I will: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${widget.solve}.',
-                      style: TextStyle(fontWeight: FontWeight.normal)),
-                  TextSpan(
-                      text: '\n\nTo address this root: ',
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                  const TextSpan(
+                      text: '\n\nResolving that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${widget.root}.',
-                      style: TextStyle(fontWeight: FontWeight.normal)),
-                  TextSpan(
-                      text: '\n\nTo solve this issue: ',
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                  const TextSpan(
+                      text: '\n\nChanging that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: widget.demoIssue,
-                      style: TextStyle(fontWeight: FontWeight.normal)),
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
                 ],
               ),
             )

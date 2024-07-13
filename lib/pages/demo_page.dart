@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/solutions_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,10 +32,10 @@ class _DemoPageState extends State<DemoPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Access your condition here using your context-dependent logic.
       // For example:
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 1) {
-        showInstructionsDialog(context); // This should show the AlertDialog.
-      }
+      //final issueData = Provider.of<IssueData>(context, listen: false);
+      // if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 1) {
+      //   showInstructionsDialog(context); // This should show the AlertDialog.
+      // }
     });
   }
 
@@ -51,53 +50,53 @@ class _DemoPageState extends State<DemoPage> {
               children: <Widget>[
                 RichText(
                   text: TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black,
                         fontSize: 16), // Default text style
                     children: <TextSpan>[
-                      TextSpan(
+                      const TextSpan(
                           text: 'Instructions\n',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 2)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "The first step in solving your issue is to identify the most impactful root cause that you can influence. Here’s the steps you will follow: \n\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "1. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Widen your thinking by entering as many potential root causes as possible. Do not judge quality or likelihood at this point, just widen!\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "2. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Drag to re-order your potential root causes with the most impactful, likely and changeable ones towards the top.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "3. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Click on the top root cause to test it against your original issue.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "4. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "If it makes sense, accept the root cause and get ready to narrow again.\n\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "Issues you may encounter:\n",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 2)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "- If your issue doesn’t seem to have a root, go back and make your issue more specific. To have the best shot at solving an issue, you want to start by narrowing. Try picking a specific example of the issue you originally entered.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "- If you are having trouble coming up with possible root causes, "),
                       TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),
                         text:
@@ -108,12 +107,12 @@ class _DemoPageState extends State<DemoPage> {
                                 mode: LaunchMode.externalApplication);
                           },
                       ),
-                      TextSpan(text: ".\n"),
-                      TextSpan(
+                      const TextSpan(text: ".\n"),
+                      const TextSpan(
                           text:
                               "- If you are having trouble picking the right root to move forward with, "),
                       TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),
                         text:
@@ -124,7 +123,7 @@ class _DemoPageState extends State<DemoPage> {
                                 mode: LaunchMode.externalApplication);
                           },
                       ),
-                      TextSpan(text: ".\n"),
+                      const TextSpan(text: ".\n"),
                     ],
                   ),
                 )
@@ -136,7 +135,7 @@ class _DemoPageState extends State<DemoPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -153,74 +152,25 @@ class _DemoPageState extends State<DemoPage> {
     _focusNode.requestFocus();
   }
 
-  //cancel Hypothesis
-  void cancel() {
-    Navigator.pop(context);
-  }
-
   //clear controllers
   void clear() {
     newHypothesisDescController.clear();
   }
 
-  //Confirm Issue-Root Relationship
-  void confirmRootTheory(String chosenHypothesis) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: const Text("Confirm Root"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const SizedBox(height: 20), // Adds spacing
-                Text(
-                    '$chosenHypothesis \n\n is causing:\n\n ${widget.demoIssue}'),
-              ],
-            ),
-          ),
-          actions: [
-            //cancel button
-            MaterialButton(
-              onPressed: cancel,
-              child: const Text("Go Back"),
-            ),
-
-            //save button
-            MaterialButton(
-              onPressed: () =>
-                  goToSolutionsPage(widget.demoIssue, chosenHypothesis),
-              child: const Text("Confirm"),
-            ),
-          ]),
-    );
-  }
-
-  //goToSolutionsPage
-  void goToSolutionsPage(String issue, String theory) {
-    Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SolutionsPage(demoIssue: issue, root: theory),
-        ));
-  }
-
   //edit hypothesis item
-void editItem(int index, String hypothesisDesc) {
-  // Set text in TextEditingController to the hypothesis description
-  newHypothesisDescController.text = hypothesisDesc;
+  void editItem(int index, String hypothesisDesc) {
+    newHypothesisDescController.text = hypothesisDesc;
 
-  // Remove the hypothesis from the list in your data model
-  Provider.of<IssueData>(context, listen: false).removeHypothesis(widget.demoIssue, index);
+    // Remove the hypothesis from the list in your data model
+    Provider.of<IssueData>(context, listen: false)
+        .removeHypothesis(widget.demoIssue, index);
 
-  // Request focus for the text input field
-  FocusScope.of(context).requestFocus(_focusNode);
+    // Request focus for the text input field
+    FocusScope.of(context).requestFocus(_focusNode);
 
-  // Optional: You might want to handle state update here if needed
-  setState(() {});
-}
-
+    // Optional: You might want to handle state update here if needed
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,11 +185,14 @@ void editItem(int index, String hypothesisDesc) {
           padding: const EdgeInsets.all(15.0),
           child: Center(
             child: Container(
-              constraints: BoxConstraints(maxWidth: 1000),
+              constraints: const BoxConstraints(maxWidth: 1000),
               child: Column(
                 children: [
-                  buildBlueContainer('Current Issue', widget.demoIssue),
-                  SizedBox(height: 5),
+                  buildBlueContainer(
+                      context,
+                      value.getRelevantIssue(widget.demoIssue),
+                      TestSubject.hypothesis),
+                  const SizedBox(height: 5),
                   TextFormField(
                     controller: newHypothesisDescController,
                     focusNode: _focusNode,
@@ -247,9 +200,11 @@ void editItem(int index, String hypothesisDesc) {
                     //textInputAction: TextInputAction.done,
                     onFieldSubmitted: (value) =>
                         save(), // Assuming 'save' is defined
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: "Enter root theories here.",
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Theme.of(context).colorScheme.tertiary,
                     ),
                   ),
                   Expanded(
@@ -265,19 +220,27 @@ void editItem(int index, String hypothesisDesc) {
                             vertical: 8.0,
                             horizontal: 5.0), // Margin around each card
                         child: ListTile(
+                          tileColor: Theme.of(context).colorScheme.tertiary,
                           leading: IconButton(
-                            icon: Icon(Icons.edit),
+                            icon: const Icon(Icons.edit),
                             onPressed: () {
-                              editItem(index, value.getHypothesisList(widget.demoIssue)[index].desc); // Replace 'editFunction' with the actual function you want to call
+                              editItem(
+                                  index,
+                                  value
+                                      .getHypothesisList(
+                                          widget.demoIssue)[index]
+                                      .desc);
                             },
                           ),
                           title: Text(value
                               .getRelevantIssue(widget.demoIssue)
                               .hypotheses[index]
                               .desc),
-                          onTap: () => confirmRootTheory(value
-                              .getHypothesisList(widget.demoIssue)[index]
-                              .desc),
+                          onTap: () => editItem(
+                              index,
+                              value
+                                  .getHypothesisList(widget.demoIssue)[index]
+                                  .desc),
                         ),
                       ),
                       onReorder: (int oldIndex, int newIndex) {
@@ -310,7 +273,7 @@ void editItem(int index, String hypothesisDesc) {
         floatingActionButton: FloatingActionButton(
           onPressed: () => showInstructionsDialog(context),
           backgroundColor: Colors.lightBlue[200],
-          child: Icon(Icons.help_outline),
+          child: const Icon(Icons.help_outline),
         ),
       ),
     );

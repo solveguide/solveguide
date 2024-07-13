@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/solve_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,10 +32,10 @@ class _SolutionsPageState extends State<SolutionsPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Access your condition here using your context-dependent logic.
       // For example:
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 1) {
-        showInstructionsDialog(context); // This should show the AlertDialog.
-      }
+      //final issueData = Provider.of<IssueData>(context, listen: false);
+      // if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 1) {
+      //   showInstructionsDialog(context); // This should show the AlertDialog.
+      // }
     });
   }
 
@@ -52,53 +51,53 @@ class _SolutionsPageState extends State<SolutionsPage> {
               children: <Widget>[
                 RichText(
                   text: TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black,
                         fontSize: 16), // Default text style
                     children: <TextSpan>[
-                      TextSpan(
+                      const TextSpan(
                           text: 'Instructions\n',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 2)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Now that you've narrowed on a single root cause, it's time to widen again. Here’s the steps you will follow: \n\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "1. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Widen your thinking by entering as many ways as you can imagine to make your root issue go away. Don't worry about quality, just widen!\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "2. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Drag to re-order your solutions with the most effective, easiest and fastest ones at the top.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "3. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "Click on the top solution to test it against your root issue.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "4. ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "If it makes sense, accept the solution and get ready to take action!\n\n"),
-                      TextSpan(
+                      const TextSpan(
                           text: "Issues you may encounter:\n",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, height: 2)),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "- If your root issue doesn't seem to have any solutions than you may have picked a root that you are not able to influence. Go back and pick a root cause you can affect.\n"),
-                      TextSpan(
+                      const TextSpan(
                           text:
                               "- If you are having trouble coming up with possible solutions, "),
                       TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),
                         text:
@@ -109,12 +108,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                 mode: LaunchMode.externalApplication);
                           },
                       ),
-                      TextSpan(text: ".\n"),
-                      TextSpan(
+                      const TextSpan(text: ".\n"),
+                      const TextSpan(
                           text:
                               "- If you are having trouble picking the right solution, "),
                       TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),
                         text:
@@ -125,7 +124,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                 mode: LaunchMode.externalApplication);
                           },
                       ),
-                      TextSpan(text: ".\n"),
+                      const TextSpan(text: ".\n"),
                     ],
                   ),
                 )
@@ -137,7 +136,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -154,58 +153,9 @@ class _SolutionsPageState extends State<SolutionsPage> {
     _focusNode.requestFocus();
   }
 
-  //stop adding Solutions
-  void cancel() {
-    Navigator.pop(context);
-  }
-
   //clear controllers
   void clear() {
     newSolutionNameController.clear();
-  }
-
-  //Confirm Issue-Root Relationship
-  void confirmChosenSolution(String chosenSolution) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: const Text("Confirm Chosen Solution"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const SizedBox(height: 20), // Adds spacing
-                Text(
-                    '$chosenSolution \n\n will resolve:\n\n ${Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root}'),
-              ],
-            ),
-          ),
-          actions: [
-            //cancel button
-            MaterialButton(
-              onPressed: cancel,
-              child: const Text("Go Back"),
-            ),
-
-            //save button
-            MaterialButton(
-              onPressed: () =>
-                  goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
-              child: const Text("Confirm"),
-            ),
-          ]),
-    );
-  }
-
-  //goToSolvePage
-  void goToSolvePage(String issue, String root, String solution) {
-    Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              SolvePage(demoIssue: issue, root: root, solve: solution),
-        ));
   }
 
   //edit solution item
@@ -237,20 +187,24 @@ class _SolutionsPageState extends State<SolutionsPage> {
                 padding: const EdgeInsets.all(15.0),
                 child: Center(
                   child: Container(
-                    constraints: BoxConstraints(maxWidth: 1000),
+                    constraints: const BoxConstraints(maxWidth: 1000),
                     child: Column(
                       children: [
-                        buildBlueContainer('Root Issue',
-                            value.getRelevantIssue(widget.demoIssue).root),
-                        SizedBox(height: 5),
+                        buildBlueContainer(
+                            context,
+                            value.getRelevantIssue(widget.demoIssue),
+                            TestSubject.solution),
+                        const SizedBox(height: 5),
                         TextFormField(
                           controller: newSolutionNameController,
                           focusNode: _focusNode,
                           autofocus: true,
                           onFieldSubmitted: (value) => save(),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: "Enter possible solutions here.",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Theme.of(context).colorScheme.tertiary,
                           ),
                         ),
                         Expanded(
@@ -266,19 +220,29 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                   vertical: 8.0,
                                   horizontal: 5.0), // Margin around each card
                               child: ListTile(
+                                tileColor:
+                                    Theme.of(context).colorScheme.tertiary,
                                 leading: IconButton(
-                                  icon: Icon(Icons.edit),
+                                  icon: const Icon(Icons.edit),
                                   onPressed: () {
-                                    editItem(index, value.getSolutionList(widget.demoIssue)[index].desc); 
+                                    editItem(
+                                        index,
+                                        value
+                                            .getSolutionList(
+                                                widget.demoIssue)[index]
+                                            .desc);
                                   },
                                 ),
                                 title: Text(value
                                     .getRelevantIssue(widget.demoIssue)
                                     .solutions[index]
                                     .desc),
-                                onTap: () => confirmChosenSolution(value
-                                    .getSolutionList(widget.demoIssue)[index]
-                                    .desc),
+                                onTap: () => editItem(
+                                    index,
+                                    value
+                                        .getSolutionList(
+                                            widget.demoIssue)[index]
+                                        .desc),
                               ),
                             ),
                             onReorder: (int oldIndex, int newIndex) {
@@ -311,7 +275,7 @@ class _SolutionsPageState extends State<SolutionsPage> {
               floatingActionButton: FloatingActionButton(
                 onPressed: () => showInstructionsDialog(context),
                 backgroundColor: Colors.lightBlue[200],
-                child: Icon(Icons.help_outline),
+                child: const Icon(Icons.help_outline),
               ),
             ));
   }

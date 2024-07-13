@@ -8,6 +8,5 @@ class Issue {
   final List<Hypothesis> hypotheses;
   final List<Solution> solutions = [];
 
-
   Issue({required this.label, required this.hypotheses});
 }
