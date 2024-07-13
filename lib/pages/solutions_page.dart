@@ -154,59 +154,9 @@ class _SolutionsPageState extends State<SolutionsPage> {
     _focusNode.requestFocus();
   }
 
-  //stop adding Solutions
-  void cancel() {
-    Navigator.pop(context);
-  }
-
   //clear controllers
   void clear() {
     newSolutionNameController.clear();
-  }
-
-  //Confirm Issue-Root Relationship
-  void confirmChosenSolution(String chosenSolution) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: const Text("Confirm Chosen Solution"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const SizedBox(height: 20), // Adds spacing
-                Text(
-                    '$chosenSolution \n\n will resolve:\n\n ${Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root}'),
-              ],
-            ),
-          ),
-          actions: [
-            //cancel button
-            MaterialButton(
-              onPressed: cancel,
-              child: const Text("Go Back"),
-            ),
-
-            //save button
-            MaterialButton(
-              onPressed: () =>
-                  goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
-              child: const Text("Confirm"),
-            ),
-          ]),
-    );
-  }
-
-  //goToSolvePage
-  void goToSolvePage(String issue, String root, String solution) {
-    Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false)
-        .setSolveByLabel(issue, solution);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              SolvePage(demoIssue: issue, root: root, solve: solution),
-        ));
   }
 
   //edit solution item

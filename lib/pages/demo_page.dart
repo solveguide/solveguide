@@ -153,58 +153,9 @@ class _DemoPageState extends State<DemoPage> {
     _focusNode.requestFocus();
   }
 
-  //cancel Hypothesis
-  void cancel() {
-    Navigator.pop(context);
-  }
-
   //clear controllers
   void clear() {
     newHypothesisDescController.clear();
-  }
-
-  //Confirm Issue-Root Relationship
-  void confirmRootTheory(String chosenHypothesis) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: const Text("Confirm Root"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const SizedBox(height: 20), // Adds spacing
-                Text(
-                    '$chosenHypothesis \n\n is causing:\n\n ${widget.demoIssue}'),
-              ],
-            ),
-          ),
-          actions: [
-            //cancel button
-            MaterialButton(
-              onPressed: cancel,
-              child: const Text("Go Back"),
-            ),
-
-            //save button
-            MaterialButton(
-              onPressed: () =>
-                  goToSolutionsPage(widget.demoIssue, chosenHypothesis),
-              child: const Text("Confirm"),
-            ),
-          ]),
-    );
-  }
-
-  //goToSolutionsPage
-  void goToSolutionsPage(String issue, String theory) {
-    Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false)
-        .setRootByLabel(issue, theory);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SolutionsPage(demoIssue: issue, root: theory),
-        ));
   }
 
   //edit hypothesis item
