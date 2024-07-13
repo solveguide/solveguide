@@ -198,7 +198,8 @@ class _DemoPageState extends State<DemoPage> {
   //goToSolutionsPage
   void goToSolutionsPage(String issue, String theory) {
     Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
+    Provider.of<IssueData>(context, listen: false)
+        .setRootByLabel(issue, theory);
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -278,16 +279,18 @@ class _DemoPageState extends State<DemoPage> {
                                   value
                                       .getHypothesisList(
                                           widget.demoIssue)[index]
-                                      .desc); // Replace 'editFunction' with the actual function you want to call
+                                      .desc);
                             },
                           ),
                           title: Text(value
                               .getRelevantIssue(widget.demoIssue)
                               .hypotheses[index]
                               .desc),
-                          onTap: () => confirmRootTheory(value
-                              .getHypothesisList(widget.demoIssue)[index]
-                              .desc),
+                          onTap: () => editItem(
+                              index,
+                              value
+                                  .getHypothesisList(widget.demoIssue)[index]
+                                  .desc),
                         ),
                       ),
                       onReorder: (int oldIndex, int newIndex) {

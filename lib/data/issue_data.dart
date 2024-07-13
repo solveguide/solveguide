@@ -92,16 +92,28 @@ ISSUE DATA STRUCTURE
     return relevantIssue.solutions.length;
   }
 
-// set the root theory
-  void setRoot(String issueLabel, String rootTheory) {
+// set the root theory by label
+  void setRootByLabel(String issueLabel, String rootTheory) {
     Issue relevantIssue = getRelevantIssue(issueLabel);
     relevantIssue.root = rootTheory;
   }
 
-// set the root solve
-  void setSolve(String issueLabel, String solution) {
+  // set the root theory by issue
+  void setRoot(Issue issue) {
+    Issue relevantIssue = issue;
+    relevantIssue.root = issue.hypotheses[0].desc;
+  }
+
+// set the root solve by label
+  void setSolveByLabel(String issueLabel, String solution) {
     Issue relevantIssue = getRelevantIssue(issueLabel);
     relevantIssue.solve = solution;
+  }
+
+  // set the root solve
+  void setSolve(Issue issue) {
+    Issue relevantIssue = issue;
+    relevantIssue.solve = issue.solutions[0].desc;
   }
 
 //build solve statement

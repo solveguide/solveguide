@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:guide_solve/components/narrow_wide.dart';
+import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/models/issue.dart';
+import 'package:guide_solve/pages/solutions_page.dart';
+import 'package:guide_solve/pages/solve_page.dart';
+import 'package:provider/provider.dart';
 
 enum TestSubject { hypothesis, solution }
 
 Widget buildBlueContainer(
     BuildContext context, Issue issue, TestSubject testSubject) {
-      var overlayController = OverlayPortalController();
+  bool isEnabled = (testSubject == TestSubject.hypothesis &&
+          issue.hypotheses.isNotEmpty &&
+          issue.hypotheses[0].desc.isNotEmpty) ||
+      (testSubject == TestSubject.solution &&
+          issue.solutions.isNotEmpty &&
+          issue.solutions[0].desc.isNotEmpty);
+
   return Center(
     child: Container(
       width: 500,
@@ -29,34 +38,40 @@ Widget buildBlueContainer(
             ),
           ),
           ElevatedButton(
-              onPressed: overlayController.toggle,
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Theme.of(context).colorScheme.tertiaryContainer,
-              ),
-              child: OverlayPortal(
-                controller: overlayController,
-                overlayChildBuilder: (context) {
-                  return Positioned(
-                    top: 200,
-                    right: 100,
-                    left: 100,
-                    // height: 200,
-                    // width: 200,
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: _containerDecoration(
-                              Theme.of(context).colorScheme.secondaryContainer),
-                          padding: const EdgeInsets.all(15),
-                          child: const Text("data"),
+            onPressed: isEnabled
+                ? () {
+                    if (testSubject == TestSubject.hypothesis) {
+                      Navigator.pop(context);
+                      Provider.of<IssueData>(context, listen: false)
+                          .setRoot(issue);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SolutionsPage(
+                              demoIssue: issue.label, root: issue.root),
                         ),
-                      ],
-                    ),
-                  );
-                },
-                child: narrowIcon(),
-              )),
+                      );
+                    } else if (testSubject == TestSubject.solution) {
+                      Navigator.pop(context);
+                      Provider.of<IssueData>(context, listen: false)
+                          .setSolve(issue);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SolvePage(
+                              demoIssue: issue.label,
+                              root: issue.root,
+                              solve: issue.solve),
+                        ),
+                      );
+                    }
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+            ),
+            child: const Text("Confirm"),
+          ),
         ],
       ),
     ),

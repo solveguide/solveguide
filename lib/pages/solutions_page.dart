@@ -199,7 +199,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
   //goToSolvePage
   void goToSolvePage(String issue, String root, String solution) {
     Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
+    Provider.of<IssueData>(context, listen: false)
+        .setSolveByLabel(issue, solution);
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -287,9 +288,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                     .getRelevantIssue(widget.demoIssue)
                                     .solutions[index]
                                     .desc),
-                                onTap: () => confirmChosenSolution(value
-                                    .getSolutionList(widget.demoIssue)[index]
-                                    .desc),
+                                onTap: () => editItem(
+                                    index,
+                                    value
+                                        .getSolutionList(
+                                            widget.demoIssue)[index]
+                                        .desc),
                               ),
                             ),
                             onReorder: (int oldIndex, int newIndex) {
