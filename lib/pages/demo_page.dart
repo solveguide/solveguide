@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/solutions_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,10 +32,10 @@ class _DemoPageState extends State<DemoPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Access your condition here using your context-dependent logic.
       // For example:
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 1) {
-        showInstructionsDialog(context); // This should show the AlertDialog.
-      }
+      //final issueData = Provider.of<IssueData>(context, listen: false);
+      // if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 1) {
+      //   showInstructionsDialog(context); // This should show the AlertDialog.
+      // }
     });
   }
 
@@ -153,62 +152,13 @@ class _DemoPageState extends State<DemoPage> {
     _focusNode.requestFocus();
   }
 
-  //cancel Hypothesis
-  void cancel() {
-    Navigator.pop(context);
-  }
-
   //clear controllers
   void clear() {
     newHypothesisDescController.clear();
   }
 
-  //Confirm Issue-Root Relationship
-  void confirmRootTheory(String chosenHypothesis) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: const Text("Confirm Root"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const SizedBox(height: 20), // Adds spacing
-                Text(
-                    '$chosenHypothesis \n\n is causing:\n\n ${widget.demoIssue}'),
-              ],
-            ),
-          ),
-          actions: [
-            //cancel button
-            MaterialButton(
-              onPressed: cancel,
-              child: const Text("Go Back"),
-            ),
-
-            //save button
-            MaterialButton(
-              onPressed: () =>
-                  goToSolutionsPage(widget.demoIssue, chosenHypothesis),
-              child: const Text("Confirm"),
-            ),
-          ]),
-    );
-  }
-
-  //goToSolutionsPage
-  void goToSolutionsPage(String issue, String theory) {
-    Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false).setRoot(issue, theory);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SolutionsPage(demoIssue: issue, root: theory),
-        ));
-  }
-
   //edit hypothesis item
   void editItem(int index, String hypothesisDesc) {
-    // Set text in TextEditingController to the hypothesis description
     newHypothesisDescController.text = hypothesisDesc;
 
     // Remove the hypothesis from the list in your data model
@@ -238,7 +188,10 @@ class _DemoPageState extends State<DemoPage> {
               constraints: const BoxConstraints(maxWidth: 1000),
               child: Column(
                 children: [
-                  buildBlueContainer('Current Issue', widget.demoIssue),
+                  buildBlueContainer(
+                      context,
+                      value.getRelevantIssue(widget.demoIssue),
+                      TestSubject.hypothesis),
                   const SizedBox(height: 5),
                   TextFormField(
                     controller: newHypothesisDescController,
@@ -247,9 +200,11 @@ class _DemoPageState extends State<DemoPage> {
                     //textInputAction: TextInputAction.done,
                     onFieldSubmitted: (value) =>
                         save(), // Assuming 'save' is defined
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: "Enter root theories here.",
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Theme.of(context).colorScheme.tertiary,
                     ),
                   ),
                   Expanded(
@@ -265,6 +220,7 @@ class _DemoPageState extends State<DemoPage> {
                             vertical: 8.0,
                             horizontal: 5.0), // Margin around each card
                         child: ListTile(
+                          tileColor: Theme.of(context).colorScheme.tertiary,
                           leading: IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
@@ -273,16 +229,18 @@ class _DemoPageState extends State<DemoPage> {
                                   value
                                       .getHypothesisList(
                                           widget.demoIssue)[index]
-                                      .desc); // Replace 'editFunction' with the actual function you want to call
+                                      .desc);
                             },
                           ),
                           title: Text(value
                               .getRelevantIssue(widget.demoIssue)
                               .hypotheses[index]
                               .desc),
-                          onTap: () => confirmRootTheory(value
-                              .getHypothesisList(widget.demoIssue)[index]
-                              .desc),
+                          onTap: () => editItem(
+                              index,
+                              value
+                                  .getHypothesisList(widget.demoIssue)[index]
+                                  .desc),
                         ),
                       ),
                       onReorder: (int oldIndex, int newIndex) {

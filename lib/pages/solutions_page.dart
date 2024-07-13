@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/solve_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,10 +32,10 @@ class _SolutionsPageState extends State<SolutionsPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Access your condition here using your context-dependent logic.
       // For example:
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 1) {
-        showInstructionsDialog(context); // This should show the AlertDialog.
-      }
+      //final issueData = Provider.of<IssueData>(context, listen: false);
+      // if (issueData.numberOfSolutionsInIssue(widget.demoIssue) < 1) {
+      //   showInstructionsDialog(context); // This should show the AlertDialog.
+      // }
     });
   }
 
@@ -154,58 +153,9 @@ class _SolutionsPageState extends State<SolutionsPage> {
     _focusNode.requestFocus();
   }
 
-  //stop adding Solutions
-  void cancel() {
-    Navigator.pop(context);
-  }
-
   //clear controllers
   void clear() {
     newSolutionNameController.clear();
-  }
-
-  //Confirm Issue-Root Relationship
-  void confirmChosenSolution(String chosenSolution) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: const Text("Confirm Chosen Solution"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const SizedBox(height: 20), // Adds spacing
-                Text(
-                    '$chosenSolution \n\n will resolve:\n\n ${Provider.of<IssueData>(context, listen: false).getRelevantIssue(widget.demoIssue).root}'),
-              ],
-            ),
-          ),
-          actions: [
-            //cancel button
-            MaterialButton(
-              onPressed: cancel,
-              child: const Text("Go Back"),
-            ),
-
-            //save button
-            MaterialButton(
-              onPressed: () =>
-                  goToSolvePage(widget.demoIssue, widget.root, chosenSolution),
-              child: const Text("Confirm"),
-            ),
-          ]),
-    );
-  }
-
-  //goToSolvePage
-  void goToSolvePage(String issue, String root, String solution) {
-    Navigator.pop(context);
-    Provider.of<IssueData>(context, listen: false).setSolve(issue, solution);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              SolvePage(demoIssue: issue, root: root, solve: solution),
-        ));
   }
 
   //edit solution item
@@ -240,17 +190,21 @@ class _SolutionsPageState extends State<SolutionsPage> {
                     constraints: const BoxConstraints(maxWidth: 1000),
                     child: Column(
                       children: [
-                        buildBlueContainer('Root Issue',
-                            value.getRelevantIssue(widget.demoIssue).root),
+                        buildBlueContainer(
+                            context,
+                            value.getRelevantIssue(widget.demoIssue),
+                            TestSubject.solution),
                         const SizedBox(height: 5),
                         TextFormField(
                           controller: newSolutionNameController,
                           focusNode: _focusNode,
                           autofocus: true,
                           onFieldSubmitted: (value) => save(),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: "Enter possible solutions here.",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Theme.of(context).colorScheme.tertiary,
                           ),
                         ),
                         Expanded(
@@ -266,6 +220,8 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                   vertical: 8.0,
                                   horizontal: 5.0), // Margin around each card
                               child: ListTile(
+                                tileColor:
+                                    Theme.of(context).colorScheme.tertiary,
                                 leading: IconButton(
                                   icon: const Icon(Icons.edit),
                                   onPressed: () {
@@ -281,9 +237,12 @@ class _SolutionsPageState extends State<SolutionsPage> {
                                     .getRelevantIssue(widget.demoIssue)
                                     .solutions[index]
                                     .desc),
-                                onTap: () => confirmChosenSolution(value
-                                    .getSolutionList(widget.demoIssue)[index]
-                                    .desc),
+                                onTap: () => editItem(
+                                    index,
+                                    value
+                                        .getSolutionList(
+                                            widget.demoIssue)[index]
+                                        .desc),
                               ),
                             ),
                             onReorder: (int oldIndex, int newIndex) {
