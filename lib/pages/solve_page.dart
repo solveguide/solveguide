@@ -51,11 +51,12 @@ class _SolvePageState extends State<SolvePage> {
                   ),
                   padding: const EdgeInsets.all(15),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Root Theories Considered:",
@@ -63,15 +64,26 @@ class _SolvePageState extends State<SolvePage> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                             ),
-                            ...issueData
-                                .getHypothesisList(widget.demoIssue)
-                                .map(
-                                    (item) => ListTile(title: Text(item.desc))),
-                          ])),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: issueData
+                                    .getHypothesisList(widget.demoIssue)
+                                    .map((item) => ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Text(item.desc),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       Expanded(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: Text("Solutions Considered:",
@@ -79,9 +91,22 @@ class _SolvePageState extends State<SolvePage> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                             ),
-                            ...issueData.getSolutionList(widget.demoIssue).map(
-                                (item) => ListTile(title: Text(item.desc))),
-                          ]))
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: issueData
+                                    .getSolutionList(widget.demoIssue)
+                                    .map((item) => ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Text(item.desc),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -97,7 +122,7 @@ class _SolvePageState extends State<SolvePage> {
                   color: Colors.red,
                   child: const Text("Create an Account"),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -128,19 +153,19 @@ class _SolvePageState extends State<SolvePage> {
                 style: const TextStyle(fontSize: 16, color: Colors.black),
                 children: [
                   const TextSpan(
-                      text: 'You will: ',
+                      text: 'I will: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${widget.solve}.',
                       style: const TextStyle(fontWeight: FontWeight.normal)),
                   const TextSpan(
-                      text: '\n\nTo address this root: ',
+                      text: '\n\nResolving that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${widget.root}.',
                       style: const TextStyle(fontWeight: FontWeight.normal)),
                   const TextSpan(
-                      text: '\n\nTo solve this issue: ',
+                      text: '\n\nChanging that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: widget.demoIssue,

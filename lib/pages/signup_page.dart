@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui_auth;
+
 import 'package:provider/provider.dart';
 import 'package:guide_solve/data/issue_data.dart';
 
@@ -9,6 +11,31 @@ class SignupPage extends StatefulWidget {
   @override
   State<SignupPage> createState() => _SignupPageState();
 }
+
+  void goToSignupPage(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => firebase_ui_auth.SignInScreen(
+              providers: [
+                firebase_ui_auth.EmailAuthProvider(),
+              ],
+              actions: [
+                firebase_ui_auth.AuthStateChangeAction<
+                    firebase_ui_auth.SignedIn>((context, state) {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/dashboard');
+                }),
+              ],
+            ),
+          ));
+    }
+  }
 
 class _SignupPageState extends State<SignupPage> {
   @override
@@ -32,10 +59,17 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
                 padding: const EdgeInsets.all(15),
-                child: const Column(
+                child:  Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Sign Up'),
+                      const Text('Sign up to create multiple issues and track your progress'),
+                      MaterialButton(
+                onPressed: () => goToSignupPage(context),
+                color: Colors.red,
+                child: const Text("Login",
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
                     ]),
               ),
             )));

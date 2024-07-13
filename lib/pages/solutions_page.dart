@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/blue_container.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/solve_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
