@@ -10,7 +10,7 @@ class Issue {
   String solve;
   List<Hypothesis> hypotheses;
   List<Solution> solutions;
-  String? ownerId; // ID of the user who owns the issue
+  final String ownerId; // ID of the user who owns the issue
   List<String>? invitedUserIds; // List of user IDs with limited permissions
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
@@ -24,8 +24,8 @@ class Issue {
     this.solve = "Accept this.",
     List<Hypothesis>? hypotheses,
     List<Solution>? solutions,
-    this.ownerId,
-    List <String>? invitedUserIds,
+    required this.ownerId,
+    List<String>? invitedUserIds,
     required this.createdTimestamp,
     required this.lastUpdatedTimestamp,
   })  : hypotheses = hypotheses ?? [],

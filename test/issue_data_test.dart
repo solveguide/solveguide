@@ -9,14 +9,14 @@ void main() {
       final issueData = IssueData();
 
       // Initial state should have one default issue
-      expect(issueData.issueList.length, 1);
+      expect(issueData.issues.length, 1);
 
       // Add a new issue
       issueData.addIssue('New Issue');
 
       // Verify the new issue is added
-      expect(issueData.issueList.length, 2);
-      expect(issueData.issueList[1].label, 'New Issue');
+      expect(issueData.issues.length, 2);
+      expect(issueData.issues[1].label, 'New Issue');
     });
   });
 }

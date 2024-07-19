@@ -20,8 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
-  bool isButtonEnabled =
-      false; // Tracks whether the start button should be enabled
+  bool isButtonEnabled = false; // Tracks whether the start button should be enabled
 
   @override
   void initState() {
@@ -35,14 +34,25 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-// start the demo
-  void goToDemo(String demoIssueLabel) {
-    createDemoIssue(demoIssueLabel);
-    Navigator.push(
+  // Start the demo
+  Future<void> goToDemo(String demoIssueLabel) async {
+    await ensureAnonymousLogin();
+    if (mounted) {
+      createDemoIssue(demoIssueLabel);
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => DemoPage(demoIssue: demoIssueLabel),
-        ));
+        ),
+      );
+    }
+  }
+
+    Future<void> ensureAnonymousLogin() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
   }
 
 // go to signup page
@@ -71,9 +81,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // create the demo issue
   void createDemoIssue(String demoIssueLabel) {
-    Provider.of<IssueData>(context, listen: false).addIssue(demoIssueLabel);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Provider.of<IssueData>(context, listen: false).addDemoIssue(demoIssueLabel, user.uid);
+    }
   }
 
   //UI
