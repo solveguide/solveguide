@@ -16,7 +16,7 @@ class IssueData extends ChangeNotifier {
   // Getter for the demo issue
   Issue? get demoIssue => _demoIssue;
 
-void addDemoIssue(String label, String ownerId) {
+  void addDemoIssue(String label, String ownerId) {
     _demoIssue = Issue(
       issueId: 'demo_${DateTime.now().millisecondsSinceEpoch}', // Unique ID
       label: label,
@@ -32,7 +32,6 @@ void addDemoIssue(String label, String ownerId) {
     );
     notifyListeners();
   }
-
 
 // get list of hypotheses
   List<Hypothesis> getHypothesisList(String issue) {
@@ -53,7 +52,7 @@ void addDemoIssue(String label, String ownerId) {
         hypotheses: [],
         seedStatement: label,
         createdTimestamp: DateTime.now(),
-        lastUpdatedTimestamp: DateTime.now(), 
+        lastUpdatedTimestamp: DateTime.now(),
         ownerId: currentUser!.uid.toString()));
     notifyListeners();
   }
@@ -181,5 +180,4 @@ void addDemoIssue(String label, String ownerId) {
       notifyListeners();
     }
   }
-
 }
