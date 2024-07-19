@@ -1,3 +1,4 @@
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
@@ -15,7 +16,7 @@ ISSUE DATA STRUCTURE
 
   List<Issue> issueList = [
     //default list
-    Issue(label: "I am concerned this demo is a waste of time", hypotheses: [])
+    Issue(label: "I am concerned this demo is a waste of time", hypotheses: [], seedStatement: 'I am concerned this demo is a waste of time', createdTimestamp: DateTime.now(), lastUpdatedTimestamp: DateTime.now())
   ];
 
 // get list of Issues
@@ -37,7 +38,7 @@ ISSUE DATA STRUCTURE
 // add a new Issue
   void addIssue(String label) {
     //add a new issue with a blank list of root theories
-    issueList.add(Issue(label: label, hypotheses: []));
+    issueList.add(Issue(label: label, hypotheses: [], seedStatement: label, createdTimestamp: DateTime.now(), lastUpdatedTimestamp: DateTime.now()));
     notifyListeners();
   }
 
