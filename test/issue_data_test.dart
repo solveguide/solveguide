@@ -16,7 +16,7 @@ void main() {
 
       // Verify the new issue is added
       expect(issueData.issues.length, 1);
-      expect(issueData.issues[1].label, 'New Issue');
+      expect(issueData.issues[0].label, 'New Issue');
     });
   });
 }
