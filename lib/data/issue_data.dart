@@ -30,19 +30,20 @@ class IssueData extends ChangeNotifier {
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),
     );
-    _issues.add(Issue(
-      issueId: 'demo_${DateTime.now().millisecondsSinceEpoch}', // Unique ID
-      label: label,
-      seedStatement: label,
-      root: "I cannot accept this.",
-      solve: "Accept this.",
-      hypotheses: [],
-      solutions: [],
-      ownerId: ownerId,
-      invitedUserIds: [],
-      createdTimestamp: DateTime.now(),
-      lastUpdatedTimestamp: DateTime.now(),
-    ),
+    _issues.add(
+      Issue(
+        issueId: 'demo_${DateTime.now().millisecondsSinceEpoch}', // Unique ID
+        label: label,
+        seedStatement: label,
+        root: "I cannot accept this.",
+        solve: "Accept this.",
+        hypotheses: [],
+        solutions: [],
+        ownerId: ownerId,
+        invitedUserIds: [],
+        createdTimestamp: DateTime.now(),
+        lastUpdatedTimestamp: DateTime.now(),
+      ),
     );
     notifyListeners();
   }

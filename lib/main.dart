@@ -60,7 +60,7 @@ class AuthWrapper extends StatelessWidget {
         // Check if the user is logged in
         if (snapshot.hasData) {
           final user = snapshot.data;
-          
+
           // Check if the user is not null and not anonymous
           if (user != null && !user.isAnonymous) {
             // Navigate to the dashboard
@@ -77,4 +77,3 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 }
-

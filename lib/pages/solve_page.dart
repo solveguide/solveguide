@@ -32,7 +32,8 @@ class _SolvePageState extends State<SolvePage> {
           actions: [
             firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>(
               (context, state) async {
-                final issueData = Provider.of<IssueData>(context, listen: false);
+                final issueData =
+                    Provider.of<IssueData>(context, listen: false);
                 // Save the demo issue if it exists
                 await issueData.saveDemoIssue();
 
@@ -43,7 +44,8 @@ class _SolvePageState extends State<SolvePage> {
               },
             ),
           ],
-          showAuthActionSwitch: false, // Hides the switch link to show the registration form directly
+          showAuthActionSwitch:
+              false, // Hides the switch link to show the registration form directly
         ),
       ),
     );
