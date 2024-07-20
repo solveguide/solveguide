@@ -1,30 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/signup_page.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui_auth;
 import 'package:provider/provider.dart';
+import 'package:guide_solve/data/issue_data.dart';
+//import 'package:guide_solve/pages/dashboard_page.dart';
 
 class SolvePage extends StatefulWidget {
   final String demoIssue;
   final String root;
   final String solve;
-  const SolvePage(
-      {super.key,
-      required this.demoIssue,
-      required this.root,
-      required this.solve});
+  const SolvePage({
+    super.key,
+    required this.demoIssue,
+    required this.root,
+    required this.solve,
+  });
 
   @override
   State<SolvePage> createState() => _SolvePageState();
 }
 
 class _SolvePageState extends State<SolvePage> {
-// start the demo
+  // Go to signup page
   void goToSignupPage() {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SignupPage(),
-        ));
+      context,
+      MaterialPageRoute(
+        builder: (context) => firebase_ui_auth.SignInScreen(
+          providers: [
+            firebase_ui_auth.EmailAuthProvider(),
+          ],
+          actions: [
+            firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>(
+              (context, state) async {
+                final issueData = Provider.of<IssueData>(context, listen: false);
+                // Save the demo issue if it exists
+                await issueData.saveDemoIssue();
+
+                if (context.mounted) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.pushReplacementNamed(context, '/');
+                }
+              },
+            ),
+          ],
+          showAuthActionSwitch: false, // Hides the switch link to show the registration form directly
+        ),
+      ),
+    );
   }
 
   @override
@@ -59,10 +81,13 @@ class _SolvePageState extends State<SolvePage> {
                           children: [
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text("Root Theories Considered:",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
+                              child: Text(
+                                "Root Theories Considered:",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             Align(
                               alignment: Alignment.topLeft,
@@ -86,10 +111,13 @@ class _SolvePageState extends State<SolvePage> {
                           children: [
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text("Solutions Considered:",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
+                              child: Text(
+                                "Solutions Considered:",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             Align(
                               alignment: Alignment.topLeft,
@@ -113,8 +141,9 @@ class _SolvePageState extends State<SolvePage> {
               ),
               const SizedBox(height: 20),
               const Text(
-                  "Do you like what you see? Create an Account to save this solve and more.",
-                  textAlign: TextAlign.center),
+                "Do you like what you see? Create an Account to save this solve and more.",
+                textAlign: TextAlign.center,
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MaterialButton(
@@ -153,26 +182,32 @@ class _SolvePageState extends State<SolvePage> {
                 style: const TextStyle(fontSize: 16, color: Colors.black),
                 children: [
                   const TextSpan(
-                      text: 'I will: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                    text: 'I will: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(
-                      text: '${widget.solve}.',
-                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                    text: '${widget.solve}.',
+                    style: const TextStyle(fontWeight: FontWeight.normal),
+                  ),
                   const TextSpan(
-                      text: '\n\nResolving that: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                    text: '\n\nResolving that: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(
-                      text: '${widget.root}.',
-                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                    text: '${widget.root}.',
+                    style: const TextStyle(fontWeight: FontWeight.normal),
+                  ),
                   const TextSpan(
-                      text: '\n\nChanging that: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                    text: '\n\nChanging that: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(
-                      text: widget.demoIssue,
-                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                    text: widget.demoIssue,
+                    style: const TextStyle(fontWeight: FontWeight.normal),
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

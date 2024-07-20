@@ -50,24 +50,31 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        // Show a loading indicator while waiting for authentication state
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
-        } else if (snapshot.hasData) {
-          // Navigate to dashboard
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushReplacementNamed(context, '/dashboard');
-          });
-          return Container(); // Return an empty container while navigation happens
+        }
+
+        // Check if the user is logged in
+        if (snapshot.hasData) {
+          final user = snapshot.data;
+          
+          // Check if the user is not null and not anonymous
+          if (user != null && !user.isAnonymous) {
+            // Navigate to the dashboard
+            return const DashboardPage(); // Replace with your DashboardPage widget
+          } else {
+            // User is logged in anonymously
+            return const HomePage(); // Replace with your DemoPage widget
+          }
         } else {
-          // Navigate to home
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushReplacementNamed(context, '/demo');
-          });
-          return Container(); // Return an empty container while navigation happens
+          // User is not logged in
+          return const HomePage(); // Replace with your DemoPage widget
         }
       },
     );
   }
 }
+
