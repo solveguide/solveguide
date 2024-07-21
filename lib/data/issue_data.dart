@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class IssueData extends ChangeNotifier {
   final List<Issue> _issues = [];
