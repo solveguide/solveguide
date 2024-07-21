@@ -26,19 +26,6 @@ class _DemoPageState extends State<DemoPage> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Access your condition here using your context-dependent logic.
-      // For example:
-      //final issueData = Provider.of<IssueData>(context, listen: false);
-      // if (issueData.numberOfHypothesesInIssue(widget.demoIssue) < 1) {
-      //   showInstructionsDialog(context); // This should show the AlertDialog.
-      // }
-    });
-  }
-
   void showInstructionsDialog(BuildContext context) {
     showDialog(
       context: context,

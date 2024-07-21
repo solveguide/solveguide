@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class IssueData extends ChangeNotifier {
   final List<Issue> _issues = [];
@@ -15,6 +15,17 @@ class IssueData extends ChangeNotifier {
 
   // Getter for the demo issue
   Issue? get demoIssue => _demoIssue;
+
+  Future<void> saveDemoIssue() async {
+    if (_demoIssue != null) {
+      await FirebaseFirestore.instance
+          .collection('issues')
+          .doc(_demoIssue!.issueId)
+          .set(getRelevantIssue(_demoIssue!.label).toJson());
+      notifyListeners();
+      _demoIssue == null;
+    }
+  }
 
   void addDemoIssue(String label, String ownerId) {
     _demoIssue = Issue(
@@ -61,13 +72,14 @@ class IssueData extends ChangeNotifier {
 
 // add a new Issue
   void addIssue(String label) {
+    User? currentUser = FirebaseAuth.instance.currentUser;
     _issues.add(Issue(
         label: label,
         hypotheses: [],
         seedStatement: label,
         createdTimestamp: DateTime.now(),
         lastUpdatedTimestamp: DateTime.now(),
-        ownerId: "currentUser!.uid.toString()"));
+        ownerId: currentUser!.uid));
     notifyListeners();
   }
 
@@ -183,15 +195,5 @@ class IssueData extends ChangeNotifier {
     Hypothesis relevantHypothesis = relevantIssue.hypotheses
         .firstWhere((hypothesis) => hypothesis.desc == hypothesisDesc);
     return relevantHypothesis;
-  }
-
-  Future<void> saveDemoIssue() async {
-    if (_demoIssue != null) {
-      await FirebaseFirestore.instance
-          .collection('issues')
-          .doc(_demoIssue!.issueId)
-          .set(_demoIssue!.toJson());
-      notifyListeners();
-    }
   }
 }

@@ -1,27 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:guide_solve/models/issue.dart';
 //import 'package:guide_solve/models/issue.dart';
 
 class FirestoreService {
   //get collection of issues
-  final CollectionReference issues =
-      FirebaseFirestore.instance.collection('issues');
+  final CollectionReference _issuesCollection = FirebaseFirestore.instance.collection('issues');
 
-  //create a new issue
-  Future<void> addIssue(String issueLabel) {
-    return issues.add({
-      'label': issueLabel,
-      'timestamp': Timestamp.now(),
-      'root': "I can't accept things this way.",
-      'solve': "I accept things this way.",
+
+  //get an issue from database
+  Stream<List<Issue>> getIssuesStream() {
+    return _issuesCollection.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
     });
   }
 
-  //get an issue from database
-  Stream<QuerySnapshot> getIssuesStream() {
-    final issuesStream =
-        issues.orderBy('timestamp', descending: true).snapshots();
-
-    return issuesStream;
+  //create an issue
+    Future<void> addIssue(Issue issue) {
+    return _issuesCollection.add(issue.toJson());
   }
 
   //update an issue

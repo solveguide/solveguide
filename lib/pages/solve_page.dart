@@ -42,23 +42,22 @@ class _SolvePageState extends State<SolvePage> {
             firebase_ui_auth.EmailAuthProvider(),
           ],
           actions: [
-            firebase_ui_auth.AuthStateChangeAction<
-                firebase_ui_auth.SignedIn>(
+            firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>(
               (context, state) {
                 Navigator.of(context).pop();
                 Navigator.pushReplacementNamed(context, '/dashboard');
               },
             ),
           ],
-           subtitleBuilder: (context, action) {
-             return Padding(
-               padding: const EdgeInsets.symmetric(vertical: 8.0),
-               child: action == firebase_ui_auth.AuthAction.signIn
-                   ? const Text('Sign in with the credentials you just created.')
-                   : const Text('Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
-             );
-           },
-
+          subtitleBuilder: (context, action) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: action == firebase_ui_auth.AuthAction.signIn
+                  ? const Text('Sign in with the credentials you just created.')
+                  : const Text(
+                      'Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
+            );
+          },
         ),
       ),
     );
