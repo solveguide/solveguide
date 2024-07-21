@@ -71,8 +71,7 @@ class _HomePageState extends State<HomePage> {
                 firebase_ui_auth.EmailAuthProvider(),
               ],
               actions: [
-                firebase_ui_auth.AuthStateChangeAction<
-                    firebase_ui_auth.SignedIn>((context, state) {
+                firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>((context, state) {
                   Navigator.of(context).pop();
                   Navigator.pushReplacementNamed(context, '/dashboard');
                 }),

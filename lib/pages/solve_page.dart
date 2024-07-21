@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui_auth;
 import 'package:provider/provider.dart';
@@ -20,32 +21,44 @@ class SolvePage extends StatefulWidget {
 }
 
 class _SolvePageState extends State<SolvePage> {
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null && !user.isAnonymous) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
+    });
+  }
+
   // Go to signup page
   void goToSignupPage() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => firebase_ui_auth.SignInScreen(
+        builder: (context) => firebase_ui_auth.RegisterScreen(
           providers: [
             firebase_ui_auth.EmailAuthProvider(),
           ],
           actions: [
-            firebase_ui_auth.AuthStateChangeAction<firebase_ui_auth.SignedIn>(
-              (context, state) async {
-                final issueData =
-                    Provider.of<IssueData>(context, listen: false);
-                // Save the demo issue if it exists
-                await issueData.saveDemoIssue();
-
-                if (context.mounted) {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  Navigator.pushReplacementNamed(context, '/');
-                }
+            firebase_ui_auth.AuthStateChangeAction<
+                firebase_ui_auth.SignedIn>(
+              (context, state) {
+                Navigator.of(context).pop();
+                Navigator.pushReplacementNamed(context, '/dashboard');
               },
             ),
           ],
-          showAuthActionSwitch:
-              false, // Hides the switch link to show the registration form directly
+           subtitleBuilder: (context, action) {
+             return Padding(
+               padding: const EdgeInsets.symmetric(vertical: 8.0),
+               child: action == firebase_ui_auth.AuthAction.signIn
+                   ? const Text('Sign in with the credentials you just created.')
+                   : const Text('Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
+             );
+           },
+
         ),
       ),
     );
