@@ -71,15 +71,14 @@ class IssueData extends ChangeNotifier {
   }
 
 // add a new Issue
-  void addIssue(String label) {
-    User? currentUser = FirebaseAuth.instance.currentUser;
+  void addIssue(String label, String ownerId) {
     _issues.add(Issue(
         label: label,
         hypotheses: [],
         seedStatement: label,
         createdTimestamp: DateTime.now(),
         lastUpdatedTimestamp: DateTime.now(),
-        ownerId: currentUser!.uid));
+        ownerId: ownerId));
     notifyListeners();
   }
 

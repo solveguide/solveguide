@@ -97,7 +97,8 @@ class _DashboardPageState extends State<DashboardPage> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.done) {
+          } else if (snapshot.connectionState == ConnectionState.active ||
+              snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               if (snapshot.data!.isNotEmpty) {
                 List<Issue> issuesList = snapshot.data!;

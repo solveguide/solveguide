@@ -4,8 +4,8 @@ import 'package:guide_solve/models/issue.dart';
 
 class FirestoreService {
   //get collection of issues
-  final CollectionReference _issuesCollection = FirebaseFirestore.instance.collection('issues');
-
+  final CollectionReference _issuesCollection =
+      FirebaseFirestore.instance.collection('issues');
 
   //get an issue from database
   Stream<List<Issue>> getIssuesStream() {
@@ -17,7 +17,7 @@ class FirestoreService {
   }
 
   //create an issue
-    Future<void> addIssue(Issue issue) {
+  Future<void> addIssue(Issue issue) {
     return _issuesCollection.add(issue.toJson());
   }
 

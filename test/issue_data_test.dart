@@ -12,7 +12,7 @@ void main() {
       expect(issueData.issues.length, 0);
 
       // Add a new issue
-      issueData.addIssue('New Issue');
+      issueData.addIssue('New Issue', 'ID');
 
       // Verify the new issue is added
       expect(issueData.issues.length, 1);
