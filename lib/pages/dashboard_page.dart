@@ -16,10 +16,14 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final FirestoreService firestoreService = FirestoreService();
   final TextEditingController textController = TextEditingController();
+  late Stream<List<Issue>> issuesStream;
 
   @override
   void initState() {
     super.initState();
+    // Initialize the stream only once in initState
+    issuesStream = firestoreService.getIssuesStream();
+
     // Save the demo issue if there is one
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final issueData = Provider.of<IssueData>(context, listen: false);
@@ -44,6 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ownerId: FirebaseAuth.instance.currentUser!.uid,
                 createdTimestamp: DateTime.now(),
                 lastUpdatedTimestamp: DateTime.now(),
+                issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
               );
               firestoreService.addIssue(newIssue);
               textController.clear();
@@ -74,7 +79,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     actions: [
                       SignedOutAction((context) {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).popUntil((route) => route.isFirst);
                         Navigator.pushReplacementNamed(context, '/');
                       })
                     ],
@@ -91,14 +96,13 @@ class _DashboardPageState extends State<DashboardPage> {
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder<List<Issue>>(
-        stream: firestoreService.getIssuesStream(),
+        stream: issuesStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.connectionState == ConnectionState.active ||
-              snapshot.connectionState == ConnectionState.done) {
+          } else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               if (snapshot.data!.isNotEmpty) {
                 List<Issue> issuesList = snapshot.data!;

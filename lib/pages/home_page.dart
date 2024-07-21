@@ -20,8 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
-  bool isButtonEnabled =
-      false; // Tracks whether the start button should be enabled
+  bool isButtonEnabled = false; // Tracks whether the start button should be enabled
 
   @override
   void initState() {
@@ -60,8 +59,35 @@ class _HomePageState extends State<HomePage> {
   void goToSignupPage(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
+    if (user != null && !user.isAnonymous) {
       Navigator.pushReplacementNamed(context, '/dashboard');
+    } else if (user != null) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => firebase_ui_auth.RegisterScreen(
+              providers: [
+                firebase_ui_auth.EmailAuthProvider(),
+              ],
+              actions: [
+                firebase_ui_auth.AuthStateChangeAction<
+                    firebase_ui_auth.SignedIn>((context, state) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.pushReplacementNamed(context, '/dashboard');
+                }
+              ),
+            ],
+            subtitleBuilder: (context, action) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: action == firebase_ui_auth.AuthAction.signIn
+                  ? const Text('Sign in with the credentials you just created.')
+                  : const Text('Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
+            );
+          },
+          ),
+        )
+      );
     } else {
       Navigator.push(
           context,
@@ -73,12 +99,14 @@ class _HomePageState extends State<HomePage> {
               actions: [
                 firebase_ui_auth.AuthStateChangeAction<
                     firebase_ui_auth.SignedIn>((context, state) {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                   Navigator.pushReplacementNamed(context, '/dashboard');
-                }),
-              ],
-            ),
-          ));
+                }
+              ),
+            ],
+          ),
+        )
+      );
     }
   }
 

@@ -44,7 +44,7 @@ class IssueData extends ChangeNotifier {
       Issue(
         issueId: 'demo_${DateTime.now().millisecondsSinceEpoch}', // Unique ID
         label: label,
-        seedStatement: label,
+        seedStatement: "demoIssue",
         root: "I cannot accept this.",
         solve: "Accept this.",
         hypotheses: [],
