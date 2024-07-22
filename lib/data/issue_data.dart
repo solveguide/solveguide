@@ -1,26 +1,61 @@
+//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
 
 class IssueData extends ChangeNotifier {
-/*
+  final List<Issue> _issues = [];
+  Issue? _demoIssue;
 
-ISSUE DATA STRUCTURE
+  // Getter for the list of issues
+  List<Issue> get issues => _issues;
 
-- This overall list contains all user Issues
-- Each Issue has a label and other optional fields
+  // Getter for the demo issue
+  Issue? get demoIssue => _demoIssue;
 
-*/
+  Future<void> saveDemoIssue() async {
+    if (_demoIssue != null) {
+      await FirebaseFirestore.instance
+          .collection('issues')
+          .doc(_demoIssue!.issueId)
+          .set(getRelevantIssue(_demoIssue!.label).toJson());
+      notifyListeners();
+      _demoIssue == null;
+    }
+  }
 
-  List<Issue> issueList = [
-    //default list
-    Issue(label: "I am concerned this demo is a waste of time", hypotheses: [])
-  ];
-
-// get list of Issues
-  List<Issue> getIssueList() {
-    return issueList;
+  void addDemoIssue(String label, String ownerId) {
+    _demoIssue = Issue(
+      issueId: 'demo_${DateTime.now().millisecondsSinceEpoch}', // Unique ID
+      label: label,
+      seedStatement: label,
+      root: "I cannot accept this.",
+      solve: "Accept this.",
+      hypotheses: [],
+      solutions: [],
+      ownerId: ownerId,
+      invitedUserIds: [],
+      createdTimestamp: DateTime.now(),
+      lastUpdatedTimestamp: DateTime.now(),
+    );
+    _issues.add(
+      Issue(
+        issueId: 'demo_${DateTime.now().millisecondsSinceEpoch}', // Unique ID
+        label: label,
+        seedStatement: "demoIssue",
+        root: "I cannot accept this.",
+        solve: "Accept this.",
+        hypotheses: [],
+        solutions: [],
+        ownerId: ownerId,
+        invitedUserIds: [],
+        createdTimestamp: DateTime.now(),
+        lastUpdatedTimestamp: DateTime.now(),
+      ),
+    );
+    notifyListeners();
   }
 
 // get list of hypotheses
@@ -35,9 +70,14 @@ ISSUE DATA STRUCTURE
   }
 
 // add a new Issue
-  void addIssue(String label) {
-    //add a new issue with a blank list of root theories
-    issueList.add(Issue(label: label, hypotheses: []));
+  void addIssue(String label, String ownerId) {
+    _issues.add(Issue(
+        label: label,
+        hypotheses: [],
+        seedStatement: label,
+        createdTimestamp: DateTime.now(),
+        lastUpdatedTimestamp: DateTime.now(),
+        ownerId: ownerId));
     notifyListeners();
   }
 
@@ -141,7 +181,7 @@ ISSUE DATA STRUCTURE
 //return relevant Issue given Issue Label
   Issue getRelevantIssue(String issueLabel) {
     Issue relevantIssue =
-        issueList.firstWhere((issue) => issue.label == issueLabel);
+        _issues.firstWhere((issue) => issue.label == issueLabel);
     return relevantIssue;
   }
 

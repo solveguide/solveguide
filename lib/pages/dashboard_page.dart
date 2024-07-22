@@ -1,7 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:guide_solve/services/firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:guide_solve/data/issue_data.dart';
+import 'package:guide_solve/models/issue.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,6 +16,20 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final FirestoreService firestoreService = FirestoreService();
   final TextEditingController textController = TextEditingController();
+  late Stream<List<Issue>> issuesStream;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the stream only once in initState
+    issuesStream = firestoreService.getIssuesStream();
+
+    // Save the demo issue if there is one
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final issueData = Provider.of<IssueData>(context, listen: false);
+      await issueData.saveDemoIssue();
+    });
+  }
 
   void _addIssue() {
     showDialog(
@@ -24,7 +41,16 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              firestoreService.addIssue(textController.text);
+              // Ensure the Issue is created properly with necessary fields
+              final newIssue = Issue(
+                label: textController.text,
+                seedStatement: textController.text,
+                ownerId: FirebaseAuth.instance.currentUser!.uid,
+                createdTimestamp: DateTime.now(),
+                lastUpdatedTimestamp: DateTime.now(),
+                issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
+              );
+              firestoreService.addIssue(newIssue);
               textController.clear();
               Navigator.pop(context);
             },
@@ -39,6 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Dashboard"),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -52,7 +79,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     actions: [
                       SignedOutAction((context) {
-                        Navigator.of(context).pop();
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
                         Navigator.pushReplacementNamed(context, '/');
                       })
                     ],
@@ -68,8 +96,8 @@ class _DashboardPageState extends State<DashboardPage> {
         onPressed: _addIssue,
         child: const Icon(Icons.add),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: firestoreService.getIssuesStream(),
+      body: StreamBuilder<List<Issue>>(
+        stream: issuesStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -77,32 +105,29 @@ class _DashboardPageState extends State<DashboardPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.connectionState == ConnectionState.active ||
               snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-              List<DocumentSnapshot> issuesList = snapshot.data!.docs;
-              return ListView.builder(
-                itemCount: issuesList.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot document = issuesList[index];
-                  //String docID = document.id;
-
-                  Map<String, dynamic> data =
-                      document.data() as Map<String, dynamic>;
-                  String label = data['label'];
-                  Timestamp timestamp = data['timestamp'];
-                  DateTime dateTime = timestamp.toDate();
-
-                  return ListTile(
-                    title: Text(label),
-                    subtitle: Text(dateTime.toString()),
-                  );
-                },
-              );
+            if (snapshot.hasData) {
+              if (snapshot.data!.isNotEmpty) {
+                List<Issue> issuesList = snapshot.data!;
+                return ListView.builder(
+                  itemCount: issuesList.length,
+                  itemBuilder: (context, index) {
+                    Issue issue = issuesList[index];
+                    return ListTile(
+                      title: Text(issue.label),
+                      subtitle: Text(issue.createdTimestamp.toString()),
+                    );
+                  },
+                );
+              } else {
+                return const Center(
+                  child: Text("Congratulations, you have no issues"),
+                );
+              }
             } else {
-              return const Center(
-                  child: Text("Congratulations, you have no issues"));
+              return const Center(child: Text("No data available"));
             }
           } else {
-            return const Center(child: Text("No data available"));
+            return const Center(child: Text("Unexpected state"));
           }
         },
       ),

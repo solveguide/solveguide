@@ -1,6 +1,6 @@
 {
-    "name": "guide_solve",
-    "short_name": "guide_solve",
+    "name": "solveguide",
+    "short_name": "solveguide",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

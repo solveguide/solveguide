@@ -35,22 +35,60 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-// start the demo
-  void goToDemo(String demoIssueLabel) {
-    createDemoIssue(demoIssueLabel);
-    Navigator.push(
+  // Start the demo
+  Future<void> goToDemo(String demoIssueLabel) async {
+    await ensureAnonymousLogin();
+    if (mounted) {
+      createDemoIssue(demoIssueLabel);
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => DemoPage(demoIssue: demoIssueLabel),
-        ));
+        ),
+      );
+    }
+  }
+
+  Future<void> ensureAnonymousLogin() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
   }
 
 // go to signup page
   void goToSignupPage(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
+    if (user != null && !user.isAnonymous) {
       Navigator.pushReplacementNamed(context, '/dashboard');
+    } else if (user != null) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => firebase_ui_auth.RegisterScreen(
+              providers: [
+                firebase_ui_auth.EmailAuthProvider(),
+              ],
+              actions: [
+                firebase_ui_auth.AuthStateChangeAction<
+                    firebase_ui_auth.SignedIn>((context, state) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.pushReplacementNamed(context, '/dashboard');
+                }),
+              ],
+              subtitleBuilder: (context, action) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: action == firebase_ui_auth.AuthAction.signIn
+                      ? const Text(
+                          'Sign in with the credentials you just created.')
+                      : const Text(
+                          'Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
+                );
+              },
+            ),
+          ));
     } else {
       Navigator.push(
           context,
@@ -62,7 +100,7 @@ class _HomePageState extends State<HomePage> {
               actions: [
                 firebase_ui_auth.AuthStateChangeAction<
                     firebase_ui_auth.SignedIn>((context, state) {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                   Navigator.pushReplacementNamed(context, '/dashboard');
                 }),
               ],
@@ -71,9 +109,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // create the demo issue
   void createDemoIssue(String demoIssueLabel) {
-    Provider.of<IssueData>(context, listen: false).addIssue(demoIssueLabel);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Provider.of<IssueData>(context, listen: false)
+          .addDemoIssue(demoIssueLabel, user.uid);
+    }
   }
 
   //UI

@@ -1,30 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:guide_solve/models/issue.dart';
+import 'package:guide_solve/models/issue.dart';
 
 class FirestoreService {
-  //get collection of issues
-  final CollectionReference issues =
+  // Get collection of issues
+  final CollectionReference _issuesCollection =
       FirebaseFirestore.instance.collection('issues');
 
-  //create a new issue
-  Future<void> addIssue(String issueLabel) {
-    return issues.add({
-      'label': issueLabel,
-      'timestamp': Timestamp.now(),
-      'root': "I can't accept things this way.",
-      'solve': "I accept things this way.",
+  // Get an issue from database
+  Stream<List<Issue>> getIssuesStream() {
+    return _issuesCollection.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }).handleError((error) {
+      //print('Error getting issues stream: $error');
+      // Handle the error appropriately, for example by showing a message to the user
     });
   }
 
-  //get an issue from database
-  Stream<QuerySnapshot> getIssuesStream() {
-    final issuesStream =
-        issues.orderBy('timestamp', descending: true).snapshots();
-
-    return issuesStream;
+  // Create an issue
+  Future<void> addIssue(Issue issue) async {
+    try {
+      await _issuesCollection.add(issue.toJson());
+    } catch (error) {
+      //print('Error adding issue: $error');
+      // Handle the error appropriately, for example by showing a message to the user
+    }
   }
 
-  //update an issue
+  // Update an issue
+  Future<void> updateIssue(String issueId, Issue issue) async {
+    try {
+      await _issuesCollection.doc(issueId).update(issue.toJson());
+    } catch (error) {
+      //print('Error updating issue: $error');
+      // Handle the error appropriately, for example by showing a message to the user
+    }
+  }
 
-  //delete an issue
+  // Delete an issue
+  Future<void> deleteIssue(String issueId) async {
+    try {
+      await _issuesCollection.doc(issueId).delete();
+    } catch (error) {
+      //print('Error deleting issue: $error');
+      // Handle the error appropriately, for example by showing a message to the user
+    }
+  }
 }
