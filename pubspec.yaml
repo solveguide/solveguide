@@ -38,6 +38,8 @@ dependencies:
   firebase_analytics: ^11.0.1 # For Firebase Analytics to collect app usage and user behavior data.
   provider: ^6.0.0
   url_launcher: ^6.0.10
+  flutter_bloc: ^8.1.6
+  meta: ^1.12.0
 
 
   # The following adds the Cupertino Icons font to your application.

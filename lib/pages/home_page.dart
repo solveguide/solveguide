@@ -20,7 +20,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
-  bool isButtonEnabled = false; // Tracks whether the start button should be enabled
+  bool isButtonEnabled =
+      false; // Tracks whether the start button should be enabled
 
   @override
   void initState() {
@@ -74,20 +75,20 @@ class _HomePageState extends State<HomePage> {
                     firebase_ui_auth.SignedIn>((context, state) {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                   Navigator.pushReplacementNamed(context, '/dashboard');
-                }
-              ),
-            ],
-            subtitleBuilder: (context, action) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: action == firebase_ui_auth.AuthAction.signIn
-                  ? const Text('Sign in with the credentials you just created.')
-                  : const Text('Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
-            );
-          },
-          ),
-        )
-      );
+                }),
+              ],
+              subtitleBuilder: (context, action) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: action == firebase_ui_auth.AuthAction.signIn
+                      ? const Text(
+                          'Sign in with the credentials you just created.')
+                      : const Text(
+                          'Once you\'ve clicked register once, click the sign-in link and use the credentials you just created.'),
+                );
+              },
+            ),
+          ));
     } else {
       Navigator.push(
           context,
@@ -101,12 +102,10 @@ class _HomePageState extends State<HomePage> {
                     firebase_ui_auth.SignedIn>((context, state) {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                   Navigator.pushReplacementNamed(context, '/dashboard');
-                }
-              ),
-            ],
-          ),
-        )
-      );
+                }),
+              ],
+            ),
+          ));
     }
   }
 
