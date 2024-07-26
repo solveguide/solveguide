@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth_bloc.dart';
+import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/services/firestore.dart';
 import 'package:guide_solve/models/issue.dart';
 
@@ -57,44 +60,64 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(AuthLogoutRequested());
+              },
+              icon: const Icon(Icons.logout))
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addIssue,
         child: const Icon(Icons.add),
       ),
-      body: StreamBuilder<List<Issue>>(
-        stream: issuesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.connectionState == ConnectionState.active ||
-              snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.isNotEmpty) {
-                List<Issue> issuesList = snapshot.data!;
-                return ListView.builder(
-                  itemCount: issuesList.length,
-                  itemBuilder: (context, index) {
-                    Issue issue = issuesList[index];
-                    return ListTile(
-                      title: Text(issue.label),
-                      subtitle: Text(issue.createdTimestamp.toString()),
-                    );
-                  },
-                );
-              } else {
-                return const Center(
-                  child: Text("Congratulations, you have no issues"),
-                );
-              }
-            } else {
-              return const Center(child: Text("No data available"));
-            }
-          } else {
-            return const Center(child: Text("Unexpected state"));
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthInitial) {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
           }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator(),);
+          }
+          return StreamBuilder<List<Issue>>(
+            stream: issuesStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (snapshot.connectionState == ConnectionState.active ||
+                  snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  if (snapshot.data!.isNotEmpty) {
+                    List<Issue> issuesList = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: issuesList.length,
+                      itemBuilder: (context, index) {
+                        Issue issue = issuesList[index];
+                        return ListTile(
+                          title: Text(issue.label),
+                          subtitle: Text(issue.createdTimestamp.toString()),
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(
+                      child: Text("Congratulations, you have no issues"),
+                    );
+                  }
+                } else {
+                  return const Center(child: Text("No data available"));
+                }
+              } else {
+                return const Center(child: Text("Unexpected state"));
+              }
+            },
+          );
+
         },
       ),
     );

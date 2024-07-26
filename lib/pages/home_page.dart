@@ -43,7 +43,8 @@ class _HomePageState extends State<HomePage> {
 
 // go to signup page
   void goToLoginPage() {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   void createDemoIssue(String demoIssueLabel) {

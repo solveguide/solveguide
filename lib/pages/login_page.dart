@@ -13,9 +13,6 @@ class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  //signin function
-  void requestSignIn() {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +21,7 @@ class LoginPage extends StatelessWidget {
         backgroundColor: Colors.orange[50],
         title: const Text('Your Account'),
       ),
-      body: BlocListener<AuthBloc, AuthState>(
+      body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -43,77 +40,76 @@ class LoginPage extends StatelessWidget {
                 (route) => false);
           }
         },
-        child: Center(
-          child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthLoading) {
-                return const CircularProgressIndicator();
-              }
-              return Column(
-                children: [
-                  //logo
-                  logoTitle(10),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  //welcome message
-                  const Text("Welcome back!"),
-                  const SizedBox(
-                    height: 25,
-                  ),
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const CircularProgressIndicator();
+          }
+          return Center(
+            child: Column(
+              children: [
+                //logo
+                logoTitle(10),
+                const SizedBox(
+                  height: 50,
+                ),
+                //welcome message
+                const Text("Welcome back!"),
+                const SizedBox(
+                  height: 25,
+                ),
 
-                  // username text field
-                  PlainTextField(
-                    hintText: "email",
-                    controller: emailController,
-                    obscureText: false,
+                // username text field
+                PlainTextField(
+                  hintText: "email",
+                  controller: emailController,
+                  obscureText: false,
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                // password text field
+                PlainTextField(
+                  hintText: "password",
+                  controller: passwordController,
+                  obscureText: true,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),
+                      )
+                    ],
                   ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  // password text field
-                  PlainTextField(
-                    hintText: "password",
-                    controller: passwordController,
-                    obscureText: true,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "Forgot Password?",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
+                ),
+                //sign in button
+                PlainButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                          AuthLoginRequested(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                  //sign in button
-                  PlainButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(
-                            AuthLoginRequested(
-                              email: emailController.text.trim(),
-                              password: passwordController.text.trim(),
-                            ),
-                          );
-                    },
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  //not a member? register now
-                ],
-              );
-            },
-          ),
-        ),
+                        );
+                  },
+                  text: "Sign In",
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                //not a member? register now
+              ],
+            ),
+          );
+        },
       ),
     );
   }

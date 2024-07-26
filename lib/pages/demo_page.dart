@@ -5,6 +5,8 @@ class DemoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("DemoPage"),);
+    return const Center(
+      child: Text("DemoPage"),
+    );
   }
 }
