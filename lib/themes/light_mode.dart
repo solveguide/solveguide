@@ -10,5 +10,5 @@ ThemeData lightMode = ThemeData(
     tertiaryContainer: Colors.lightBlue.shade200,
     surface: Colors.orange.shade50,
     onSurface: Colors.black,
-  ),
+  )
 );

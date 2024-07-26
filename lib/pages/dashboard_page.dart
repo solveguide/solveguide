@@ -1,9 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:guide_solve/services/firestore.dart';
-import 'package:provider/provider.dart';
-import 'package:guide_solve/data/issue_data.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -23,12 +20,6 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     // Initialize the stream only once in initState
     issuesStream = firestoreService.getIssuesStream();
-
-    // Save the demo issue if there is one
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      await issueData.saveDemoIssue();
-    });
   }
 
   void _addIssue() {
@@ -66,31 +57,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<ProfileScreen>(
-                  builder: (context) => ProfileScreen(
-                    appBar: AppBar(
-                      title: const Text('User Profile'),
-                    ),
-                    actions: [
-                      SignedOutAction((context) {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                        Navigator.pushReplacementNamed(context, '/');
-                      })
-                    ],
-                  ),
-                ),
-              );
-            },
-          )
-        ],
-        automaticallyImplyLeading: false,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addIssue,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:guide_solve/data/issue_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth_bloc.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/themes/light_mode.dart';
-import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'pages/home_page.dart';
 
@@ -26,8 +26,8 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => IssueData(),
+    return BlocProvider(
+      create: (context) => AuthBloc(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: lightMode,
