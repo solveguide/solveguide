@@ -1,64 +1,62 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthInitial()) {
-    on<AuthLoginRequested>(
-      (event, emit) async {
-        emit(AuthLoading());
-        try {
-          // get the email
-          final email = event.email;
-          // get the password
-          final password = event.password;
-          // check that they are valid
-          //email validation using regex?
-          bool isValidEmail(String email) {
-            final emailRegExp = RegExp(
-                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-            return emailRegExp.hasMatch(email);
-          }
+  final AuthRepository _authRepository;
 
-          if (!isValidEmail(email)) {
+AuthBloc({required AuthRepository authRepository})
+      : _authRepository = authRepository,
+        super(AuthInitial()) {
+    on<AuthLoginRequested>(_onLoginRequested);
+    on<AuthLogoutRequested>(_onLogoutRequested);
+    on<AuthRegisterRequested>(_onRegisterRequested);
+  }
+
+  Future<void> _onLoginRequested(AuthLoginRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    if (!_authRepository.isValidEmail(event.email)) {
             emit(
               AuthFailure('Please enter a valid email.'),
             );
             return;
           }
+    try {
+      final user = await _authRepository.signInWithEmailAndPassword(event.email, event.password);
+      emit(AuthSuccess(uid: user!.uid));
+    } catch (error) {
+      emit(AuthFailure(error.toString()));
+    }
+  }
 
-          //password length check
-          if (password.length < 6) {
+  Future<void> _onLogoutRequested(AuthLogoutRequested event, Emitter<AuthState> emit) async {
+    await _authRepository.signOut();
+    emit(AuthInitial());
+  }
+
+  Future<void> _onRegisterRequested(AuthRegisterRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    if (!_authRepository.isValidEmail(event.email)) {
+            emit(
+              AuthFailure('Please enter a valid email.'),
+            );
+            return;
+          }
+          if (event.password.length < 6) {
             emit(
               AuthFailure('Password cannot be less than 6 characters.'),
             );
             return;
           }
-          // navigate on success
-          await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-          final user = FirebaseAuth.instance.currentUser!;
-          return emit(AuthSuccess(uid: user.uid));
-        } catch (e) {
-          return emit(
-            AuthFailure(
-              e.toString(),
-            ),
-          );
-        }
-      },
-    );
-    on<AuthLogoutRequested>((event, emit) async {
-      emit(AuthLoading());
-      try {
-        await FirebaseAuth.instance.signOut();
-          return emit(AuthInitial());
-
-      } catch (e) {
-        emit(AuthFailure(e.toString()));
-      }
-    });
+    try {
+      final user = await _authRepository.registerWithEmailAndPassword(event.email, event.password);
+      await _authRepository.sendEmailVerification();
+      emit(AuthSuccess(uid: user!.uid));
+    } catch (error) {
+      emit(AuthFailure(error.toString()));
+    }
   }
 }

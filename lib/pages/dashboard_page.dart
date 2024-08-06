@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth_bloc.dart';
 import 'package:guide_solve/pages/home_page.dart';
-import 'package:guide_solve/services/firestore.dart';
+import 'package:guide_solve/repositories/firestore_repository.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -75,12 +75,17 @@ class _DashboardPageState extends State<DashboardPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthInitial) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
           }
         },
         builder: (context, state) {
           if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator(),);
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
           return StreamBuilder<List<Issue>>(
             stream: issuesStream,
@@ -117,7 +122,6 @@ class _DashboardPageState extends State<DashboardPage> {
               }
             },
           );
-
         },
       ),
     );

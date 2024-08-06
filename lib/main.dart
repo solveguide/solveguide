@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth_bloc.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
+import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/themes/light_mode.dart';
 import 'firebase_options.dart';
 import 'pages/home_page.dart';
@@ -27,7 +28,7 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthBloc(),
+      create: (context) => AuthBloc(authRepository: AuthRepository()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: lightMode,
