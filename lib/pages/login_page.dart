@@ -91,16 +91,33 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 //sign in button
-                PlainButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                          AuthLoginRequested(
-                            email: emailController.text.trim(),
-                            password: passwordController.text.trim(),
-                          ),
-                        );
-                  },
-                  text: "Sign In",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    PlainButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                              AuthLoginRequested(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              ),
+                            );
+                      },
+                      text: "Sign In",
+                    ),
+                    const SizedBox(width: 25.0,),
+                    PlainButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                              AuthRegisterRequested(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              ),
+                            );
+                      },
+                      text: "Register",
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 25,

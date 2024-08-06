@@ -17,7 +17,8 @@ class PlainButton extends StatelessWidget {
       ),
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(text),
+        style: ButtonStyle(side: WidgetStateProperty.all<BorderSide>(BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 2),),),
+        child: Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onSurface),),
       ),
     );
   }
