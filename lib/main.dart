@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guide_solve/bloc/auth_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/themes/light_mode.dart';

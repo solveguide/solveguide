@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guide_solve/bloc/auth_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/components/plain_button.dart';
 import 'package:guide_solve/components/plain_textfield.dart';
@@ -105,7 +105,9 @@ class LoginPage extends StatelessWidget {
                       },
                       text: "Sign In",
                     ),
-                    const SizedBox(width: 25.0,),
+                    const SizedBox(
+                      width: 25.0,
+                    ),
                     PlainButton(
                       onPressed: () {
                         context.read<AuthBloc>().add(

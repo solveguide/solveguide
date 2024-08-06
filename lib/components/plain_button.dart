@@ -12,13 +12,21 @@ class PlainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+      decoration: const BoxDecoration(
+        //color: Theme.of(context).colorScheme.surface,
       ),
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ButtonStyle(side: WidgetStateProperty.all<BorderSide>(BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 2),),),
-        child: Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onSurface),),
+        style: ButtonStyle(
+          side: WidgetStateProperty.all<BorderSide>(
+            BorderSide(
+                color: Theme.of(context).colorScheme.onSurface, width: 1),
+          ),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
       ),
     );
   }

@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guide_solve/bloc/auth_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
+import 'package:guide_solve/components/issue_tile.dart';
 import 'package:guide_solve/pages/home_page.dart';
-import 'package:guide_solve/repositories/firestore_repository.dart';
+import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -14,7 +15,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final FirestoreService firestoreService = FirestoreService();
+  final IssueRepository issueRepository = IssueRepository();
   final TextEditingController textController = TextEditingController();
   late Stream<List<Issue>> issuesStream;
 
@@ -22,7 +23,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     // Initialize the stream only once in initState
-    issuesStream = firestoreService.getIssuesStream();
+    issuesStream = issueRepository.getIssuesStream();
   }
 
   void _addIssue() {
@@ -44,7 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 lastUpdatedTimestamp: DateTime.now(),
                 issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
               );
-              firestoreService.addIssue(newIssue);
+              issueRepository.addIssue(newIssue);
               textController.clear();
               Navigator.pop(context);
             },
@@ -58,6 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.orange[50],
       appBar: AppBar(
         title: const Text("Dashboard"),
         actions: [
@@ -103,10 +105,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       itemCount: issuesList.length,
                       itemBuilder: (context, index) {
                         Issue issue = issuesList[index];
-                        return ListTile(
-                          title: Text(issue.label),
-                          subtitle: Text(issue.createdTimestamp.toString()),
-                        );
+                        return IssueTile(issue: issue);
                       },
                     );
                   } else {

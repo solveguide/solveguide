@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:guide_solve/models/issue.dart';
 
-class FirestoreService {
+class IssueRepository {
   // Get collection of issues
   final CollectionReference _issuesCollection =
       FirebaseFirestore.instance.collection('issues');
 
-  // Get an issue from database
+  // Get issues from database
   Stream<List<Issue>> getIssuesStream() {
     return _issuesCollection.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
