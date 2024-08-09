@@ -13,8 +13,7 @@ class IssueRepository {
         return Issue.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
     }).handleError((error) {
-      //print('Error getting issues stream: $error');
-      // Handle the error appropriately, for example by showing a message to the user
+      throw error.toString();
     });
   }
 
@@ -23,8 +22,7 @@ class IssueRepository {
     try {
       await _issuesCollection.add(issue.toJson());
     } catch (error) {
-      //print('Error adding issue: $error');
-      // Handle the error appropriately, for example by showing a message to the user
+      throw error.toString();
     }
   }
 
@@ -33,8 +31,7 @@ class IssueRepository {
     try {
       await _issuesCollection.doc(issueId).update(issue.toJson());
     } catch (error) {
-      //print('Error updating issue: $error');
-      // Handle the error appropriately, for example by showing a message to the user
+      throw error.toString();
     }
   }
 
@@ -43,8 +40,7 @@ class IssueRepository {
     try {
       await _issuesCollection.doc(issueId).delete();
     } catch (error) {
-      //print('Error deleting issue: $error');
-      // Handle the error appropriately, for example by showing a message to the user
+      throw error.toString();
     }
   }
 }

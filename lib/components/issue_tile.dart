@@ -30,7 +30,8 @@ class _IssueTileState extends State<IssueTile> {
       decoration: BoxDecoration(
           //color of the tile
           color: Theme.of(context).colorScheme.primaryContainer,
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface, width: 1),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface, width: 1),
           //curve corners
           borderRadius: BorderRadius.circular(8)),
       child: Column(
@@ -47,7 +48,9 @@ class _IssueTileState extends State<IssueTile> {
               ),
               // Priority
               // Age
-              Text('Updated: ${formattedDate(widget.issue.lastUpdatedTimestamp)}', style: const TextStyle(fontSize: 10.0),
+              Text(
+                'Updated: ${formattedDate(widget.issue.lastUpdatedTimestamp)}',
+                style: const TextStyle(fontSize: 10.0),
               ),
             ],
           ),
@@ -58,7 +61,8 @@ class _IssueTileState extends State<IssueTile> {
             children: [
               // Actions --
               // Start solving Issue
-              PlainButton(onPressed: () => goToIssueSolvingPage(), text: "Solve")
+              PlainButton(
+                  onPressed: () => goToIssueSolvingPage(), text: "Solve")
               // View Stakeholders
               //
             ],
@@ -67,7 +71,8 @@ class _IssueTileState extends State<IssueTile> {
       ),
     );
   }
-    String _truncateString(String text, {int maxLength = 150}) {
+
+  String _truncateString(String text, {int maxLength = 150}) {
     if (text.length > maxLength) {
       return '${text.substring(0, maxLength)}...';
     } else {

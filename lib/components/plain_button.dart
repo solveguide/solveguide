@@ -13,8 +13,8 @@ class PlainButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        //color: Theme.of(context).colorScheme.surface,
-      ),
+          //color: Theme.of(context).colorScheme.surface,
+          ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ButtonStyle(

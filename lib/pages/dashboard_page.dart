@@ -64,10 +64,10 @@ class _DashboardPageState extends State<DashboardPage> {
         title: const Text("Dashboard"),
         actions: [
           IconButton(
-              onPressed: () {
-                context.read<AuthBloc>().add(AuthLogoutRequested());
-              },
-              icon: const Icon(Icons.logout))
+            onPressed: () {
+              context.read<AuthBloc>().add(AuthLogoutRequested());
+            },
+            icon: const Icon(Icons.logout),)
         ],
       ),
       floatingActionButton: FloatingActionButton(
