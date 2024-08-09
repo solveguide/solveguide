@@ -10,6 +10,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final IssueRepository issueRepository;
   IssueBloc(this.issueRepository) : super(IssueInitial()) {
     on<IssuesFetched>(_fetchIssues);
+    on<NewIssueCreated>(_addNewIssue);
   }
 
   void _fetchIssues(
@@ -32,6 +33,16 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           return IssuesListFailure(error.toString());
         },
       );
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
+    }
+  }
+
+  void _addNewIssue(NewIssueCreated event,Emitter<IssueState> emit) async {
+    try {
+      issueRepository.addIssue(event.newIssue);
+      emit(IssueInitial());
+
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
     }

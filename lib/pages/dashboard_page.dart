@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_tile.dart';
+import 'package:guide_solve/components/plain_button.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/models/issue.dart';
@@ -26,7 +26,11 @@ class _DashboardPageState extends State<DashboardPage> {
     context.read<IssueBloc>().add(IssuesFetched());
   }
 
-  void _addIssue() {
+void _addIssue() {
+  // Get the AuthBloc state before showing the dialog
+  final authState = context.read<AuthBloc>().state;
+
+  if (authState is AuthSuccess) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -40,12 +44,13 @@ class _DashboardPageState extends State<DashboardPage> {
               final newIssue = Issue(
                 label: textController.text,
                 seedStatement: textController.text,
-                ownerId: FirebaseAuth.instance.currentUser!.uid,
+                ownerId: authState.uid,  // Use ownerId from AuthState
                 createdTimestamp: DateTime.now(),
                 lastUpdatedTimestamp: DateTime.now(),
                 issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
               );
-              issueRepository.addIssue(newIssue);
+              // Dispatch the new issue creation event
+              context.read<IssueBloc>().add(NewIssueCreated(newIssue: newIssue));
               textController.clear();
               Navigator.pop(context);
             },
@@ -54,7 +59,14 @@ class _DashboardPageState extends State<DashboardPage> {
         ],
       ),
     );
+  } else {
+    // Handle the case where the user is not authenticated
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('You need to be logged in to add an issue')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +83,6 @@ class _DashboardPageState extends State<DashboardPage> {
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addIssue,
-        child: const Icon(Icons.add),
-      ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthInitial) {
@@ -90,25 +98,33 @@ class _DashboardPageState extends State<DashboardPage> {
               child: CircularProgressIndicator(),
             );
           }
-          return BlocBuilder<IssueBloc, IssueState>(
-            builder: (context, issueState) {
-              if (issueState is IssuesListLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (issueState is IssuesListFailure) {
-                return Center(child: Text('Error: ${issueState.error}'));
-              } else if (issueState is IssuesListSuccess) {
-                List<Issue> issuesList = issueState.issueList;
-                return ListView.builder(
-                  itemCount: issuesList.length,
-                  itemBuilder: (context, index) {
-                    Issue issue = issuesList[index];
-                    return IssueTile(issue: issue);
-                  },
-                );
-              } else {
-                return const Center(child: Text("Unexpected state"));
-              }
-            },
+          return Column(
+            children: [
+              Center(child: PlainButton(onPressed: _addIssue, text: 'Create New Issue')),
+              const SizedBox(height: 20),
+              BlocBuilder<IssueBloc, IssueState>(
+                builder: (context, issueState) {
+                  if (issueState is IssuesListLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (issueState is IssuesListFailure) {
+                    return Center(child: Text('Error: ${issueState.error}'));
+                  } else if (issueState is IssuesListSuccess) {
+                    List<Issue> issuesList = issueState.issueList;
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: issuesList.length,
+                        itemBuilder: (context, index) {
+                          Issue issue = issuesList[index];
+                          return IssueTile(issue: issue);
+                        },
+                      ),
+                    );
+                  } else {
+                    return const Center(child: Text("Unexpected state"));
+                  }
+                },
+              ),
+            ],
           );
         },
       ),

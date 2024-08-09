@@ -34,7 +34,7 @@ class MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthBloc(authRepository: AuthRepository()),
+          create: (context) => AuthBloc(authRepository: AuthRepository())..add(AppStarted()),
         ),
         BlocProvider(
           create: (context) => IssueBloc(IssueRepository()),

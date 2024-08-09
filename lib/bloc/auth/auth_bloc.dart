@@ -11,13 +11,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required AuthRepository authRepository})
       : _authRepository = authRepository,
         super(AuthInitial()) {
+    on<AppStarted>(_onAppStarted);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
   }
 
+  Future<void> _onAppStarted(
+    AppStarted event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      final currentUser = await _authRepository.getCurrentUser();
+      emit(AuthSuccess(uid: currentUser.uid));
+    } catch (error) {
+      emit(AuthInitial());
+    }
+  }
+
   Future<void> _onLoginRequested(
-      AuthLoginRequested event, Emitter<AuthState> emit) async {
+    AuthLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
     if (!_authRepository.isValidEmail(event.email)) {
       emit(
@@ -35,13 +50,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogoutRequested(
-      AuthLogoutRequested event, Emitter<AuthState> emit) async {
+    AuthLogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     await _authRepository.signOut();
     emit(AuthInitial());
   }
 
   Future<void> _onRegisterRequested(
-      AuthRegisterRequested event, Emitter<AuthState> emit) async {
+    AuthRegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
     if (!_authRepository.isValidEmail(event.email)) {
       emit(

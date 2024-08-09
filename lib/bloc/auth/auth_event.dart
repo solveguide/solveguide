@@ -24,3 +24,5 @@ final class AuthRegisterRequested extends AuthEvent {
     required this.password,
   });
 }
+
+final class AppStarted extends AuthEvent {}

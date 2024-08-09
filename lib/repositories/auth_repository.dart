@@ -11,8 +11,6 @@ class AuthRepository {
     return emailRegExp.hasMatch(email);
   }
 
-// validate password
-
 // send verification email
   Future<void> sendEmailVerification() async {
     try {
@@ -64,4 +62,19 @@ class AuthRepository {
   }
 
 // lost password
+// validate password
+
+// check authentication status
+  Future<User> getCurrentUser() async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser != null) {
+        return currentUser;
+      } else {
+        throw "current user is null";
+      }
+    } catch (error) {
+      throw (error.toString());
+    }
+  }
 }
