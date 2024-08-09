@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
+import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_tile.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
@@ -17,13 +18,12 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final IssueRepository issueRepository = IssueRepository();
   final TextEditingController textController = TextEditingController();
-  late Stream<List<Issue>> issuesStream;
 
   @override
   void initState() {
     super.initState();
     // Initialize the stream only once in initState
-    issuesStream = issueRepository.getIssuesStream();
+    context.read<IssueBloc>().add(IssuesFetched());
   }
 
   void _addIssue() {
@@ -67,7 +67,8 @@ class _DashboardPageState extends State<DashboardPage> {
             onPressed: () {
               context.read<AuthBloc>().add(AuthLogoutRequested());
             },
-            icon: const Icon(Icons.logout),)
+            icon: const Icon(Icons.logout),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -89,33 +90,21 @@ class _DashboardPageState extends State<DashboardPage> {
               child: CircularProgressIndicator(),
             );
           }
-          return StreamBuilder<List<Issue>>(
-            stream: issuesStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          return BlocBuilder<IssueBloc, IssueState>(
+            builder: (context, issueState) {
+              if (issueState is IssuesListLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (snapshot.connectionState == ConnectionState.active ||
-                  snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData) {
-                  if (snapshot.data!.isNotEmpty) {
-                    List<Issue> issuesList = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: issuesList.length,
-                      itemBuilder: (context, index) {
-                        Issue issue = issuesList[index];
-                        return IssueTile(issue: issue);
-                      },
-                    );
-                  } else {
-                    return const Center(
-                      child: Text("Congratulations, you have no issues"),
-                    );
-                  }
-                } else {
-                  return const Center(child: Text("No data available"));
-                }
+              } else if (issueState is IssuesListFailure) {
+                return Center(child: Text('Error: ${issueState.error}'));
+              } else if (issueState is IssuesListSuccess) {
+                List<Issue> issuesList = issueState.issueList;
+                return ListView.builder(
+                  itemCount: issuesList.length,
+                  itemBuilder: (context, index) {
+                    Issue issue = issuesList[index];
+                    return IssueTile(issue: issue);
+                  },
+                );
               } else {
                 return const Center(child: Text("Unexpected state"));
               }

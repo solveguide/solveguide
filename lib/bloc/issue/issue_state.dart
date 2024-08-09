@@ -6,7 +6,7 @@ sealed class IssueState {}
 final class IssueInitial extends IssueState {}
 
 final class IssuesListSuccess extends IssueState {
-  final Stream<List<Issue>> issueList;
+  final List<Issue> issueList;
 
   IssuesListSuccess({required this.issueList});
 }

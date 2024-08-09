@@ -14,5 +14,3 @@ final class FocusIssueSelected extends IssueEvent {
 }
 
 final class DemoIssueStarted extends IssueEvent {}
-
-

@@ -3,8 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
+import 'package:guide_solve/bloc/issue/issue_bloc.dart';
+import 'package:guide_solve/components/app_bloc_observer.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
+import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/themes/light_mode.dart';
 import 'firebase_options.dart';
 import 'pages/home_page.dart';
@@ -14,6 +17,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  Bloc.observer = AppBlocObserver();
   runApp(const MyApp());
 }
 
@@ -27,8 +31,15 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc(authRepository: AuthRepository()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AuthBloc(authRepository: AuthRepository()),
+        ),
+        BlocProvider(
+          create: (context) => IssueBloc(IssueRepository()),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: lightMode,

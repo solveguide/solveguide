@@ -12,15 +12,28 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<IssuesFetched>(_fetchIssues);
   }
 
-  void _fetchIssues(
-    IssuesFetched event,
-    Emitter<IssueState> emit,
-  ) async {
-    try {
-      final issueList = issueRepository.getIssuesStream();
-      emit(IssuesListSuccess(issueList : issueList));
-    } catch (error) {
-      emit(IssuesListFailure(error.toString()));
-    }
+void _fetchIssues(
+  IssuesFetched event,
+  Emitter<IssueState> emit,
+) async {
+  emit(IssuesListLoading());
+  try {
+    await emit.forEach<List<Issue>>(
+      issueRepository.getIssuesStream(),
+      onData: (issuesList) {
+        if (issuesList.isEmpty) {
+          return IssuesListFailure("Congratulations, you have no issues.");  // Custom state for empty list
+        } else {
+          return IssuesListSuccess(issueList: issuesList);
+        }
+      },
+      onError: (error, stackTrace) {
+        return IssuesListFailure(error.toString());
+      },
+    );
+  } catch (error) {
+    emit(IssuesListFailure(error.toString()));
   }
+}
+
 }
