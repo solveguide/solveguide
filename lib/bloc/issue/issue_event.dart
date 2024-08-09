@@ -5,6 +5,14 @@ sealed class IssueEvent {}
 
 final class IssuesFetched extends IssueEvent {}
 
+final class NewIssueCreated extends IssueEvent {
+  final Issue newIssue;
+
+  NewIssueCreated({
+    required this.newIssue,
+  });
+}
+
 final class FocusIssueSelected extends IssueEvent {
   final String issueID;
 

@@ -15,14 +15,11 @@ class PlainButton extends StatelessWidget {
       decoration: const BoxDecoration(
           //color: Theme.of(context).colorScheme.surface,
           ),
-      child: ElevatedButton(
+      child: MaterialButton(
         onPressed: onPressed,
-        style: ButtonStyle(
-          side: WidgetStateProperty.all<BorderSide>(
-            BorderSide(
-                color: Theme.of(context).colorScheme.onSurface, width: 1),
-          ),
-        ),
+        color: Theme.of(context).colorScheme.tertiaryContainer,
+        disabledColor: Colors.grey.shade100,
+        disabledTextColor: Colors.grey.shade700,
         child: Text(
           text,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),

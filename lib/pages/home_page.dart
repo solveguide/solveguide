@@ -19,8 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
-  bool isButtonEnabled =
-      false; // Tracks whether the start button should be enabled
+  bool isButtonEnabled = false; // Tracks whether demo button can be clicked
 
   @override
   void initState() {
