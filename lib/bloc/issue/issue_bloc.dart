@@ -20,7 +20,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     emit(IssuesListLoading());
     try {
       await emit.forEach<List<Issue>>(
-        issueRepository.getIssuesStream(),
+        issueRepository.getIssuesStream(event.userId),
         onData: (issuesList) {
           if (issuesList.isEmpty) {
             return IssuesListFailure(
@@ -38,11 +38,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _addNewIssue(NewIssueCreated event,Emitter<IssueState> emit) async {
+  void _addNewIssue(NewIssueCreated event, Emitter<IssueState> emit) async {
     try {
-      issueRepository.addIssue(event.newIssue);
+      issueRepository.addIssue(event.seedStatement, event.ownerId);
       emit(IssueInitial());
-
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
     }

@@ -23,50 +23,49 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     // Initialize the stream only once in initState
-    context.read<IssueBloc>().add(IssuesFetched());
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthSuccess) {
+    context.read<IssueBloc>().add(IssuesFetched(userId : authState.uid));
+    } else {
+      Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+    }
   }
 
-void _addIssue() {
-  // Get the AuthBloc state before showing the dialog
-  final authState = context.read<AuthBloc>().state;
+  void _addIssue() {
+    // Get the AuthBloc state before showing the dialog
+    final authState = context.read<AuthBloc>().state;
 
-  if (authState is AuthSuccess) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: TextField(
-          controller: textController,
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              // Ensure the Issue is created properly with necessary fields
-              final newIssue = Issue(
-                label: textController.text,
-                seedStatement: textController.text,
-                ownerId: authState.uid,  // Use ownerId from AuthState
-                createdTimestamp: DateTime.now(),
-                lastUpdatedTimestamp: DateTime.now(),
-                issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
-              );
-              // Dispatch the new issue creation event
-              context.read<IssueBloc>().add(NewIssueCreated(newIssue: newIssue));
-              textController.clear();
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
+    if (authState is AuthSuccess) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: TextField(
+            controller: textController,
           ),
-        ],
-      ),
-    );
-  } else {
-    // Handle the case where the user is not authenticated
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('You need to be logged in to add an issue')),
-    );
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                // Dispatch the new issue creation event
+                context.read<IssueBloc>().add(NewIssueCreated(seedStatement: textController.text, ownerId: authState.uid));
+                textController.clear();
+                Navigator.pop(context);
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Handle the case where the user is not authenticated
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You need to be logged in to add an issue')),
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +99,9 @@ void _addIssue() {
           }
           return Column(
             children: [
-              Center(child: PlainButton(onPressed: _addIssue, text: 'Create New Issue')),
+              Center(
+                  child: PlainButton(
+                      onPressed: _addIssue, text: 'Create New Issue')),
               const SizedBox(height: 20),
               BlocBuilder<IssueBloc, IssueState>(
                 builder: (context, issueState) {

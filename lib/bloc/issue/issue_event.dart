@@ -3,13 +3,19 @@ part of 'issue_bloc.dart';
 @immutable
 sealed class IssueEvent {}
 
-final class IssuesFetched extends IssueEvent {}
+final class IssuesFetched extends IssueEvent {
+  final String userId;
+
+  IssuesFetched({required this.userId});
+}
 
 final class NewIssueCreated extends IssueEvent {
-  final Issue newIssue;
+  final String seedStatement;
+  final String ownerId;
 
   NewIssueCreated({
-    required this.newIssue,
+    required this.seedStatement,
+    required this.ownerId,
   });
 }
 
