@@ -11,10 +11,12 @@ import 'package:guide_solve/models/issue.dart';
 
 class IssueTile extends StatefulWidget {
   final Issue issue;
+  final VoidCallback firstButton;
 
   const IssueTile({
     super.key,
     required this.issue,
+    required this.firstButton,
   });
 
   @override
@@ -62,7 +64,7 @@ class _IssueTileState extends State<IssueTile> {
               // Actions --
               // Start solving Issue
               PlainButton(
-                  onPressed: () => goToIssueSolvingPage(), text: "Solve")
+                  onPressed: () => widget.firstButton(), text: "Solve")
               // View Stakeholders
               //
             ],
@@ -79,8 +81,4 @@ class _IssueTileState extends State<IssueTile> {
       return text;
     }
   }
-}
-
-void goToIssueSolvingPage() {
-//solve issue experience
 }

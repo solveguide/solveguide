@@ -5,6 +5,7 @@ import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_tile.dart';
 import 'package:guide_solve/components/plain_button.dart';
 import 'package:guide_solve/pages/home_page.dart';
+import 'package:guide_solve/pages/issue_page.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/models/issue.dart';
 
@@ -25,12 +26,12 @@ class _DashboardPageState extends State<DashboardPage> {
     // Initialize the stream only once in initState
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthSuccess) {
-    context.read<IssueBloc>().add(IssuesFetched(userId : authState.uid));
+      context.read<IssueBloc>().add(IssuesFetched(userId: authState.uid));
     } else {
       Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
     }
   }
 
@@ -49,7 +50,9 @@ class _DashboardPageState extends State<DashboardPage> {
             ElevatedButton(
               onPressed: () {
                 // Dispatch the new issue creation event
-                context.read<IssueBloc>().add(NewIssueCreated(seedStatement: textController.text, ownerId: authState.uid));
+                context.read<IssueBloc>().add(NewIssueCreated(
+                    seedStatement: textController.text,
+                    ownerId: authState.uid));
                 textController.clear();
                 Navigator.pop(context);
               },
@@ -116,7 +119,18 @@ class _DashboardPageState extends State<DashboardPage> {
                         itemCount: issuesList.length,
                         itemBuilder: (context, index) {
                           Issue issue = issuesList[index];
-                          return IssueTile(issue: issue);
+                          return IssueTile(
+                            issue: issue,
+                            firstButton: () {
+                              // Navigate to IssuePage with the selected issue
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => IssuePage(issue: issue),
+                                ),
+                              );
+                            },
+                          );
                         },
                       ),
                     );

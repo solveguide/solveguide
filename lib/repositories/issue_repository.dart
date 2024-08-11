@@ -8,7 +8,10 @@ class IssueRepository {
 
   // Get issues from database
   Stream<List<Issue>> getIssuesStream(String currentUserId) {
-    return _issuesCollection.where('ownerId', isEqualTo: currentUserId).snapshots().map((snapshot) {
+    return _issuesCollection
+        .where('ownerId', isEqualTo: currentUserId)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
         return Issue.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
@@ -20,13 +23,13 @@ class IssueRepository {
   // Create an issue
   Future<void> addIssue(String seedStatement, String ownerId) async {
     final newIssue = Issue(
-                  label: seedStatement,
-                  seedStatement: seedStatement,
-                  ownerId: ownerId, // Use ownerId from AuthState
-                  createdTimestamp: DateTime.now(),
-                  lastUpdatedTimestamp: DateTime.now(),
-                  //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
-                );
+      label: seedStatement,
+      seedStatement: seedStatement,
+      ownerId: ownerId, // Use ownerId from AuthState
+      createdTimestamp: DateTime.now(),
+      lastUpdatedTimestamp: DateTime.now(),
+      //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
+    );
     try {
       final docRef = await _issuesCollection.add(newIssue.toJson());
       await docRef.update({'issueId': docRef.id});
