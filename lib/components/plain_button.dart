@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 
 class PlainButton extends StatelessWidget {
-  const PlainButton({super.key});
+  final VoidCallback onPressed;
+  final String text;
+  const PlainButton({
+    super.key,
+    required this.onPressed,
+    required this.text,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.red,
-      ),
-      child: const Center(
+          //color: Theme.of(context).colorScheme.surface,
+          ),
+      child: MaterialButton(
+        onPressed: onPressed,
+        color: Theme.of(context).colorScheme.tertiaryContainer,
+        disabledColor: Colors.grey.shade100,
+        disabledTextColor: Colors.grey.shade700,
         child: Text(
-          "Submit",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          text,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
       ),
     );

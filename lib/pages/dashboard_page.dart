@@ -1,9 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:guide_solve/services/firestore.dart';
-import 'package:provider/provider.dart';
-import 'package:guide_solve/data/issue_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
+import 'package:guide_solve/bloc/issue/issue_bloc.dart';
+import 'package:guide_solve/components/issue_tile.dart';
+import 'package:guide_solve/components/plain_button.dart';
+import 'package:guide_solve/pages/home_page.dart';
+import 'package:guide_solve/pages/issue_page.dart';
+import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -14,121 +17,130 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final FirestoreService firestoreService = FirestoreService();
+  final IssueRepository issueRepository = IssueRepository();
   final TextEditingController textController = TextEditingController();
-  late Stream<List<Issue>> issuesStream;
 
   @override
   void initState() {
     super.initState();
     // Initialize the stream only once in initState
-    issuesStream = firestoreService.getIssuesStream();
-
-    // Save the demo issue if there is one
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final issueData = Provider.of<IssueData>(context, listen: false);
-      await issueData.saveDemoIssue();
-    });
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthSuccess) {
+      context.read<IssueBloc>().add(IssuesFetched(userId: authState.uid));
+    } else {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
+    }
   }
 
   void _addIssue() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: TextField(
-          controller: textController,
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              // Ensure the Issue is created properly with necessary fields
-              final newIssue = Issue(
-                label: textController.text,
-                seedStatement: textController.text,
-                ownerId: FirebaseAuth.instance.currentUser!.uid,
-                createdTimestamp: DateTime.now(),
-                lastUpdatedTimestamp: DateTime.now(),
-                issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
-              );
-              firestoreService.addIssue(newIssue);
-              textController.clear();
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
+    // Get the AuthBloc state before showing the dialog
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is AuthSuccess) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: TextField(
+            controller: textController,
           ),
-        ],
-      ),
-    );
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                // Dispatch the new issue creation event
+                context.read<IssueBloc>().add(NewIssueCreated(
+                    seedStatement: textController.text,
+                    ownerId: authState.uid));
+                textController.clear();
+                Navigator.pop(context);
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Handle the case where the user is not authenticated
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You need to be logged in to add an issue')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.orange[50],
       appBar: AppBar(
         title: const Text("Dashboard"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<ProfileScreen>(
-                  builder: (context) => ProfileScreen(
-                    appBar: AppBar(
-                      title: const Text('User Profile'),
-                    ),
-                    actions: [
-                      SignedOutAction((context) {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                        Navigator.pushReplacementNamed(context, '/');
-                      })
-                    ],
-                  ),
-                ),
-              );
+              context.read<AuthBloc>().add(AuthLogoutRequested());
             },
+            icon: const Icon(Icons.logout),
           )
         ],
-        automaticallyImplyLeading: false,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addIssue,
-        child: const Icon(Icons.add),
-      ),
-      body: StreamBuilder<List<Issue>>(
-        stream: issuesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.connectionState == ConnectionState.active ||
-              snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.isNotEmpty) {
-                List<Issue> issuesList = snapshot.data!;
-                return ListView.builder(
-                  itemCount: issuesList.length,
-                  itemBuilder: (context, index) {
-                    Issue issue = issuesList[index];
-                    return ListTile(
-                      title: Text(issue.label),
-                      subtitle: Text(issue.createdTimestamp.toString()),
-                    );
-                  },
-                );
-              } else {
-                return const Center(
-                  child: Text("Congratulations, you have no issues"),
-                );
-              }
-            } else {
-              return const Center(child: Text("No data available"));
-            }
-          } else {
-            return const Center(child: Text("Unexpected state"));
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthInitial) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
           }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return Column(
+            children: [
+              Center(
+                  child: PlainButton(
+                      onPressed: _addIssue, text: 'Create New Issue')),
+              const SizedBox(height: 20),
+              BlocBuilder<IssueBloc, IssueState>(
+                builder: (context, issueState) {
+                  if (issueState is IssuesListLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (issueState is IssuesListFailure) {
+                    return Center(child: Text('Error: ${issueState.error}'));
+                  } else if (issueState is IssuesListSuccess) {
+                    List<Issue> issuesList = issueState.issueList;
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: issuesList.length,
+                        itemBuilder: (context, index) {
+                          Issue issue = issuesList[index];
+                          return IssueTile(
+                            issue: issue,
+                            firstButton: () {
+                              // Navigate to IssuePage with the selected issue
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => IssuePage(issue: issue),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return const Center(child: Text("Unexpected state"));
+                  }
+                },
+              ),
+            ],
+          );
         },
       ),
     );

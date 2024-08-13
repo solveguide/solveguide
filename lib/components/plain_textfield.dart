@@ -3,20 +3,23 @@ import 'package:flutter/material.dart';
 class PlainTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
+  final bool obscureText;
   const PlainTextField({
     super.key,
     required this.hintText,
     required this.controller,
+    required this.obscureText,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: TextField(
         //keyboardType: TextInputType.multiline, // Enables line breaks
         //maxLines: null,
         controller: controller,
+        obscureText: obscureText,
         decoration: InputDecoration(
           hintText: hintText,
           fillColor: Theme.of(context).colorScheme.secondary,
