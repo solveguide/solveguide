@@ -63,8 +63,7 @@ class _IssueTileState extends State<IssueTile> {
             children: [
               // Actions --
               // Start solving Issue
-              PlainButton(
-                  onPressed: () => widget.firstButton(), text: "Solve")
+              PlainButton(onPressed: () => widget.firstButton(), text: "Solve")
               // View Stakeholders
               //
             ],
