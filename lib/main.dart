@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
@@ -41,52 +40,22 @@ class MyAppState extends State<MyApp> {
           create: (context) => IssueBloc(IssueRepository()),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: lightMode,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const AuthWrapper(),
-          '/dashboard': (context) => const DashboardPage(),
-          '/demo': (context) => const HomePage(),
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthSuccess) {
+            return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: lightMode,
+            home: const DashboardPage(),
+          );
+          }
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: lightMode,
+            home: const HomePage(),
+          );
         },
       ),
-    );
-  }
-}
-
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        // Show a loading indicator while waiting for authentication state
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        // Check if the user is logged in
-        if (snapshot.hasData) {
-          final user = snapshot.data;
-
-          // Check if the user is not null and not anonymous
-          if (user != null && !user.isAnonymous) {
-            // Navigate to the dashboard
-            return const DashboardPage(); // Replace with your DashboardPage widget
-          } else {
-            // User is logged in anonymously
-            return const HomePage(); // Replace with your DemoPage widget
-          }
-        } else {
-          // User is not logged in
-          return const HomePage(); // Replace with your DemoPage widget
-        }
-      },
     );
   }
 }
