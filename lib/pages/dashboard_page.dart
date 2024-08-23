@@ -157,13 +157,13 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     );
                   } else if (issueState is IssueFocusedState) {
-                
                     context
                         .read<IssueBloc>()
                         .add(IssuesFetched(userId: authState.uid));
-                        return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else {
-                    return const Center(child: Text("Unexpected state: IssueBloc"));
+                    return const Center(
+                        child: Text("Unexpected state: IssueBloc"));
                   }
                 },
               );

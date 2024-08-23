@@ -40,7 +40,7 @@ class MyAppState extends State<MyApp> {
           create: (context) => IssueBloc(IssueRepository()),
         ),
       ],
-child: MaterialApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: lightMode,
         home: BlocBuilder<AuthBloc, AuthState>(
