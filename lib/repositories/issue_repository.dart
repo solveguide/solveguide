@@ -55,4 +55,22 @@ class IssueRepository {
       throw error.toString();
     }
   }
+
+/*
+LOCAL iSSUE MANIPULATING FUNCTIONS
+*/
+Issue? _focusedIssue;
+
+  // Method to set the focused issue
+  void setFocusIssue(Issue issue) {
+    _focusedIssue = issue;
+  }
+
+  // Method to get the focused issue
+  Issue? getFocusIssue() {
+    return _focusedIssue;
+  }
+
+
+
 }

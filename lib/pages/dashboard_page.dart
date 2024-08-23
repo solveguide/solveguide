@@ -102,7 +102,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           BlocListener<IssueBloc, IssueState>(
             listener: (context, issueState) {
-              if (issueState is IssueFocusedState) {
+              if (issueState is IssueInFocus) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -156,7 +156,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ],
                     );
-                  } else if (issueState is IssueFocusedState) {
+                  } else if (issueState is IssueInFocus) {
                     context
                         .read<IssueBloc>()
                         .add(IssuesFetched(userId: authState.uid));

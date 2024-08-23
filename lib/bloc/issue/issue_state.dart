@@ -19,8 +19,30 @@ final class IssuesListFailure extends IssueState {
   IssuesListFailure(this.error);
 }
 
-final class IssueFocusedState extends IssueState {
+sealed class IssueInFocus extends IssueState {
   final Issue focusedIssue;
 
-  IssueFocusedState({required this.focusedIssue});
+  IssueInFocus({required this.focusedIssue});
+}
+
+final class IssueInFocusInitial extends IssueInFocus {
+  IssueInFocusInitial({required super.focusedIssue});
+}
+
+final class IssueInFocusRootIdentified extends IssueInFocus {
+  final String rootCause;
+
+  IssueInFocusRootIdentified({
+    required super.focusedIssue, // directly pass to the superclass
+    required this.rootCause,
+  });
+}
+
+final class IssueInFocusSolutionIdentified extends IssueInFocus {
+  final String solution;
+
+  IssueInFocusSolutionIdentified({
+    required super.focusedIssue, // directly pass to the superclass
+    required this.solution,
+  });
 }

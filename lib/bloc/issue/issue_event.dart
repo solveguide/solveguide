@@ -19,6 +19,11 @@ final class NewIssueCreated extends IssueEvent {
   });
 }
 
+/*
+
+THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
+
+*/
 final class FocusIssueSelected extends IssueEvent {
   final String issueID;
 
@@ -27,4 +32,18 @@ final class FocusIssueSelected extends IssueEvent {
   });
 }
 
+final class NewHypothesisCreated extends IssueEvent {
+  final String newHypothesis;
+
+  NewHypothesisCreated({
+    required this.newHypothesis,
+  });
+}
+
+
+/*
+
+AS OF YET UNUSED DEMO EVENTS
+
+*/
 final class DemoIssueStarted extends IssueEvent {}

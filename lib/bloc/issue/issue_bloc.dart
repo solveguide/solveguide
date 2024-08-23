@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
@@ -12,6 +13,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
+    //Issue Solving Events
+    on<NewHypothesisCreated>(_newHypothesisCreated);
   }
 
   void _fetchIssues(
@@ -62,12 +65,30 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         final focusedIssue = issuesList.firstWhere(
           (issue) => issue.issueId == event.issueID,
         );
-        emit(IssueFocusedState(focusedIssue: focusedIssue));
+        issueRepository.setFocusIssue(focusedIssue);
+        emit(IssueInFocusInitial(focusedIssue: focusedIssue));
       } catch (e) {
         emit(IssuesListFailure("Issue not found"));
       }
     } else {
       emit(IssuesListFailure("Issues not loaded"));
+    }
+  }
+
+  void _newHypothesisCreated(
+    NewHypothesisCreated event,
+    Emitter<IssueState> emit,
+  ) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      focusIssue.hypotheses.insert(
+        0,
+        Hypothesis(desc: event.newHypothesis),
+      );
+      emit(IssueInFocusInitial(focusedIssue: focusIssue));
     }
   }
 }
