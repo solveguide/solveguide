@@ -11,6 +11,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   IssueBloc(this.issueRepository) : super(IssueInitial()) {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
+    on<FocusIssueSelected>(_onFocusIssueSelected);
   }
 
   void _fetchIssues(
@@ -38,12 +39,35 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _addNewIssue(NewIssueCreated event, Emitter<IssueState> emit) async {
+  void _addNewIssue(
+    NewIssueCreated event,
+    Emitter<IssueState> emit,
+  ) async {
     try {
       issueRepository.addIssue(event.seedStatement, event.ownerId);
       emit(IssueInitial());
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
+    }
+  }
+
+  void _onFocusIssueSelected(
+    FocusIssueSelected event,
+    Emitter<IssueState> emit,
+  ) {
+    if (state is IssuesListSuccess) {
+      final issuesList = (state as IssuesListSuccess).issueList;
+      try {
+        // Assuming Issue has a unique 'id' field
+        final focusedIssue = issuesList.firstWhere(
+          (issue) => issue.issueId == event.issueID,
+        );
+        emit(IssueFocusedState(focusedIssue: focusedIssue));
+      } catch (e) {
+        emit(IssuesListFailure("Issue not found"));
+      }
+    } else {
+      emit(IssuesListFailure("Issues not loaded"));
     }
   }
 }

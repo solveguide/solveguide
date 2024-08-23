@@ -18,3 +18,9 @@ final class IssuesListFailure extends IssueState {
 
   IssuesListFailure(this.error);
 }
+
+final class IssueFocusedState extends IssueState {
+  final Issue focusedIssue;
+
+  IssueFocusedState({required this.focusedIssue});
+}

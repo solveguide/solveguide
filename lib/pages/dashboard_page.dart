@@ -45,6 +45,9 @@ class _DashboardPageState extends State<DashboardPage> {
         builder: (context) => AlertDialog(
           content: TextField(
             controller: textController,
+            decoration: const InputDecoration(
+              hintText: 'Enter issue description',
+            ),
           ),
           actions: [
             ElevatedButton(
@@ -85,28 +88,42 @@ class _DashboardPageState extends State<DashboardPage> {
           )
         ],
       ),
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthInitial) {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
-          }
-        },
-        builder: (context, state) {
-          if (state is AuthLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return Column(
-            children: [
-              Center(
-                  child: PlainButton(
-                      onPressed: _addIssue, text: 'Create New Issue')),
-              const SizedBox(height: 20),
-              BlocBuilder<IssueBloc, IssueState>(
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, authState) {
+              if (authState is AuthInitial) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    (route) => false);
+              }
+            },
+          ),
+          BlocListener<IssueBloc, IssueState>(
+            listener: (context, issueState) {
+              if (issueState is IssueFocusedState) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        IssuePage(issue: issueState.focusedIssue),
+                  ),
+                );
+              } else if (issueState is IssuesListFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(issueState.error)),
+                );
+              }
+            },
+          ),
+        ],
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            if (authState is AuthLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (authState is AuthSuccess) {
+              return BlocBuilder<IssueBloc, IssueState>(
                 builder: (context, issueState) {
                   if (issueState is IssuesListLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -114,34 +131,47 @@ class _DashboardPageState extends State<DashboardPage> {
                     return Center(child: Text('Error: ${issueState.error}'));
                   } else if (issueState is IssuesListSuccess) {
                     List<Issue> issuesList = issueState.issueList;
-                    return Expanded(
-                      child: ListView.builder(
-                        itemCount: issuesList.length,
-                        itemBuilder: (context, index) {
-                          Issue issue = issuesList[index];
-                          return IssueTile(
-                            issue: issue,
-                            firstButton: () {
-                              // Navigate to IssuePage with the selected issue
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => IssuePage(issue: issue),
-                                ),
+                    return Column(
+                      children: [
+                        Center(
+                            child: PlainButton(
+                                onPressed: _addIssue,
+                                text: 'Create New Issue')),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: issuesList.length,
+                            itemBuilder: (context, index) {
+                              Issue issue = issuesList[index];
+                              return IssueTile(
+                                issue: issue,
+                                firstButton: () {
+                                  context.read<IssueBloc>().add(
+                                      FocusIssueSelected(
+                                          issueID: issue.issueId!));
+                                },
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     );
+                  } else if (issueState is IssueFocusedState) {
+                
+                    context
+                        .read<IssueBloc>()
+                        .add(IssuesFetched(userId: authState.uid));
+                        return const Center(child: CircularProgressIndicator());
                   } else {
-                    return const Center(child: Text("Unexpected state"));
+                    return const Center(child: Text("Unexpected state: IssueBloc"));
                   }
                 },
-              ),
-            ],
-          );
-        },
+              );
+            } else {
+              return const Center(child: Text("Unexpected state: AuthBloc"));
+            }
+          },
+        ),
       ),
     );
   }
