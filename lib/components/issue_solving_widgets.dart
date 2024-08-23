@@ -5,7 +5,7 @@ class HelpInstructions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    // TO-DO: implement build
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 25.0),
       child: Text("Help Instructions"),
