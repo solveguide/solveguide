@@ -46,8 +46,8 @@ class _IssuePageState extends State<IssuePage> {
               controller: textController,
               focusNode: _focusNode,
               onSubmitted: () {
-                context.read<IssueBloc>()
-                        .add(NewHypothesisCreated(newHypothesis: textController.text));
+                context.read<IssueBloc>().add(
+                    NewHypothesisCreated(newHypothesis: textController.text));
                 textController.clear();
                 // Handle updating the issue state
               },
@@ -55,14 +55,12 @@ class _IssuePageState extends State<IssuePage> {
               hintText: 'Enter root theories here.',
             ),
             const SizedBox(height: 20),
-            Expanded(
-              child: ResortableListWidget<Hypothesis>(
+            ResortableListWidget<Hypothesis>(
                 items: widget.issue.hypotheses,
                 getItemDescription: (hypothesis) => hypothesis.desc,
                 //onEdit: _editHypothesis,
                 //onDelete: _deleteHypothesis,
               ),
-            ),
           ],
         ),
       ),

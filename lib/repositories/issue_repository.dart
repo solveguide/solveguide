@@ -59,7 +59,7 @@ class IssueRepository {
 /*
 LOCAL iSSUE MANIPULATING FUNCTIONS
 */
-Issue? _focusedIssue;
+  Issue? _focusedIssue;
 
   // Method to set the focused issue
   void setFocusIssue(Issue issue) {
@@ -70,7 +70,4 @@ Issue? _focusedIssue;
   Issue? getFocusIssue() {
     return _focusedIssue;
   }
-
-
-
 }

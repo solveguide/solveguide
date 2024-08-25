@@ -40,7 +40,6 @@ final class NewHypothesisCreated extends IssueEvent {
   });
 }
 
-
 /*
 
 AS OF YET UNUSED DEMO EVENTS
