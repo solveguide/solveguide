@@ -32,16 +32,16 @@ class ResortableListWidget<T> extends StatelessWidget {
             ),
             child: ListTile(
               tileColor: Theme.of(context).colorScheme.tertiary,
-              leading: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () => onEdit?.call(index, item),
-              ),
+              // leading: IconButton(
+              //   icon: const Icon(Icons.edit),
+              //   onPressed: () => onEdit?.call(index, item),
+              // ),
               title: Text(getItemDescription(item)),
               onTap: () => onEdit?.call(index, item),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () => onDelete?.call(index, item),
-              ),
+              // trailing: IconButton(
+              //   icon: const Icon(Icons.delete),
+              //   onPressed: () => onDelete?.call(index, item),
+              // ),
             ),
           );
         },

@@ -38,6 +38,30 @@ class IssueRepository {
     }
   }
 
+    // Spinoff an issue
+  Future<String> addSpinoffIssue(Issue oldIssue, String spinoffHypothesis, String ownerId) async {
+    final newIssue = Issue(
+      label: spinoffHypothesis,
+      seedStatement: oldIssue.seedStatement,
+      spinoffSourceIssueId: oldIssue.issueId,
+      ownerId: ownerId, // Use ownerId from AuthState
+      createdTimestamp: oldIssue.createdTimestamp,
+      lastUpdatedTimestamp: DateTime.now(),
+      root: oldIssue.root,
+      solve: oldIssue.solve,
+      hypotheses: oldIssue.hypotheses,
+      solutions: oldIssue.solutions,
+      invitedUserIds: oldIssue.invitedUserIds,
+    );
+    try {
+      final docRef = await _issuesCollection.add(newIssue.toJson());
+      await docRef.update({'issueId': docRef.id});
+      return docRef.id;
+    } catch (error) {
+      throw error.toString();
+    }
+  }
+
   // Update an issue
   Future<void> updateIssue(String issueId, Issue issue) async {
     try {

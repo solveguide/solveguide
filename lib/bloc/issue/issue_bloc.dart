@@ -20,6 +20,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
+    on<HypothesisUpdated>(_onHypothesisUpdated);
+    on<CreateSeparateIssueFromHypothesis>(_onCreateSeparateIssueFromHypothesis);
   }
 
   void _fetchIssues(
@@ -130,6 +132,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       emit(IssuesListFailure("No Issue Selected"));
     } else {
       focusIssue.root = event.confirmedRoot;
+      focusIssue.label = event.confirmedRoot;
       emit(IssueInFocusRootIdentified(
         focusedIssue: focusIssue,
         rootCause: event.confirmedRoot,
@@ -164,6 +167,69 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     } else {
       focusIssue.solve = event.confirmedSolve;
       emit(IssueInFocusSolved(focusedIssue: focusIssue));
+    }
+  }
+
+void _onHypothesisUpdated(
+  HypothesisUpdated event,
+  Emitter<IssueState> emit,
+) {
+  final currentState = state;
+
+  if (currentState is IssueInFocusInitial) {
+    // Create a copy of the current hypotheses list
+    final updatedHypotheses = List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
+
+    // Update the hypothesis at the given index
+    updatedHypotheses[event.index] = event.updatedHypothesis;
+
+    // Move the updated hypothesis to the top of the list
+    final hypothesis = updatedHypotheses.removeAt(event.index);
+    updatedHypotheses.insert(0, hypothesis);
+
+    // Create a new focused issue with the updated hypotheses
+    final updatedIssue = currentState.focusedIssue.copyWith(
+      hypotheses: updatedHypotheses,
+    );
+
+    // Emit the new state
+    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+  }
+}
+
+  void _onCreateSeparateIssueFromHypothesis(
+    CreateSeparateIssueFromHypothesis event,
+    Emitter<IssueState> emit,
+  ) async {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure(
+          "An Error Occurred while spinning off your issue."));
+    } else {
+      try {
+        String spinoffId;
+        try {
+          //update focus issue to db
+          issueRepository.updateIssue(focusIssue.issueId!, focusIssue);
+
+          //create a new spinoff issue in the db
+          spinoffId = await issueRepository.addSpinoffIssue(
+            focusIssue,
+            event.hypothesis.desc,
+            event.ownerId,
+          );
+          event.hypothesis.isSpinoffIssue = true;
+          event.hypothesis.spinoffIssueId = spinoffId;
+          
+          emit(IssueInFocusInitial(focusedIssue: focusIssue));
+        } catch (e) {
+          emit(IssuesListFailure(
+              "Error occurred while spinning off the issue."));
+        }
+      } catch (e) {
+        emit(IssuesListFailure("Issue not found"));
+      }
     }
   }
 }

@@ -4,12 +4,12 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onCreate(BlocBase bloc) {
     super.onCreate(bloc);
-    //print('$bloc created!');
+    print('$bloc created!');
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    //print('$bloc - $transition');
+    print('$bloc - $transition');
   }
 }

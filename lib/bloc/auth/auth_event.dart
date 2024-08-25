@@ -26,3 +26,5 @@ final class AuthRegisterRequested extends AuthEvent {
 }
 
 final class AppStarted extends AuthEvent {}
+
+final class AnnonymousUserBlocked extends AuthEvent {}

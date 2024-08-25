@@ -2,12 +2,14 @@ class Hypothesis {
   final String desc;
   bool isRoot;
   bool isSpinoffIssue;
+  String? spinoffIssueId;
   int rank;
 
   Hypothesis({
     required this.desc,
     this.isRoot = false,
     this.isSpinoffIssue = false,
+    String? spinoffIssueId,
     this.rank = 0,
   });
 
@@ -16,6 +18,7 @@ class Hypothesis {
         'desc': desc,
         'isRoot': isRoot,
         'isSpinoffIssue': isSpinoffIssue,
+        'spinoffIssueId': spinoffIssueId,
         'rank': rank,
       };
 
@@ -24,6 +27,7 @@ class Hypothesis {
         desc: json['desc'],
         isRoot: json['isRoot'] ?? false,
         isSpinoffIssue: json['isSpinoffIssue'] ?? false,
+        spinoffIssueId: json['spinoffIssueId'],
         rank: json['rank'] ?? 0,
       );
 }

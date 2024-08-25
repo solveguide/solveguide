@@ -40,6 +40,28 @@ final class NewHypothesisCreated extends IssueEvent {
   });
 }
 
+class HypothesisUpdated extends IssueEvent {
+  final int index;
+  final Hypothesis updatedHypothesis;
+
+  HypothesisUpdated({
+    required this.index,
+    required this.updatedHypothesis,
+  });
+}
+
+class CreateSeparateIssueFromHypothesis extends IssueEvent {
+  final Hypothesis hypothesis;
+  final bool newIssuePrioritized;
+  final String ownerId;
+
+  CreateSeparateIssueFromHypothesis({
+    required this.hypothesis,
+    required this.newIssuePrioritized,
+    required this.ownerId,
+  });
+}
+
 class ListResorted<T> extends IssueEvent {
   final List<T> items;
   final int oldIndex;

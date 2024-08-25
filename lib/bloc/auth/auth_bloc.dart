@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
@@ -15,6 +17,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
+    on<AnnonymousUserBlocked>(_onAnnonymousUserBlocked);
   }
 
   Future<void> _onAppStarted(
@@ -80,6 +83,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthSuccess(uid: user!.uid));
     } catch (error) {
       emit(AuthFailure(error.toString()));
+    }
+  }
+
+  void _onAnnonymousUserBlocked(AnnonymousUserBlocked event, Emitter<AuthState> emit) async {
+    try {
+      final currentUser = await _authRepository.getCurrentUser();
+      emit(AuthSuccess(uid: currentUser.uid));
+    } catch (error) {
+      emit(AuthInitial());
     }
   }
 }
