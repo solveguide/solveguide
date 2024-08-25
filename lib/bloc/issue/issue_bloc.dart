@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
+import 'package:guide_solve/models/solution.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 part 'issue_event.dart';
@@ -15,6 +18,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusIssueSelected>(_onFocusIssueSelected);
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
+    on<ListResorted>(_onListResorted);
+    on<FocusRootConfirmed>(_onFocusRootConfirmed);
+    on<NewSolutionCreated>(_onNewSolutionCreated);
+    on<FocusSolveConfirmed>(_focusSolveConfirmed);
   }
 
   void _fetchIssues(
@@ -89,6 +96,76 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         Hypothesis(desc: event.newHypothesis),
       );
       emit(IssueInFocusInitial(focusedIssue: focusIssue));
+    }
+  }
+
+  void _onListResorted<T>(
+    ListResorted<T> event,
+    Emitter<IssueState> emit,
+  ) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      // Create a mutable copy of newIndex
+      int newIndex = event.newIndex;
+
+      if (newIndex > event.oldIndex) {
+        newIndex -= 1;
+      }
+
+      final item = event.items.removeAt(event.oldIndex);
+      event.items.insert(newIndex, item);
+
+      emit(IssueInFocusInitial(focusedIssue: focusIssue));
+    }
+  }
+
+  void _onFocusRootConfirmed(
+    FocusRootConfirmed event,
+    Emitter<IssueState> emit,
+  ) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      focusIssue.root = event.confirmedRoot;
+      emit(IssueInFocusRootIdentified(
+        focusedIssue: focusIssue,
+        rootCause: event.confirmedRoot,
+      ));
+    }
+  }
+
+  void _onNewSolutionCreated(
+      NewSolutionCreated event, Emitter<IssueState> emit) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      focusIssue.solutions.insert(
+        0,
+        Solution(desc: event.newSolution),
+      );
+      emit(IssueInFocusRootIdentified(
+        focusedIssue: focusIssue,
+        rootCause: focusIssue.root,
+      ));
+    }
+  }
+
+  void _focusSolveConfirmed(
+      FocusSolveConfirmed event, Emitter<IssueState> emit) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      focusIssue.solve = event.confirmedSolve;
+      emit(IssueInFocusSolved(focusedIssue: focusIssue));
     }
   }
 }

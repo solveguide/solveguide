@@ -39,6 +39,43 @@ final class NewHypothesisCreated extends IssueEvent {
     required this.newHypothesis,
   });
 }
+class ListResorted<T> extends IssueEvent {
+  final List<T> items;
+  final int oldIndex;
+  final int newIndex;
+
+  ListResorted({
+    required this.items,
+    required this.oldIndex,
+    required this.newIndex,
+  });
+}
+
+
+final class FocusRootConfirmed extends IssueEvent {
+  final String confirmedRoot;
+
+  FocusRootConfirmed({
+    required this.confirmedRoot,
+  });
+}
+
+final class NewSolutionCreated extends IssueEvent {
+  final String newSolution;
+
+  NewSolutionCreated({
+    required this.newSolution,
+  });
+}
+
+final class FocusSolveConfirmed extends IssueEvent {
+  final String confirmedSolve;
+
+  FocusSolveConfirmed({
+    required this.confirmedSolve,
+  });
+}
+
 
 /*
 

@@ -6,11 +6,13 @@ enum TestSubject { hypothesis, solution }
 class ConfirmationWidget extends StatelessWidget {
   final Issue issue;
   final TestSubject testSubject;
+  final VoidCallback onConfirm;
 
   const ConfirmationWidget({
     super.key,
     required this.issue,
     required this.testSubject,
+    required this.onConfirm,
   });
 
   bool _isEnabled() {
@@ -22,23 +24,13 @@ class ConfirmationWidget extends StatelessWidget {
             issue.solutions[0].desc.isNotEmpty);
   }
 
-  void _onConfirm(BuildContext context) {
-    if (_isEnabled()) {
-      if (testSubject == TestSubject.hypothesis) {
-        // TO-DO: Send Confirm Root Event
-      } else if (testSubject == TestSubject.solution) {
-        // TO-DO: Send Confirm Root Event
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
         width: 500,
         decoration: _containerDecoration(
-            Theme.of(context).colorScheme.secondaryContainer),
+            Theme.of(context).colorScheme.tertiaryContainer),
         padding: const EdgeInsets.all(15),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,17 +43,9 @@ class ConfirmationWidget extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildRelationship(),
                   const SizedBox(height: 10),
-                  _buildProposal(),
+                  _buildProposal(context),
                 ],
               ),
-            ),
-            ElevatedButton(
-              onPressed: _isEnabled() ? () => _onConfirm(context) : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Theme.of(context).colorScheme.tertiaryContainer,
-              ),
-              child: const Text("Confirm"),
             ),
           ],
         ),
@@ -75,15 +59,11 @@ class ConfirmationWidget extends StatelessWidget {
       consensusObject = issue.root;
     }
 
-    return Container(
-      decoration: _innerContainerDecoration(
-          Theme.of(context).colorScheme.tertiaryContainer),
-      padding: const EdgeInsets.all(8),
-      child: Text(
-        consensusObject,
-        style: const TextStyle(
-          fontSize: 20,
-        ),
+    return Text(
+      consensusObject,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
@@ -96,11 +76,14 @@ class ConfirmationWidget extends StatelessWidget {
 
     return Text(
       relation,
-      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.normal,
+      ),
     );
   }
 
-  Widget _buildProposal() {
+  Widget _buildProposal(BuildContext context) {
     String testObject = "?";
     if (testSubject == TestSubject.hypothesis && issue.hypotheses.isNotEmpty) {
       testObject = issue.hypotheses[0].desc;
@@ -109,25 +92,49 @@ class ConfirmationWidget extends StatelessWidget {
       testObject = issue.solutions[0].desc;
     }
 
-    return Text(
-      testObject,
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-    );
+    return Container(
+        decoration: _containerDecoration(
+            Theme.of(context).colorScheme.secondaryContainer),
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                testObject,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign
+                    .center, // Center the text within the available space
+                softWrap: true, // Enable text wrapping
+              ),
+            ),
+            const SizedBox(
+                width: 10), // Consistent space between text and button
+            Align(
+              alignment: Alignment.centerRight, // Align the button to the right
+              child: IconButton(
+                onPressed: _isEnabled() ? () => onConfirm() : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.tertiaryContainer,
+                ),
+                icon: const Icon(Icons.check),
+              ),
+            ),
+          ],
+        ));
   }
 
   BoxDecoration _containerDecoration(Color color) {
     return BoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(width: 5, color: Colors.black),
-    );
-  }
-
-  BoxDecoration _innerContainerDecoration(Color color) {
-    return BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(width: 2, color: Colors.black),
+      border: Border.all(
+        width: 2,
+        color: Colors.black,
+      ),
     );
   }
 }
