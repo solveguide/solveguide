@@ -50,7 +50,7 @@ class EditHypothesisDialogState extends State<EditHypothesisDialog> {
           ),
         ],
       ),
-      actions: [     
+      actions: [
         TextButton(
           onPressed: () {
             final updatedHypothesis = Hypothesis(desc: _controller.text);

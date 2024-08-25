@@ -170,32 +170,33 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-void _onHypothesisUpdated(
-  HypothesisUpdated event,
-  Emitter<IssueState> emit,
-) {
-  final currentState = state;
+  void _onHypothesisUpdated(
+    HypothesisUpdated event,
+    Emitter<IssueState> emit,
+  ) {
+    final currentState = state;
 
-  if (currentState is IssueInFocusInitial) {
-    // Create a copy of the current hypotheses list
-    final updatedHypotheses = List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
+    if (currentState is IssueInFocusInitial) {
+      // Create a copy of the current hypotheses list
+      final updatedHypotheses =
+          List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
 
-    // Update the hypothesis at the given index
-    updatedHypotheses[event.index] = event.updatedHypothesis;
+      // Update the hypothesis at the given index
+      updatedHypotheses[event.index] = event.updatedHypothesis;
 
-    // Move the updated hypothesis to the top of the list
-    final hypothesis = updatedHypotheses.removeAt(event.index);
-    updatedHypotheses.insert(0, hypothesis);
+      // Move the updated hypothesis to the top of the list
+      final hypothesis = updatedHypotheses.removeAt(event.index);
+      updatedHypotheses.insert(0, hypothesis);
 
-    // Create a new focused issue with the updated hypotheses
-    final updatedIssue = currentState.focusedIssue.copyWith(
-      hypotheses: updatedHypotheses,
-    );
+      // Create a new focused issue with the updated hypotheses
+      final updatedIssue = currentState.focusedIssue.copyWith(
+        hypotheses: updatedHypotheses,
+      );
 
-    // Emit the new state
-    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+      // Emit the new state
+      emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+    }
   }
-}
 
   void _onCreateSeparateIssueFromHypothesis(
     CreateSeparateIssueFromHypothesis event,
@@ -221,7 +222,7 @@ void _onHypothesisUpdated(
           );
           event.hypothesis.isSpinoffIssue = true;
           event.hypothesis.spinoffIssueId = spinoffId;
-          
+
           emit(IssueInFocusInitial(focusedIssue: focusIssue));
         } catch (e) {
           emit(IssuesListFailure(

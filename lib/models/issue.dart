@@ -98,5 +98,4 @@ class Issue {
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
     );
   }
-
 }

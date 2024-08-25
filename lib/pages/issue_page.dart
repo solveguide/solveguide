@@ -21,7 +21,7 @@ class IssuePage extends StatelessWidget {
   final TextEditingController textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
- void _showEditDialog(BuildContext context, Hypothesis hypothesis, int index) {
+  void _showEditDialog(BuildContext context, Hypothesis hypothesis, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -36,7 +36,8 @@ class IssuePage extends StatelessWidget {
             );
           },
           onCreateSeparateIssue: (hypothesis) {
-            final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
+            final authState =
+                BlocProvider.of<AuthBloc>(context, listen: false).state;
             if (authState is AuthSuccess) {
               BlocProvider.of<IssueBloc>(context, listen: false).add(
                 CreateSeparateIssueFromHypothesis(
@@ -46,7 +47,8 @@ class IssuePage extends StatelessWidget {
                 ),
               );
             } else {
-              BlocProvider.of<AuthBloc>(context, listen: false).add(AnnonymousUserBlocked());
+              BlocProvider.of<AuthBloc>(context, listen: false)
+                  .add(AnnonymousUserBlocked());
             }
           },
         );
@@ -54,10 +56,9 @@ class IssuePage extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-     final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
+    final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
 
     if (authState is AuthInitial) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -104,9 +105,10 @@ class IssuePage extends StatelessWidget {
                     issue: state.focusedIssue,
                     testSubject: TestSubject.hypothesis,
                     onConfirm: () {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(FocusRootConfirmed(
-                          confirmedRoot:
-                              state.focusedIssue.hypotheses[0].desc));
+                      BlocProvider.of<IssueBloc>(context, listen: false).add(
+                          FocusRootConfirmed(
+                              confirmedRoot:
+                                  state.focusedIssue.hypotheses[0].desc));
                     },
                   );
                 } else if (state is IssueInFocusRootIdentified) {
@@ -114,9 +116,10 @@ class IssuePage extends StatelessWidget {
                     issue: state.focusedIssue,
                     testSubject: TestSubject.solution,
                     onConfirm: () {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(FocusSolveConfirmed(
-                          confirmedSolve:
-                              state.focusedIssue.solutions[0].desc));
+                      BlocProvider.of<IssueBloc>(context, listen: false).add(
+                          FocusSolveConfirmed(
+                              confirmedSolve:
+                                  state.focusedIssue.solutions[0].desc));
                     },
                   );
                 } else {
@@ -132,8 +135,9 @@ class IssuePage extends StatelessWidget {
                   controller: textController,
                   focusNode: _focusNode,
                   onSubmitted: () {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(NewHypothesisCreated(
-                        newHypothesis: textController.text));
+                    BlocProvider.of<IssueBloc>(context, listen: false).add(
+                        NewHypothesisCreated(
+                            newHypothesis: textController.text));
                     textController.clear();
                   },
                   labelText: 'New Root Theories',
@@ -165,12 +169,12 @@ class IssuePage extends StatelessWidget {
                     getItemDescription: (hypothesis) => hypothesis.desc,
                     onReorder: (oldIndex, newIndex) {
                       BlocProvider.of<IssueBloc>(context, listen: false).add(
-                            ListResorted<Hypothesis>(
-                              items: state.focusedIssue.hypotheses,
-                              oldIndex: oldIndex,
-                              newIndex: newIndex,
-                            ),
-                          );
+                        ListResorted<Hypothesis>(
+                          items: state.focusedIssue.hypotheses,
+                          oldIndex: oldIndex,
+                          newIndex: newIndex,
+                        ),
+                      );
                     },
                     onEdit: (index, hypothesis) {
                       _showEditDialog(context, hypothesis, index);
@@ -185,12 +189,12 @@ class IssuePage extends StatelessWidget {
                     getItemDescription: (solution) => solution.desc,
                     onReorder: (oldIndex, newIndex) {
                       BlocProvider.of<IssueBloc>(context, listen: false).add(
-                            ListResorted<Solution>(
-                              items: state.focusedIssue.solutions,
-                              oldIndex: oldIndex,
-                              newIndex: newIndex,
-                            ),
-                          );
+                        ListResorted<Solution>(
+                          items: state.focusedIssue.solutions,
+                          oldIndex: oldIndex,
+                          newIndex: newIndex,
+                        ),
+                      );
                     },
                     onEdit: (index, solution) {
                       // Add edit logic here

@@ -86,7 +86,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onAnnonymousUserBlocked(AnnonymousUserBlocked event, Emitter<AuthState> emit) async {
+  void _onAnnonymousUserBlocked(
+      AnnonymousUserBlocked event, Emitter<AuthState> emit) async {
     try {
       final currentUser = await _authRepository.getCurrentUser();
       emit(AuthSuccess(uid: currentUser.uid));

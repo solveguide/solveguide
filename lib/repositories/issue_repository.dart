@@ -38,8 +38,9 @@ class IssueRepository {
     }
   }
 
-    // Spinoff an issue
-  Future<String> addSpinoffIssue(Issue oldIssue, String spinoffHypothesis, String ownerId) async {
+  // Spinoff an issue
+  Future<String> addSpinoffIssue(
+      Issue oldIssue, String spinoffHypothesis, String ownerId) async {
     final newIssue = Issue(
       label: spinoffHypothesis,
       seedStatement: oldIssue.seedStatement,
