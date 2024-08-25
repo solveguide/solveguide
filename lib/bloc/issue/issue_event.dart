@@ -39,6 +39,7 @@ final class NewHypothesisCreated extends IssueEvent {
     required this.newHypothesis,
   });
 }
+
 class ListResorted<T> extends IssueEvent {
   final List<T> items;
   final int oldIndex;
@@ -50,7 +51,6 @@ class ListResorted<T> extends IssueEvent {
     required this.newIndex,
   });
 }
-
 
 final class FocusRootConfirmed extends IssueEvent {
   final String confirmedRoot;
@@ -75,7 +75,6 @@ final class FocusSolveConfirmed extends IssueEvent {
     required this.confirmedSolve,
   });
 }
-
 
 /*
 

@@ -48,7 +48,6 @@ final class IssueInFocusSolutionIdentified extends IssueInFocus {
 }
 
 final class IssueInFocusSolved extends IssueInFocus {
-
   IssueInFocusSolved({
     required super.focusedIssue, // directly pass to the superclass
   });
