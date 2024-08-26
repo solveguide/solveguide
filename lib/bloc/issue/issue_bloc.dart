@@ -82,34 +82,34 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-void _newHypothesisCreated(
-  NewHypothesisCreated event,
-  Emitter<IssueState> emit,
-) {
-  final currentState = state;
+  void _newHypothesisCreated(
+    NewHypothesisCreated event,
+    Emitter<IssueState> emit,
+  ) {
+    final currentState = state;
 
-  if (currentState is IssueInFocusInitial) {
-    // Create a new hypothesis
-    final newHypothesis = Hypothesis(desc: event.newHypothesis);
+    if (currentState is IssueInFocusInitial) {
+      // Create a new hypothesis
+      final newHypothesis = Hypothesis(desc: event.newHypothesis);
 
-    // Create a copy of the current hypotheses list and add the new hypothesis at the top
-    final updatedHypotheses = List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
-    updatedHypotheses.insert(0, newHypothesis);
+      // Create a copy of the current hypotheses list and add the new hypothesis at the top
+      final updatedHypotheses =
+          List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
+      updatedHypotheses.insert(0, newHypothesis);
 
-    // Create a new focused issue with the updated hypotheses list
-    final updatedIssue = currentState.focusedIssue.copyWith(
-      hypotheses: updatedHypotheses,
-    );
+      // Create a new focused issue with the updated hypotheses list
+      final updatedIssue = currentState.focusedIssue.copyWith(
+        hypotheses: updatedHypotheses,
+      );
 
-    // Emit the new state
-    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
-  } else {
-    emit(IssuesListFailure("No Issue Selected"));
+      // Emit the new state
+      emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+    } else {
+      emit(IssuesListFailure("No Issue Selected"));
+    }
   }
-}
 
-
-    void _onHypothesisUpdated(
+  void _onHypothesisUpdated(
     HypothesisUpdated event,
     Emitter<IssueState> emit,
   ) {
@@ -195,36 +195,36 @@ void _newHypothesisCreated(
       emit(IssueInFocusInitial(focusedIssue: focusIssue));
     }
   }
-void _onFocusRootConfirmed(
-  FocusRootConfirmed event,
-  Emitter<IssueState> emit,
-) async {
-  Issue? focusIssue = issueRepository.getFocusIssue();
 
-  if (focusIssue == null) {
-    emit(IssuesListFailure("No Issue Selected"));
-  } else {
-    // Update the local copy of the issue
-    focusIssue = focusIssue.copyWith(
-      root: event.confirmedRoot,
-      label: event.confirmedRoot,
-    );
+  void _onFocusRootConfirmed(
+    FocusRootConfirmed event,
+    Emitter<IssueState> emit,
+  ) async {
+    Issue? focusIssue = issueRepository.getFocusIssue();
 
-    try {
-      // Push the updated issue to Firebase
-      await issueRepository.updateIssue(focusIssue.issueId!, focusIssue);
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      // Update the local copy of the issue
+      focusIssue = focusIssue.copyWith(
+        root: event.confirmedRoot,
+        label: event.confirmedRoot,
+      );
 
-      // Emit the updated state
-      emit(IssueInFocusRootIdentified(
-        focusedIssue: focusIssue,
-        rootCause: event.confirmedRoot,
-      ));
-    } catch (error) {
-      emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
+      try {
+        // Push the updated issue to Firebase
+        await issueRepository.updateIssue(focusIssue.issueId!, focusIssue);
+
+        // Emit the updated state
+        emit(IssueInFocusRootIdentified(
+          focusedIssue: focusIssue,
+          rootCause: event.confirmedRoot,
+        ));
+      } catch (error) {
+        emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
+      }
     }
   }
-}
-
 
   void _onNewSolutionCreated(
       NewSolutionCreated event, Emitter<IssueState> emit) {
@@ -255,6 +255,4 @@ void _onFocusRootConfirmed(
       emit(IssueInFocusSolved(focusedIssue: focusIssue));
     }
   }
-
-
 }

@@ -90,7 +90,7 @@ class IssuePage extends StatelessWidget {
           HelpTextWidget(helpText: "This is where you solve the issue."),
         ],
       ),
-      drawer: MyNavigationDrawer(),
+      drawer: const MyNavigationDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

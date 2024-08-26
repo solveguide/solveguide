@@ -89,7 +89,7 @@ class _DashboardPageState extends State<DashboardPage> {
           )
         ],
       ),
-      drawer: MyNavigationDrawer(),
+      drawer: const MyNavigationDrawer(),
       body: MultiBlocListener(
         listeners: [
           BlocListener<AuthBloc, AuthState>(

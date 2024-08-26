@@ -24,7 +24,7 @@ Widget _buildIconRow(double iconSize) {
         alignment: Alignment.center,
         child: Icon(Icons.psychology_outlined, size: iconSize),
       ),
-     Icon(Icons.psychology_alt, size: iconSize),
+      Icon(Icons.psychology_alt, size: iconSize),
     ],
   );
 }
