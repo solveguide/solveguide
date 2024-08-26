@@ -65,8 +65,14 @@ class IssueRepository {
 
   // Update an issue
   Future<void> updateIssue(String issueId, Issue issue) async {
+    Issue updatedIssue = issue.copyWith(
+      hypotheses: issue.hypotheses,
+      solutions: issue.solutions,
+      invitedUserIds: issue.invitedUserIds,
+      lastUpdatedTimestamp: DateTime.now(),
+    );
     try {
-      await _issuesCollection.doc(issueId).update(issue.toJson());
+      await _issuesCollection.doc(issueId).update(updatedIssue.toJson());
     } catch (error) {
       throw error.toString();
     }

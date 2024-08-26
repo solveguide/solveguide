@@ -8,6 +8,7 @@ import 'package:guide_solve/components/issue_solving_widgets/help_text_widget.da
 import 'package:guide_solve/components/issue_solving_widgets/input_widget.dart';
 import 'package:guide_solve/components/issue_solving_widgets/resortable_list_widget.dart';
 import 'package:guide_solve/components/issue_solving_widgets/solve_summary.dart';
+import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
@@ -89,6 +90,7 @@ class IssuePage extends StatelessWidget {
           HelpTextWidget(helpText: "This is where you solve the issue."),
         ],
       ),
+      drawer: MyNavigationDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

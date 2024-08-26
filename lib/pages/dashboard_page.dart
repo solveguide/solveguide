@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_tile.dart';
+import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/components/plain_button.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/issue_page.dart';
@@ -88,6 +89,7 @@ class _DashboardPageState extends State<DashboardPage> {
           )
         ],
       ),
+      drawer: MyNavigationDrawer(),
       body: MultiBlocListener(
         listeners: [
           BlocListener<AuthBloc, AuthState>(
@@ -103,12 +105,12 @@ class _DashboardPageState extends State<DashboardPage> {
           BlocListener<IssueBloc, IssueState>(
             listener: (context, issueState) {
               if (issueState is IssueInFocus) {
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        IssuePage(issue: issueState.focusedIssue),
-                  ),
+                      builder: (context) =>
+                          IssuePage(issue: issueState.focusedIssue)),
+                  (route) => false,
                 );
               } else if (issueState is IssuesListFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(

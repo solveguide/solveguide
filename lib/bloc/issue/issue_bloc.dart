@@ -82,95 +82,34 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _newHypothesisCreated(
-    NewHypothesisCreated event,
-    Emitter<IssueState> emit,
-  ) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
+void _newHypothesisCreated(
+  NewHypothesisCreated event,
+  Emitter<IssueState> emit,
+) {
+  final currentState = state;
 
-    if (focusIssue == null) {
-      emit(IssuesListFailure("No Issue Selected"));
-    } else {
-      focusIssue.hypotheses.insert(
-        0,
-        Hypothesis(desc: event.newHypothesis),
-      );
-      emit(IssueInFocusInitial(focusedIssue: focusIssue));
-    }
+  if (currentState is IssueInFocusInitial) {
+    // Create a new hypothesis
+    final newHypothesis = Hypothesis(desc: event.newHypothesis);
+
+    // Create a copy of the current hypotheses list and add the new hypothesis at the top
+    final updatedHypotheses = List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
+    updatedHypotheses.insert(0, newHypothesis);
+
+    // Create a new focused issue with the updated hypotheses list
+    final updatedIssue = currentState.focusedIssue.copyWith(
+      hypotheses: updatedHypotheses,
+    );
+
+    // Emit the new state
+    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+  } else {
+    emit(IssuesListFailure("No Issue Selected"));
   }
+}
 
-  void _onListResorted<T>(
-    ListResorted<T> event,
-    Emitter<IssueState> emit,
-  ) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
 
-    if (focusIssue == null) {
-      emit(IssuesListFailure("No Issue Selected"));
-    } else {
-      // Create a mutable copy of newIndex
-      int newIndex = event.newIndex;
-
-      if (newIndex > event.oldIndex) {
-        newIndex -= 1;
-      }
-
-      final item = event.items.removeAt(event.oldIndex);
-      event.items.insert(newIndex, item);
-
-      emit(IssueInFocusInitial(focusedIssue: focusIssue));
-    }
-  }
-
-  void _onFocusRootConfirmed(
-    FocusRootConfirmed event,
-    Emitter<IssueState> emit,
-  ) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
-
-    if (focusIssue == null) {
-      emit(IssuesListFailure("No Issue Selected"));
-    } else {
-      focusIssue.root = event.confirmedRoot;
-      focusIssue.label = event.confirmedRoot;
-      emit(IssueInFocusRootIdentified(
-        focusedIssue: focusIssue,
-        rootCause: event.confirmedRoot,
-      ));
-    }
-  }
-
-  void _onNewSolutionCreated(
-      NewSolutionCreated event, Emitter<IssueState> emit) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
-
-    if (focusIssue == null) {
-      emit(IssuesListFailure("No Issue Selected"));
-    } else {
-      focusIssue.solutions.insert(
-        0,
-        Solution(desc: event.newSolution),
-      );
-      emit(IssueInFocusRootIdentified(
-        focusedIssue: focusIssue,
-        rootCause: focusIssue.root,
-      ));
-    }
-  }
-
-  void _focusSolveConfirmed(
-      FocusSolveConfirmed event, Emitter<IssueState> emit) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
-
-    if (focusIssue == null) {
-      emit(IssuesListFailure("No Issue Selected"));
-    } else {
-      focusIssue.solve = event.confirmedSolve;
-      emit(IssueInFocusSolved(focusedIssue: focusIssue));
-    }
-  }
-
-  void _onHypothesisUpdated(
+    void _onHypothesisUpdated(
     HypothesisUpdated event,
     Emitter<IssueState> emit,
   ) {
@@ -233,4 +172,89 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       }
     }
   }
+
+  void _onListResorted<T>(
+    ListResorted<T> event,
+    Emitter<IssueState> emit,
+  ) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      // Create a mutable copy of newIndex
+      int newIndex = event.newIndex;
+
+      if (newIndex > event.oldIndex) {
+        newIndex -= 1;
+      }
+
+      final item = event.items.removeAt(event.oldIndex);
+      event.items.insert(newIndex, item);
+
+      emit(IssueInFocusInitial(focusedIssue: focusIssue));
+    }
+  }
+void _onFocusRootConfirmed(
+  FocusRootConfirmed event,
+  Emitter<IssueState> emit,
+) async {
+  Issue? focusIssue = issueRepository.getFocusIssue();
+
+  if (focusIssue == null) {
+    emit(IssuesListFailure("No Issue Selected"));
+  } else {
+    // Update the local copy of the issue
+    focusIssue = focusIssue.copyWith(
+      root: event.confirmedRoot,
+      label: event.confirmedRoot,
+    );
+
+    try {
+      // Push the updated issue to Firebase
+      await issueRepository.updateIssue(focusIssue.issueId!, focusIssue);
+
+      // Emit the updated state
+      emit(IssueInFocusRootIdentified(
+        focusedIssue: focusIssue,
+        rootCause: event.confirmedRoot,
+      ));
+    } catch (error) {
+      emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
+    }
+  }
+}
+
+
+  void _onNewSolutionCreated(
+      NewSolutionCreated event, Emitter<IssueState> emit) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      focusIssue.solutions.insert(
+        0,
+        Solution(desc: event.newSolution),
+      );
+      emit(IssueInFocusRootIdentified(
+        focusedIssue: focusIssue,
+        rootCause: focusIssue.root,
+      ));
+    }
+  }
+
+  void _focusSolveConfirmed(
+      FocusSolveConfirmed event, Emitter<IssueState> emit) {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(IssuesListFailure("No Issue Selected"));
+    } else {
+      focusIssue.solve = event.confirmedSolve;
+      emit(IssueInFocusSolved(focusedIssue: focusIssue));
+    }
+  }
+
+
 }
