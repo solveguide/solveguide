@@ -83,7 +83,7 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           IconButton(
             onPressed: () {
-              context.read<AuthBloc>().add(AuthLogoutRequested());
+              BlocProvider.of<AuthBloc>(context, listen: false).add(AuthLogoutRequested());
             },
             icon: const Icon(Icons.logout),
           )

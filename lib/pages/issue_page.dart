@@ -12,7 +12,7 @@ import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
-import 'package:guide_solve/pages/login_page.dart';
+import 'package:guide_solve/pages/home_page.dart';
 
 class IssuePage extends StatelessWidget {
   final Issue issue;
@@ -59,27 +59,34 @@ class IssuePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
+     final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
 
-    if (authState is AuthInitial) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                const Text("Register your email to save this issue and more."),
-            action: SnackBarAction(
-              label: "Register here!",
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LoginPage(),
-                ),
-              ),
-            ),
-          ),
-        );
-      });
+    if (authState is! AuthSuccess) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
     }
+
+    // if (authState is AuthInitial) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(
+    //         content:
+    //             const Text("Register your email to save this issue and more."),
+    //         action: SnackBarAction(
+    //           label: "Register here!",
+    //           onPressed: () => Navigator.push(
+    //             context,
+    //             MaterialPageRoute(
+    //               builder: (context) => LoginPage(),
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //     );
+    //   });
+    // }
 
     return Scaffold(
       backgroundColor: Colors.orange[50],

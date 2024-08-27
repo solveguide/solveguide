@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
+import 'package:guide_solve/pages/profile_page.dart';
 
 class MyNavigationDrawer extends StatelessWidget {
   const MyNavigationDrawer({super.key});
@@ -60,9 +61,15 @@ class MyNavigationDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 25.0, bottom: 25),
             child: ListTile(
-              title: const Text("L O G O U T"),
+              title: const Text("M Y   A C C O U N T"),
               leading: const Icon(Icons.logout),
-              onTap: () {},
+              onTap: () {Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage()),
+                    );
+              },
             ),
           ),
         ],

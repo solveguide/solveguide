@@ -4,11 +4,13 @@ class PlainTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
   final bool obscureText;
+  final VoidCallback? onSubmit;
   const PlainTextField({
     super.key,
     required this.hintText,
     required this.controller,
     required this.obscureText,
+    this.onSubmit,
   });
 
   @override
@@ -20,6 +22,12 @@ class PlainTextField extends StatelessWidget {
         //maxLines: null,
         controller: controller,
         obscureText: obscureText,
+        onSubmitted: (value) {
+          // Call onSubmit if it's not null
+          if (onSubmit != null) {
+            onSubmit!();
+          }
+        },
         decoration: InputDecoration(
           hintText: hintText,
           fillColor: Theme.of(context).colorScheme.secondary,

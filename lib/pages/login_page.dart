@@ -12,14 +12,25 @@ class LoginPage extends StatelessWidget {
   //controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  
 
   @override
   Widget build(BuildContext context) {
+
+    loginNow() {
+  BlocProvider.of<AuthBloc>(context, listen: false).add(
+    AuthLoginRequested(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    ),
+  );
+}
+
     return Scaffold(
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
         backgroundColor: Colors.orange[50],
-        title: const Text('Your Account'),
+        title: const Text('Login/Register'),
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -72,6 +83,7 @@ class LoginPage extends StatelessWidget {
                   hintText: "password",
                   controller: passwordController,
                   obscureText: true,
+                  onSubmit: loginNow,
                 ),
                 const SizedBox(
                   height: 10,
@@ -96,12 +108,12 @@ class LoginPage extends StatelessWidget {
                   children: [
                     PlainButton(
                       onPressed: () {
-                        context.read<AuthBloc>().add(
-                              AuthLoginRequested(
-                                email: emailController.text.trim(),
-                                password: passwordController.text.trim(),
-                              ),
-                            );
+                        BlocProvider.of<AuthBloc>(context, listen: false).add(
+                          AuthLoginRequested(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                          ),
+                        );
                       },
                       text: "Sign In",
                     ),
@@ -110,12 +122,12 @@ class LoginPage extends StatelessWidget {
                     ),
                     PlainButton(
                       onPressed: () {
-                        context.read<AuthBloc>().add(
-                              AuthRegisterRequested(
-                                email: emailController.text.trim(),
-                                password: passwordController.text.trim(),
-                              ),
-                            );
+                        BlocProvider.of<AuthBloc>(context, listen: false).add(
+                          AuthRegisterRequested(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                          ),
+                        );
                       },
                       text: "Register",
                     ),
