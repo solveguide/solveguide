@@ -63,12 +63,12 @@ class MyNavigationDrawer extends StatelessWidget {
             child: ListTile(
               title: const Text("M Y   A C C O U N T"),
               leading: const Icon(Icons.logout),
-              onTap: () {Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProfilePage()),
-                    );
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
               },
             ),
           ),

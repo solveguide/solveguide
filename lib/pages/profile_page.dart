@@ -51,15 +51,14 @@ class ProfilePage extends StatelessWidget {
                   height: 25,
                 ),
 
-              
                 const SizedBox(
                   height: 25,
                 ),
-            
+
                 const SizedBox(
                   height: 10,
                 ),
-              
+
                 //sign out button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -67,8 +66,8 @@ class ProfilePage extends StatelessWidget {
                     PlainButton(
                       onPressed: () {
                         BlocProvider.of<AuthBloc>(context, listen: false).add(
-                              AuthLogoutRequested(),
-                            );
+                          AuthLogoutRequested(),
+                        );
                       },
                       text: "Sign Out",
                     ),

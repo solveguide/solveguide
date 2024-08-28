@@ -17,11 +17,13 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
     on<ListResorted>(_onListResorted);
+    on<HypothesisUpdated>(_onHypothesisUpdated);
+    on<CreateSeparateIssueFromHypothesis>(_onCreateSeparateIssueFromHypothesis);
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
-    on<HypothesisUpdated>(_onHypothesisUpdated);
-    on<CreateSeparateIssueFromHypothesis>(_onCreateSeparateIssueFromHypothesis);
+    on<SolutionUpdated>(_onSolutionUpdated);
+    
   }
 
   void _fetchIssues(
@@ -244,6 +246,31 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
+  void _onSolutionUpdated(SolutionUpdated event, Emitter<IssueState> emit) {
+    final currentState = state;
+
+    if (currentState is IssueInFocusRootIdentified) {
+      // Create a copy of the current hypotheses list
+      final updatedSolutions =
+          List<Solution>.from(currentState.focusedIssue.solutions);
+
+      // Update the hypothesis at the given index
+      updatedSolutions[event.index] = event.updatedSolution;
+
+      // Move the updated hypothesis to the top of the list
+      final solution = updatedSolutions.removeAt(event.index);
+      updatedSolutions.insert(0, solution);
+
+      // Create a new focused issue with the updated hypotheses
+      final updatedIssue = currentState.focusedIssue.copyWith(
+        solutions: updatedSolutions,
+      );
+
+      // Emit the new state
+      emit(IssueInFocusRootIdentified(rootCause: updatedIssue.root, focusedIssue: updatedIssue));
+    }
+  }
+
   void _focusSolveConfirmed(
       FocusSolveConfirmed event, Emitter<IssueState> emit) {
     Issue? focusIssue = issueRepository.getFocusIssue();
@@ -255,4 +282,6 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       emit(IssueInFocusSolved(focusedIssue: focusIssue));
     }
   }
+
+  
 }

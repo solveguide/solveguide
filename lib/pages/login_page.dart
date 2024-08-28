@@ -12,19 +12,17 @@ class LoginPage extends StatelessWidget {
   //controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  
 
   @override
   Widget build(BuildContext context) {
-
     loginNow() {
-  BlocProvider.of<AuthBloc>(context, listen: false).add(
-    AuthLoginRequested(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    ),
-  );
-}
+      BlocProvider.of<AuthBloc>(context, listen: false).add(
+        AuthLoginRequested(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.orange[50],

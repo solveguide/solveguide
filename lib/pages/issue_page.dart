@@ -22,12 +22,12 @@ class IssuePage extends StatelessWidget {
   final TextEditingController textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  void _showEditDialog(BuildContext context, Hypothesis hypothesis, int index) {
+  void _showHypothesisEditDialog(BuildContext context, Hypothesis hypothesis, int index) {
     showDialog(
       context: context,
       builder: (context) {
-        return EditHypothesisDialog(
-          hypothesis: hypothesis,
+        return EditItemDialog(
+          item: hypothesis,
           onSave: (updatedHypothesis) {
             BlocProvider.of<IssueBloc>(context, listen: false).add(
               HypothesisUpdated(
@@ -57,9 +57,28 @@ class IssuePage extends StatelessWidget {
     );
   }
 
+    void _showSolutionEditDialog(BuildContext context, Solution solution, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return EditItemDialog(
+          item: solution,
+          onSave: (updatedSolution) {
+            BlocProvider.of<IssueBloc>(context, listen: false).add(
+              SolutionUpdated(
+                index: index,
+                updatedSolution: updatedSolution,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-     final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
+    final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
 
     if (authState is! AuthSuccess) {
       Navigator.pushAndRemoveUntil(
@@ -186,7 +205,7 @@ class IssuePage extends StatelessWidget {
                       );
                     },
                     onEdit: (index, hypothesis) {
-                      _showEditDialog(context, hypothesis, index);
+                      _showHypothesisEditDialog(context, hypothesis, index);
                     },
                     onDelete: (index, hypothesis) {
                       // Add delete logic here
@@ -206,7 +225,7 @@ class IssuePage extends StatelessWidget {
                       );
                     },
                     onEdit: (index, solution) {
-                      // Add edit logic here
+                      _showSolutionEditDialog(context, solution, index);
                     },
                     onDelete: (index, solution) {
                       // Add delete logic here

@@ -90,6 +90,16 @@ final class NewSolutionCreated extends IssueEvent {
   });
 }
 
+class SolutionUpdated extends IssueEvent {
+  final int index;
+  final Solution updatedSolution;
+
+  SolutionUpdated({
+    required this.index,
+    required this.updatedSolution,
+  });
+}
+
 final class FocusSolveConfirmed extends IssueEvent {
   final String confirmedSolve;
 
