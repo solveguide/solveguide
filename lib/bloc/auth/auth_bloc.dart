@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
@@ -12,7 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc({required AuthRepository authRepository})
       : _authRepository = authRepository,
-        super(AuthInitial()) {
+        super(const AuthInitial()) {
     on<AppStarted>(_onAppStarted);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
@@ -28,7 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final currentUser = await _authRepository.getCurrentUser();
       emit(AuthSuccess(uid: currentUser.uid));
     } catch (error) {
-      emit(AuthInitial());
+      emit(const AuthInitial());
     }
   }
 
@@ -36,10 +37,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(const AuthLoading());
     if (!_authRepository.isValidEmail(event.email)) {
       emit(
-        AuthFailure('Please enter a valid email.'),
+        const AuthFailure('Please enter a valid email.'),
       );
       return;
     }
@@ -57,23 +58,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     await _authRepository.signOut();
-    emit(AuthInitial());
+    emit(const AuthInitial());
   }
 
   Future<void> _onRegisterRequested(
     AuthRegisterRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(const AuthLoading());
     if (!_authRepository.isValidEmail(event.email)) {
       emit(
-        AuthFailure('Please enter a valid email.'),
+        const AuthFailure('Please enter a valid email.'),
       );
       return;
     }
     if (event.password.length < 6) {
       emit(
-        AuthFailure('Password cannot be less than 6 characters.'),
+        const AuthFailure('Password cannot be less than 6 characters.'),
       );
       return;
     }
@@ -92,7 +93,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final currentUser = await _authRepository.getCurrentUser();
       emit(AuthSuccess(uid: currentUser.uid));
     } catch (error) {
-      emit(AuthInitial());
+      emit(const AuthInitial());
     }
   }
 }

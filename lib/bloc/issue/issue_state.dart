@@ -1,14 +1,22 @@
 part of 'issue_bloc.dart';
 
 @immutable
-sealed class IssueState {}
+abstract class IssueState extends Equatable {
+  const IssueState();
+
+  @override
+  List<Object?> get props => [];
+}
 
 final class IssueInitial extends IssueState {}
 
 final class IssuesListSuccess extends IssueState {
   final List<Issue> issueList;
 
-  IssuesListSuccess({required this.issueList});
+  const IssuesListSuccess({required this.issueList});
+
+  @override
+  List<Object?> get props => [issueList];
 }
 
 final class IssuesListLoading extends IssueState {}
@@ -16,39 +24,51 @@ final class IssuesListLoading extends IssueState {}
 final class IssuesListFailure extends IssueState {
   final String error;
 
-  IssuesListFailure(this.error);
+  const IssuesListFailure(this.error);
+
+  @override
+  List<Object?> get props => [error];
 }
 
-sealed class IssueInFocus extends IssueState {
+abstract class IssueInFocus extends IssueState {
   final Issue focusedIssue;
 
-  IssueInFocus({required this.focusedIssue});
+  const IssueInFocus({required this.focusedIssue});
+
+  @override
+  List<Object?> get props => [focusedIssue];
 }
 
 final class IssueInFocusInitial extends IssueInFocus {
-  IssueInFocusInitial({required super.focusedIssue});
+  const IssueInFocusInitial({required super.focusedIssue});
 }
 
 final class IssueInFocusRootIdentified extends IssueInFocus {
   final String rootCause;
 
-  IssueInFocusRootIdentified({
-    required super.focusedIssue, // directly pass to the superclass
+  const IssueInFocusRootIdentified({
+    required super.focusedIssue,
     required this.rootCause,
   });
+
+  @override
+  List<Object?> get props => [focusedIssue, rootCause];
 }
 
 final class IssueInFocusSolutionIdentified extends IssueInFocus {
   final String solution;
 
-  IssueInFocusSolutionIdentified({
-    required super.focusedIssue, // directly pass to the superclass
+  const IssueInFocusSolutionIdentified({
+    required super.focusedIssue,
     required this.solution,
   });
+
+  @override
+  List<Object?> get props => [focusedIssue, solution];
 }
 
 final class IssueInFocusSolved extends IssueInFocus {
-  IssueInFocusSolved({
-    required super.focusedIssue, // directly pass to the superclass
+  const IssueInFocusSolved({
+    required super.focusedIssue,
   });
 }

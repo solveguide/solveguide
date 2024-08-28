@@ -30,4 +30,21 @@ class Hypothesis {
         spinoffIssueId: json['spinoffIssueId'],
         rank: json['rank'] ?? 0,
       );
+
+  // Add the copyWith method
+  Hypothesis copyWith({
+    String? desc,
+    bool? isRoot,
+    bool? isSpinoffIssue,
+    String? spinoffIssueId,
+    int? rank,
+  }) {
+    return Hypothesis(
+      desc: desc ?? this.desc,
+      isRoot: isRoot ?? this.isRoot,
+      isSpinoffIssue: isSpinoffIssue ?? this.isSpinoffIssue,
+      spinoffIssueId: spinoffIssueId ?? this.spinoffIssueId,
+      rank: rank ?? this.rank,
+    );
+  }
 }

@@ -27,7 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // Initialize the stream only once in initState
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthSuccess) {
-      context.read<IssueBloc>().add(IssuesFetched(userId: authState.uid));
+      BlocProvider.of<IssueBloc>(context, listen: false).add(IssuesFetched(userId: authState.uid));
     } else {
       Navigator.pushAndRemoveUntil(
           context,
@@ -84,7 +84,7 @@ class _DashboardPageState extends State<DashboardPage> {
           IconButton(
             onPressed: () {
               BlocProvider.of<AuthBloc>(context, listen: false)
-                  .add(AuthLogoutRequested());
+                  .add(const AuthLogoutRequested());
             },
             icon: const Icon(Icons.logout),
           )
@@ -128,7 +128,11 @@ class _DashboardPageState extends State<DashboardPage> {
             } else if (authState is AuthSuccess) {
               return BlocBuilder<IssueBloc, IssueState>(
                 builder: (context, issueState) {
-                  if (issueState is IssuesListLoading) {
+                  if (issueState is IssueInitial) {
+                    BlocProvider.of<IssueBloc>(context, listen: false).add(IssuesFetched(userId: authState.uid));
+                    return const Center(
+                        child: Text("Problem with IssueInitial State"));
+                  } else if (issueState is IssuesListLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (issueState is IssuesListFailure) {
                     return Center(child: Text('Error: ${issueState.error}'));
@@ -149,8 +153,9 @@ class _DashboardPageState extends State<DashboardPage> {
                               return IssueTile(
                                 issue: issue,
                                 firstButton: () {
-                                  context.read<IssueBloc>().add(
+                                  BlocProvider.of<IssueBloc>(context, listen: false).add(
                                       FocusIssueSelected(
+                                        userId: authState.uid,
                                           issueID: issue.issueId!));
                                 },
                               );
@@ -160,8 +165,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     );
                   } else {
+                    BlocProvider.of<IssueBloc>(context, listen: false).add(IssuesFetched(userId: authState.uid));
                     return const Center(
-                        child: Text("Unexpected state: IssueBloc"));
+                        child: Text("Problem with IssueInitial State"));
                   }
                 },
               );

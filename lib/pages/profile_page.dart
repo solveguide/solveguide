@@ -66,7 +66,7 @@ class ProfilePage extends StatelessWidget {
                     PlainButton(
                       onPressed: () {
                         BlocProvider.of<AuthBloc>(context, listen: false).add(
-                          AuthLogoutRequested(),
+                          const AuthLogoutRequested(),
                         );
                       },
                       text: "Sign Out",

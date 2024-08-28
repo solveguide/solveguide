@@ -34,7 +34,7 @@ class MyAppState extends State<MyApp> {
       providers: [
         BlocProvider(
           create: (context) =>
-              AuthBloc(authRepository: AuthRepository())..add(AppStarted()),
+              AuthBloc(authRepository: AuthRepository())..add(const AppStarted()),
         ),
         BlocProvider(
           create: (context) => IssueBloc(IssueRepository()),

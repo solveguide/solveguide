@@ -22,7 +22,8 @@ class IssuePage extends StatelessWidget {
   final TextEditingController textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  void _showHypothesisEditDialog(BuildContext context, Hypothesis hypothesis, int index) {
+  void _showHypothesisEditDialog(
+      BuildContext context, Hypothesis hypothesis, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -42,6 +43,7 @@ class IssuePage extends StatelessWidget {
             if (authState is AuthSuccess) {
               BlocProvider.of<IssueBloc>(context, listen: false).add(
                 CreateSeparateIssueFromHypothesis(
+                  index: index,
                   hypothesis: hypothesis,
                   newIssuePrioritized: false,
                   ownerId: authState.uid,
@@ -49,7 +51,7 @@ class IssuePage extends StatelessWidget {
               );
             } else {
               BlocProvider.of<AuthBloc>(context, listen: false)
-                  .add(AnnonymousUserBlocked());
+                  .add(const AnnonymousUserBlocked());
             }
           },
         );
@@ -57,7 +59,8 @@ class IssuePage extends StatelessWidget {
     );
   }
 
-    void _showSolutionEditDialog(BuildContext context, Solution solution, int index) {
+  void _showSolutionEditDialog(
+      BuildContext context, Solution solution, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -126,6 +129,10 @@ class IssuePage extends StatelessWidget {
               builder: (context, state) {
                 if (state is IssuesListFailure) {
                   return Center(child: Text('Error: ${state.error}'));
+                } else if (state is IssuesListSuccess) {
+                  BlocProvider.of<IssueBloc>(context, listen: false).add(
+                          FocusIssueCatchUp());
+                          return const Center(child: CircularProgressIndicator());
                 } else if (state is IssueInFocusSolved) {
                   return SolveSummaryWidget(issue: issue);
                 } else if (state is IssueInFocusInitial) {

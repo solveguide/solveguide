@@ -16,7 +16,8 @@ class EditItemDialog<T> extends StatefulWidget {
 
   @override
   EditItemDialogState<T> createState() => EditItemDialogState<T>();
-  }
+}
+
 class EditItemDialogState<T> extends State<EditItemDialog<T>> {
   late TextEditingController _controller;
 
@@ -24,7 +25,8 @@ class EditItemDialogState<T> extends State<EditItemDialog<T>> {
   void initState() {
     super.initState();
     if (widget.item is Hypothesis) {
-      _controller = TextEditingController(text: (widget.item as Hypothesis).desc);
+      _controller =
+          TextEditingController(text: (widget.item as Hypothesis).desc);
     } else if (widget.item is Solution) {
       _controller = TextEditingController(text: (widget.item as Solution).desc);
     }
@@ -47,8 +49,12 @@ class EditItemDialogState<T> extends State<EditItemDialog<T>> {
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
-              labelText: widget.item is Hypothesis ? 'Hypothesis Description' : 'Solution Description',
-              hintText: widget.item is Hypothesis ? 'Edit your hypothesis here' : 'Edit your solution here',
+              labelText: widget.item is Hypothesis
+                  ? 'Hypothesis Description'
+                  : 'Solution Description',
+              hintText: widget.item is Hypothesis
+                  ? 'Edit your hypothesis here'
+                  : 'Edit your solution here',
               border: const OutlineInputBorder(),
             ),
           ),
