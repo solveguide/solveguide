@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_tile.dart';
+import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/components/plain_button.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/issue_page.dart';
@@ -23,15 +24,20 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the stream only once in initState
+    _fetchIssuesIfAuthenticated();
+  }
+
+  void _fetchIssuesIfAuthenticated() {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthSuccess) {
-      context.read<IssueBloc>().add(IssuesFetched(userId: authState.uid));
+      BlocProvider.of<IssueBloc>(context, listen: false)
+          .add(IssuesFetched(userId: authState.uid));
     } else {
       Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false);
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        (route) => false,
+      );
     }
   }
 
@@ -45,14 +51,18 @@ class _DashboardPageState extends State<DashboardPage> {
         builder: (context) => AlertDialog(
           content: TextField(
             controller: textController,
+            decoration: const InputDecoration(
+              hintText: 'I feel . . . when . . .',
+            ),
           ),
           actions: [
             ElevatedButton(
               onPressed: () {
                 // Dispatch the new issue creation event
-                context.read<IssueBloc>().add(NewIssueCreated(
-                    seedStatement: textController.text,
-                    ownerId: authState.uid));
+                BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    NewIssueCreated(
+                        seedStatement: textController.text,
+                        ownerId: authState.uid));
                 textController.clear();
                 Navigator.pop(context);
               },
@@ -79,34 +89,42 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           IconButton(
             onPressed: () {
-              context.read<AuthBloc>().add(AuthLogoutRequested());
+              BlocProvider.of<AuthBloc>(context, listen: false)
+                  .add(const AuthLogoutRequested());
             },
             icon: const Icon(Icons.logout),
           )
         ],
       ),
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthInitial) {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
-          }
-        },
-        builder: (context, state) {
-          if (state is AuthLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return Column(
-            children: [
-              Center(
-                  child: PlainButton(
-                      onPressed: _addIssue, text: 'Create New Issue')),
-              const SizedBox(height: 20),
-              BlocBuilder<IssueBloc, IssueState>(
+      drawer: const MyNavigationDrawer(),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, authState) {
+              if (authState is AuthInitial) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    (route) => false);
+              }
+            },
+          ),
+          BlocListener<IssueBloc, IssueState>(
+            listener: (context, issueState) {
+              if (issueState is IssuesListFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(issueState.error)),
+                );
+              }
+            },
+          ),
+        ],
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            if (authState is AuthLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (authState is AuthSuccess) {
+              return BlocBuilder<IssueBloc, IssueState>(
                 builder: (context, issueState) {
                   if (issueState is IssuesListLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -114,34 +132,51 @@ class _DashboardPageState extends State<DashboardPage> {
                     return Center(child: Text('Error: ${issueState.error}'));
                   } else if (issueState is IssuesListSuccess) {
                     List<Issue> issuesList = issueState.issueList;
-                    return Expanded(
-                      child: ListView.builder(
-                        itemCount: issuesList.length,
-                        itemBuilder: (context, index) {
-                          Issue issue = issuesList[index];
-                          return IssueTile(
-                            issue: issue,
-                            firstButton: () {
-                              // Navigate to IssuePage with the selected issue
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => IssuePage(issue: issue),
-                                ),
+                    return Column(
+                      children: [
+                        Center(
+                            child: PlainButton(
+                                onPressed: _addIssue,
+                                text: 'Create New Issue')),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: issuesList.length,
+                            itemBuilder: (context, index) {
+                              Issue issue = issuesList[index];
+                              return IssueTile(
+                                issue: issue,
+                                firstButton: () {
+                                  BlocProvider.of<IssueBloc>(context,
+                                          listen: false)
+                                      .add(FocusIssueSelected(
+                                          userId: authState.uid,
+                                          issueID: issue.issueId!));
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            IssuePage(issue: issue)),
+                                    (route) => false,
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     );
                   } else {
-                    return const Center(child: Text("Unexpected state"));
+                    return const Center(
+                        child: Text("Problem with IssueInitial State"));
                   }
                 },
-              ),
-            ],
-          );
-        },
+              );
+            } else {
+              return const Center(child: Text("Unexpected state: AuthBloc"));
+            }
+          },
+        ),
       ),
     );
   }

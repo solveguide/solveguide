@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-Widget logoTitle(double height, {bool title = true}) {
+Widget logoTitle(double height, {bool title = true, double iconSize = 75}) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      _buildIconRow(),
+      _buildIconRow(iconSize),
       if (title) ...[
         SizedBox(height: height),
         _buildMainText(),
@@ -15,16 +15,16 @@ Widget logoTitle(double height, {bool title = true}) {
   );
 }
 
-Widget _buildIconRow() {
+Widget _buildIconRow(double iconSize) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Transform(
         transform: Matrix4.rotationY(pi),
         alignment: Alignment.center,
-        child: const Icon(Icons.psychology_outlined, size: 75),
+        child: Icon(Icons.psychology_outlined, size: iconSize),
       ),
-      const Icon(Icons.psychology_alt, size: 75),
+      Icon(Icons.psychology_alt, size: iconSize),
     ],
   );
 }
