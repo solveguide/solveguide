@@ -30,6 +30,9 @@ class PlainTextField extends StatelessWidget {
         },
         decoration: InputDecoration(
           hintText: hintText,
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+          ),
           fillColor: Theme.of(context).colorScheme.secondary,
           filled: true,
           border: const OutlineInputBorder(),

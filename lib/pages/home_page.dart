@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildMainContainer(),
             SizedBox(height: 10),
-            _buildCenterContainer(),
+            //_buildCenterContainer(),
           ],
         ),
       ),

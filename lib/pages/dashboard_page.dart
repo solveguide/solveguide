@@ -5,6 +5,7 @@ import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_tile.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/components/plain_button.dart';
+import 'package:guide_solve/components/plain_textfield.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/issue_page.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
@@ -49,12 +50,12 @@ class _DashboardPageState extends State<DashboardPage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          content: TextField(
-            controller: textController,
-            decoration: const InputDecoration(
-              hintText: 'I feel . . . when . . .',
-            ),
-          ),
+          content: PlainTextField(hintText: "I feel . .  when . .", controller: textController, obscureText: false, onSubmit: () {BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    NewIssueCreated(
+                        seedStatement: textController.text,
+                        ownerId: authState.uid));
+                textController.clear();
+                Navigator.pop(context);},),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -66,6 +67,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 textController.clear();
                 Navigator.pop(context);
               },
+              style: ElevatedButton.styleFrom(
+    backgroundColor: Theme.of(context).colorScheme.tertiaryContainer, // Background color
+    foregroundColor: Theme.of(context).colorScheme.onSurface, // Text color
+  ),
               child: const Text('Add'),
             ),
           ],
