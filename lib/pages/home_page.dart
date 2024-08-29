@@ -1,13 +1,12 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui_auth;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/components/narrow_wide.dart';
 import 'package:guide_solve/data/issue_data.dart';
-import 'package:guide_solve/pages/demo_page.dart';
+import 'package:guide_solve/pages/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,8 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
-  bool isButtonEnabled =
-      false; // Tracks whether the start button should be enabled
+  bool isButtonEnabled = false; // Tracks whether demo button can be clicked
 
   @override
   void initState() {
@@ -35,45 +33,25 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-// start the demo
-  void goToDemo(String demoIssueLabel) {
-    createDemoIssue(demoIssueLabel);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DemoPage(demoIssue: demoIssueLabel),
-        ));
-  }
-
-// go to signup page
-  void goToSignupPage(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
-    } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => firebase_ui_auth.SignInScreen(
-              providers: [
-                firebase_ui_auth.EmailAuthProvider(),
-              ],
-              actions: [
-                firebase_ui_auth.AuthStateChangeAction<
-                    firebase_ui_auth.SignedIn>((context, state) {
-                  Navigator.of(context).pop();
-                  Navigator.pushReplacementNamed(context, '/dashboard');
-                }),
-              ],
-            ),
-          ));
+  Future<void> ensureAnonymousLogin() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      await FirebaseAuth.instance.signInAnonymously();
     }
   }
 
-  // create the demo issue
+// go to signup page
+  void goToLoginPage() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
+  }
+
   void createDemoIssue(String demoIssueLabel) {
-    Provider.of<IssueData>(context, listen: false).addIssue(demoIssueLabel);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Provider.of<IssueData>(context, listen: false)
+          .addDemoIssue(demoIssueLabel, user.uid);
+    }
   }
 
   //UI
@@ -110,15 +88,13 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _buildIconRow(),
-            SizedBox(height: 30),
-            _buildMainText(),
+            logoTitle(30),
             SizedBox(height: 30),
             _buildDetailedText(),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
-                onPressed: () => {},//goToSignupPage(context),
+                onPressed: () => goToLoginPage(),
                 color: Colors.red,
                 child: Text("Login",
                     style:
@@ -153,9 +129,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 10),
             TextField(
               controller: demoIssueLabel,
-              onSubmitted: (String value) {
-                goToDemo(value);
-              },
+              onSubmitted: (String value) {},
               // keyboardType: TextInputType.multiline, // Enables line breaks
               //maxLines: null,
               decoration: InputDecoration(
@@ -169,9 +143,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
-                onPressed: isButtonEnabled
-                    ? () => goToDemo(demoIssueLabel.text)
-                    : null,
+                onPressed: isButtonEnabled ? () => {} : null,
                 color: Colors.red,
                 disabledColor: Colors.grey,
                 child: Text("Start!",
@@ -192,25 +164,6 @@ class _HomePageState extends State<HomePage> {
       border: Border.all(width: 5, color: Colors.black),
     );
   }
-
-  Widget _buildIconRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Transform(
-          transform: Matrix4.rotationY(pi),
-          alignment: Alignment.center,
-          child: Icon(Icons.psychology_outlined, size: 75),
-        ),
-        Icon(Icons.psychology_alt, size: 75),
-      ],
-    );
-  }
-
-  Widget _buildMainText() => const Text(
-        'Solve Guide',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      );
 
   Widget _buildDetailedText() => Column(
         children: [
