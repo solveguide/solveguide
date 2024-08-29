@@ -19,41 +19,33 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusIssueSelected>(_onFocusIssueSelected);
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
-    on<ListResorted>(_onListResorted);
+    on<HypothesisListResorted>(_onHypothesisListResorted);
     on<HypothesisUpdated>(_onHypothesisUpdated);
     on<CreateSeparateIssueFromHypothesis>(_onCreateSeparateIssueFromHypothesis);
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
+    on<SolutionListResorted>(_onSolutionListResorted);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<SolutionUpdated>(_onSolutionUpdated);
-    on<FocusIssueCatchUp>(_onFocusIssueCatchUp);
   }
 
   Future<void> _fetchIssues(
     IssuesFetched event,
     Emitter<IssueState> emit,
   ) async {
-    // Return the current state if it's not appropriate to fetch issues
-    if (state is! IssueInitial && state is! IssuesListLoading) {
-      emit(state); // Re-emit the current state to maintain the issue-solving process
-      return;
-    }
+    // Check if the current state is related to an issue being in focus
+    // if (state is IssueInFocusInitial ||
+    //     state is IssueInFocusRootIdentified ||
+    //     state is IssueInFocusSolved) {
+    //   // Return early to prevent fetching issues and changing the state
+    //   return;
+    // }
+
     emit(IssuesListLoading());
     try {
-      await emit.forEach<List<Issue>>(
-        issueRepository.getIssuesStream(event.userId),
-        onData: (issuesList) {
-          if (issuesList.isEmpty) {
-            return const IssuesListFailure(
-                "Congratulations, you have no issues."); // Custom state for empty list
-          } else {
-            return IssuesListSuccess(issueList: issuesList);
-          }
-        },
-        onError: (error, stackTrace) {
-          return IssuesListFailure(error.toString());
-        },
-      );
+      // Use getIssuesList for a one-time fetch
+      final issuesList = await issueRepository.getIssueList(event.userId);
+      emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
     }
@@ -63,9 +55,11 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     NewIssueCreated event,
     Emitter<IssueState> emit,
   ) async {
+    emit(IssuesListLoading());
     try {
       issueRepository.addIssue(event.seedStatement, event.ownerId);
-      emit(IssueInitial());
+      final issuesList = await issueRepository.getIssueList(event.ownerId);
+      emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
     }
@@ -137,9 +131,13 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       );
 
       // Emit the new state
-      issueRepository.setFocusIssue(updatedIssue);
-      issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
-      emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+      try {
+        issueRepository.setFocusIssue(updatedIssue);
+        issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
+        emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+      } catch (e) {
+        emit(IssuesListFailure(e.toString()));
+      }
     }
   }
 
@@ -191,48 +189,74 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onListResorted<T>(
-    ListResorted<T> event,
+  void _onHypothesisListResorted(
+    HypothesisListResorted event,
     Emitter<IssueState> emit,
   ) {
     final Issue? focusIssue = issueRepository.getFocusIssue();
 
     if (focusIssue == null) {
       emit(const IssuesListFailure("No Issue Selected"));
-    } else {
-      // Step 1: Create a copy of the list
-      final List<T> updatedItems = List.from(event.items);
-
-      // Step 2: Remove the item at the old index and insert it at the new index
-      final item = updatedItems.removeAt(event.oldIndex);
-
-      int newIndex = event.newIndex;
-      if (newIndex > event.oldIndex) {
-        newIndex -= 1;
-      }
-
-      updatedItems.insert(newIndex, item);
-
-      // Step 3: Update the Issue object with the new list
-      Issue updatedIssue;
-      if (T == Hypothesis) {
-        updatedIssue = focusIssue.copyWith(
-          hypotheses: updatedItems as List<Hypothesis>,
-        );
-      } else if (T == Solution) {
-        updatedIssue = focusIssue.copyWith(
-          solutions: updatedItems as List<Solution>,
-        );
-      } else {
-        emit(const IssuesListFailure("Unknown item type"));
-        return;
-      }
-
-      // Step 4: Emit the new state with the updated issue
-      issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-      issueRepository.setFocusIssue(updatedIssue);
-      emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+      return;
     }
+
+    // Step 1: Create a copy of the list
+    final List<Hypothesis> updatedItems = List.from(event.items);
+
+    // Step 2: Remove the item at the old index and insert it at the new index
+    final item = updatedItems.removeAt(event.oldIndex);
+
+    int newIndex = event.newIndex;
+    if (newIndex > event.oldIndex) {
+      newIndex -= 1;
+    }
+
+    updatedItems.insert(newIndex, item);
+
+    // Step 3: Update the Issue object with the new list
+    final updatedIssue = focusIssue.copyWith(
+      hypotheses: updatedItems,
+    );
+
+    // Step 4: Emit the new state with the updated issue
+    issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
+    issueRepository.setFocusIssue(updatedIssue);
+    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+  }
+
+  void _onSolutionListResorted(
+    SolutionListResorted event,
+    Emitter<IssueState> emit,
+  ) {
+    final Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(const IssuesListFailure("No Issue Selected"));
+      return;
+    }
+
+    // Step 1: Create a copy of the list
+    final List<Solution> updatedItems = List.from(event.items);
+
+    // Step 2: Remove the item at the old index and insert it at the new index
+    final item = updatedItems.removeAt(event.oldIndex);
+
+    int newIndex = event.newIndex;
+    if (newIndex > event.oldIndex) {
+      newIndex -= 1;
+    }
+
+    updatedItems.insert(newIndex, item);
+
+    // Step 3: Update the Issue object with the new list
+    final updatedIssue = focusIssue.copyWith(
+      solutions: updatedItems,
+    );
+
+    // Step 4: Emit the new state with the updated issue
+    issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
+    issueRepository.setFocusIssue(updatedIssue);
+    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
   }
 
   void _onFocusRootConfirmed(
@@ -255,8 +279,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
         // Emit the updated state
         emit(IssueInFocusRootIdentified(
-          focusedIssue: focusIssue,
-          rootCause: event.confirmedRoot,
+          focusedIssue: updatedIssue,
+          rootCause: updatedIssue.root,
         ));
       } catch (error) {
         emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
@@ -280,7 +304,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       issueRepository.setFocusIssue(updatedIssue);
       emit(IssueInFocusRootIdentified(
         focusedIssue: updatedIssue,
-        rootCause: focusIssue.root,
+        rootCause: updatedIssue.root,
       ));
     }
   }
@@ -325,23 +349,6 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
       issueRepository.setFocusIssue(updatedIssue);
       emit(IssueInFocusSolved(focusedIssue: updatedIssue));
-    }
-  }
-
-  void _onFocusIssueCatchUp(FocusIssueCatchUp event, Emitter<IssueState> emit) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
-
-    if (focusIssue == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
-    } else {
-      if (focusIssue.solve.isNotEmpty) {
-        emit(IssueInFocusSolved(focusedIssue: focusIssue));
-      } else if (focusIssue.root.isNotEmpty) {
-        emit(IssueInFocusRootIdentified(
-            focusedIssue: focusIssue, rootCause: focusIssue.root));
-      } else {
-        emit(IssueInFocusInitial(focusedIssue: focusIssue));
-      }
     }
   }
 }

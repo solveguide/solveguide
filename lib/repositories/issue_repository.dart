@@ -21,21 +21,21 @@ class IssueRepository {
   }
 
   Future<List<Issue>> getIssueList(String currentUserId) async {
-  try {
-    // Fetch the snapshot from Firestore
-    final snapshot = await _issuesCollection
-        .where('ownerId', isEqualTo: currentUserId)
-        .get(); // Use get() instead of snapshots()
+    try {
+      // Fetch the snapshot from Firestore
+      final snapshot = await _issuesCollection
+          .where('ownerId', isEqualTo: currentUserId)
+          .get(); // Use get() instead of snapshots()
 
-    // Convert the snapshot into a List of Issue objects
-    return snapshot.docs.map((doc) {
-      return Issue.fromJson(doc.data() as Map<String, dynamic>);
-    }).toList();
-  } catch (error) {
-    // Handle any errors that occur
-    throw error.toString();
+      // Convert the snapshot into a List of Issue objects
+      return snapshot.docs.map((doc) {
+        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    } catch (error) {
+      // Handle any errors that occur
+      throw error.toString();
+    }
   }
-}
 
   // Create an issue
   Future<void> addIssue(String seedStatement, String ownerId) async {

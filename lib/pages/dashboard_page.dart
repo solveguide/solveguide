@@ -24,15 +24,20 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the stream only once in initState
+    _fetchIssuesIfAuthenticated();
+  }
+
+  void _fetchIssuesIfAuthenticated() {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthSuccess) {
-      BlocProvider.of<IssueBloc>(context, listen: false).add(IssuesFetched(userId: authState.uid));
+      BlocProvider.of<IssueBloc>(context, listen: false)
+          .add(IssuesFetched(userId: authState.uid));
     } else {
       Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false);
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        (route) => false,
+      );
     }
   }
 
@@ -47,16 +52,17 @@ class _DashboardPageState extends State<DashboardPage> {
           content: TextField(
             controller: textController,
             decoration: const InputDecoration(
-              hintText: 'Enter issue description',
+              hintText: 'I feel . . . when . . .',
             ),
           ),
           actions: [
             ElevatedButton(
               onPressed: () {
                 // Dispatch the new issue creation event
-                context.read<IssueBloc>().add(NewIssueCreated(
-                    seedStatement: textController.text,
-                    ownerId: authState.uid));
+                BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    NewIssueCreated(
+                        seedStatement: textController.text,
+                        ownerId: authState.uid));
                 textController.clear();
                 Navigator.pop(context);
               },
@@ -105,15 +111,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           BlocListener<IssueBloc, IssueState>(
             listener: (context, issueState) {
-              if (issueState is IssueInFocus) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          IssuePage(issue: issueState.focusedIssue)),
-                  (route) => false,
-                );
-              } else if (issueState is IssuesListFailure) {
+              if (issueState is IssuesListFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(issueState.error)),
                 );
@@ -128,11 +126,7 @@ class _DashboardPageState extends State<DashboardPage> {
             } else if (authState is AuthSuccess) {
               return BlocBuilder<IssueBloc, IssueState>(
                 builder: (context, issueState) {
-                  if (issueState is IssueInitial) {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(IssuesFetched(userId: authState.uid));
-                    return const Center(
-                        child: Text("Problem with IssueInitial State"));
-                  } else if (issueState is IssuesListLoading) {
+                  if (issueState is IssuesListLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (issueState is IssuesListFailure) {
                     return Center(child: Text('Error: ${issueState.error}'));
@@ -153,10 +147,18 @@ class _DashboardPageState extends State<DashboardPage> {
                               return IssueTile(
                                 issue: issue,
                                 firstButton: () {
-                                  BlocProvider.of<IssueBloc>(context, listen: false).add(
-                                      FocusIssueSelected(
-                                        userId: authState.uid,
+                                  BlocProvider.of<IssueBloc>(context,
+                                          listen: false)
+                                      .add(FocusIssueSelected(
+                                          userId: authState.uid,
                                           issueID: issue.issueId!));
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            IssuePage(issue: issue)),
+                                    (route) => false,
+                                  );
                                 },
                               );
                             },
@@ -165,7 +167,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     );
                   } else {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(IssuesFetched(userId: authState.uid));
                     return const Center(
                         child: Text("Problem with IssueInitial State"));
                   }

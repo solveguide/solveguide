@@ -129,10 +129,6 @@ class IssuePage extends StatelessWidget {
               builder: (context, state) {
                 if (state is IssuesListFailure) {
                   return Center(child: Text('Error: ${state.error}'));
-                } else if (state is IssuesListSuccess) {
-                  BlocProvider.of<IssueBloc>(context, listen: false).add(
-                          FocusIssueCatchUp());
-                          return const Center(child: CircularProgressIndicator());
                 } else if (state is IssueInFocusSolved) {
                   return SolveSummaryWidget(issue: issue);
                 } else if (state is IssueInFocusInitial) {
@@ -158,7 +154,7 @@ class IssuePage extends StatelessWidget {
                     },
                   );
                 } else {
-                  return Container(); // or handle other states as needed
+                  return const Center(child: Text("Unexpected state: IssueBloc")); // or handle other states as needed
                 }
               },
             ),
@@ -166,6 +162,7 @@ class IssuePage extends StatelessWidget {
             // InputWidget with BlocBuilder
             BlocBuilder<IssueBloc, IssueState>(builder: (context, state) {
               if (state is IssueInFocusInitial) {
+                _focusNode.requestFocus();
                 return InputWidget(
                   controller: textController,
                   focusNode: _focusNode,
@@ -179,6 +176,7 @@ class IssuePage extends StatelessWidget {
                   hintText: 'Enter root theories here.',
                 );
               } else if (state is IssueInFocusRootIdentified) {
+                _focusNode.requestFocus();
                 return InputWidget(
                   controller: textController,
                   focusNode: _focusNode,
@@ -204,7 +202,7 @@ class IssuePage extends StatelessWidget {
                     getItemDescription: (hypothesis) => hypothesis.desc,
                     onReorder: (oldIndex, newIndex) {
                       BlocProvider.of<IssueBloc>(context, listen: false).add(
-                        ListResorted<Hypothesis>(
+                        HypothesisListResorted(
                           items: state.focusedIssue.hypotheses,
                           oldIndex: oldIndex,
                           newIndex: newIndex,
@@ -224,7 +222,7 @@ class IssuePage extends StatelessWidget {
                     getItemDescription: (solution) => solution.desc,
                     onReorder: (oldIndex, newIndex) {
                       BlocProvider.of<IssueBloc>(context, listen: false).add(
-                        ListResorted<Solution>(
+                        SolutionListResorted(
                           items: state.focusedIssue.solutions,
                           oldIndex: oldIndex,
                           newIndex: newIndex,

@@ -29,9 +29,6 @@ final class NewIssueCreated extends IssueEvent {
   @override
   List<Object?> get props => [seedStatement, ownerId];
 }
-
-final class FocusIssueCatchUp extends IssueEvent{}
-
 /*
 
 THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
@@ -88,16 +85,15 @@ class CreateSeparateIssueFromHypothesis extends IssueEvent {
   });
 
   @override
-  List<Object?> get props =>
-      [index, hypothesis, newIssuePrioritized, ownerId];
+  List<Object?> get props => [index, hypothesis, newIssuePrioritized, ownerId];
 }
 
-class ListResorted<T> extends IssueEvent {
-  final List<T> items;
+class HypothesisListResorted<T> extends IssueEvent {
+  final List<Hypothesis> items;
   final int oldIndex;
   final int newIndex;
 
-  const ListResorted({
+  const HypothesisListResorted({
     required this.items,
     required this.oldIndex,
     required this.newIndex,
@@ -140,6 +136,20 @@ class SolutionUpdated extends IssueEvent {
 
   @override
   List<Object?> get props => [index, updatedSolution];
+}
+class SolutionListResorted<T> extends IssueEvent {
+  final List<Solution> items;
+  final int oldIndex;
+  final int newIndex;
+
+  const SolutionListResorted({
+    required this.items,
+    required this.oldIndex,
+    required this.newIndex,
+  });
+
+  @override
+  List<Object?> get props => [items, oldIndex, newIndex];
 }
 
 final class FocusSolveConfirmed extends IssueEvent {
