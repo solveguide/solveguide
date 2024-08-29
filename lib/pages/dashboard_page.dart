@@ -50,12 +50,19 @@ class _DashboardPageState extends State<DashboardPage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          content: PlainTextField(hintText: "I feel . .  when . .", controller: textController, obscureText: false, onSubmit: () {BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    NewIssueCreated(
-                        seedStatement: textController.text,
-                        ownerId: authState.uid));
-                textController.clear();
-                Navigator.pop(context);},),
+          content: PlainTextField(
+            hintText: "I feel . .  when . .",
+            controller: textController,
+            obscureText: false,
+            onSubmit: () {
+              BlocProvider.of<IssueBloc>(context, listen: false).add(
+                  NewIssueCreated(
+                      seedStatement: textController.text,
+                      ownerId: authState.uid));
+              textController.clear();
+              Navigator.pop(context);
+            },
+          ),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -68,9 +75,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-    backgroundColor: Theme.of(context).colorScheme.tertiaryContainer, // Background color
-    foregroundColor: Theme.of(context).colorScheme.onSurface, // Text color
-  ),
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .tertiaryContainer, // Background color
+                foregroundColor:
+                    Theme.of(context).colorScheme.onSurface, // Text color
+              ),
               child: const Text('Add'),
             ),
           ],

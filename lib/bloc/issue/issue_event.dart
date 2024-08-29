@@ -29,6 +29,7 @@ final class NewIssueCreated extends IssueEvent {
   @override
   List<Object?> get props => [seedStatement, ownerId];
 }
+
 /*
 
 THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
@@ -137,6 +138,7 @@ class SolutionUpdated extends IssueEvent {
   @override
   List<Object?> get props => [index, updatedSolution];
 }
+
 class SolutionListResorted<T> extends IssueEvent {
   final List<Solution> items;
   final int oldIndex;

@@ -76,8 +76,7 @@ class SolveSummaryWidget extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: issue.solutions
-                              .where(
-                                  (solution) => solution.desc != issue.solve)
+                              .where((solution) => solution.desc != issue.solve)
                               .map((solution) => ListTile(
                                     contentPadding: EdgeInsets.zero,
                                     title: Text(solution.desc),

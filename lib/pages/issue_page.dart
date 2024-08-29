@@ -154,7 +154,9 @@ class IssuePage extends StatelessWidget {
                     },
                   );
                 } else {
-                  return const Center(child: Text("Unexpected state: IssueBloc")); // or handle other states as needed
+                  return const Center(
+                      child: Text(
+                          "Unexpected state: IssueBloc")); // or handle other states as needed
                 }
               },
             ),
