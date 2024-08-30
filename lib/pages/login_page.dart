@@ -69,7 +69,9 @@ class LoginPage extends StatelessWidget {
 
                 // username text field
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 500.0,),
+                  constraints: const BoxConstraints(
+                    maxWidth: 500.0,
+                  ),
                   child: PlainTextField(
                     hintText: "email",
                     controller: emailController,
@@ -81,7 +83,9 @@ class LoginPage extends StatelessWidget {
                 ),
                 // password text field
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 500.0,),
+                  constraints: const BoxConstraints(
+                    maxWidth: 500.0,
+                  ),
                   child: PlainTextField(
                     hintText: "password",
                     controller: passwordController,

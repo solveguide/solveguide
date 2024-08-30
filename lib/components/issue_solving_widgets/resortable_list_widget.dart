@@ -50,7 +50,8 @@ class ResortableListWidget<T> extends StatelessWidget {
             );
           },
           onReorder: onReorder,
-          proxyDecorator: (Widget child, int index, Animation<double> animation) {
+          proxyDecorator:
+              (Widget child, int index, Animation<double> animation) {
             return child;
           },
         ),
