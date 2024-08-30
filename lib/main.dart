@@ -5,6 +5,8 @@ import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 //import 'package:guide_solve/components/app_bloc_observer.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
+import 'package:guide_solve/pages/login_page.dart';
+import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/themes/light_mode.dart';
@@ -52,6 +54,11 @@ class MyAppState extends State<MyApp> {
             }
           },
         ),
+        routes: {
+          '/dashboard': (context) => const DashboardPage(),
+          '/login': (context) => LoginPage(),
+          '/profile': (context) => ProfilePage(),
+        },
       ),
     );
   }
