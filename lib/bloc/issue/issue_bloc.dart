@@ -256,7 +256,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     // Step 4: Emit the new state with the updated issue
     issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
     issueRepository.setFocusIssue(updatedIssue);
-    emit(IssueInFocusRootIdentified(focusedIssue: updatedIssue, rootCause: updatedIssue.root));
+    emit(IssueInFocusRootIdentified(
+        focusedIssue: updatedIssue, rootCause: updatedIssue.root));
   }
 
   void _onFocusRootConfirmed(

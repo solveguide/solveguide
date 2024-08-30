@@ -19,6 +19,7 @@ class InputWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 750,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: TextFormField(
         controller: controller,

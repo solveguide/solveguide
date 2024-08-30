@@ -17,6 +17,7 @@ class SolveSummaryWidget extends StatelessWidget {
         const SizedBox(height: 20),
         Center(
           child: Container(
+            width: 1000,
             decoration: BoxDecoration(
               color: Colors.grey[300] ?? Colors.orange,
               borderRadius: BorderRadius.circular(20),

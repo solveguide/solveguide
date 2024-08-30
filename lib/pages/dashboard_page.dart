@@ -155,28 +155,33 @@ class _DashboardPageState extends State<DashboardPage> {
                                 text: 'Create New Issue')),
                         const SizedBox(height: 20),
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: issuesList.length,
-                            itemBuilder: (context, index) {
-                              Issue issue = issuesList[index];
-                              return IssueTile(
-                                issue: issue,
-                                firstButton: () {
-                                  BlocProvider.of<IssueBloc>(context,
-                                          listen: false)
-                                      .add(FocusIssueSelected(
-                                          userId: authState.uid,
-                                          issueID: issue.issueId!));
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            IssuePage(issue: issue)),
-                                    (route) => false,
-                                  );
-                                },
-                              );
-                            },
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 1000.0,
+                            ),
+                            child: ListView.builder(
+                              itemCount: issuesList.length,
+                              itemBuilder: (context, index) {
+                                Issue issue = issuesList[index];
+                                return IssueTile(
+                                  issue: issue,
+                                  firstButton: () {
+                                    BlocProvider.of<IssueBloc>(context,
+                                            listen: false)
+                                        .add(FocusIssueSelected(
+                                            userId: authState.uid,
+                                            issueID: issue.issueId!));
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              IssuePage(issue: issue)),
+                                      (route) => false,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ],
