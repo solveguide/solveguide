@@ -4,6 +4,7 @@ import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/components/plain_button.dart';
+import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/login_page.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -29,6 +30,13 @@ class ProfilePage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => LoginPage(),
+                ),
+                (route) => false);
+          }else if (state is AuthInitial){
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
                 ),
                 (route) => false);
           }

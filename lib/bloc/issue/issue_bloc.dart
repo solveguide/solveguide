@@ -57,7 +57,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   ) async {
     emit(IssuesListLoading());
     try {
-      issueRepository.addIssue(event.seedStatement, event.ownerId);
+      await issueRepository.addIssue(event.seedStatement, event.ownerId);
       final issuesList = await issueRepository.getIssueList(event.ownerId);
       emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {
@@ -256,7 +256,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     // Step 4: Emit the new state with the updated issue
     issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
     issueRepository.setFocusIssue(updatedIssue);
-    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
+    emit(IssueInFocusRootIdentified(
+        focusedIssue: updatedIssue, rootCause: updatedIssue.root));
   }
 
   void _onFocusRootConfirmed(
@@ -337,7 +338,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   }
 
   void _focusSolveConfirmed(
-      FocusSolveConfirmed event, Emitter<IssueState> emit) {
+      FocusSolveConfirmed event, Emitter<IssueState> emit) async {
     Issue? focusIssue = issueRepository.getFocusIssue();
 
     if (focusIssue == null) {
@@ -346,7 +347,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       Issue updatedIssue = focusIssue.copyWith(
         solve: event.confirmedSolve,
       );
-      issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
+      await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
       issueRepository.setFocusIssue(updatedIssue);
       emit(IssueInFocusSolved(focusedIssue: updatedIssue));
     }

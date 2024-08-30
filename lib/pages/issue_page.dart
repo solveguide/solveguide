@@ -130,7 +130,7 @@ class IssuePage extends StatelessWidget {
                 if (state is IssuesListFailure) {
                   return Center(child: Text('Error: ${state.error}'));
                 } else if (state is IssueInFocusSolved) {
-                  return SolveSummaryWidget(issue: issue);
+                  return SolveSummaryWidget(issue: state.focusedIssue);
                 } else if (state is IssueInFocusInitial) {
                   return ConfirmationWidget(
                     issue: state.focusedIssue,
