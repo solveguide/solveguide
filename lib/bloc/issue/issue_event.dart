@@ -30,8 +30,6 @@ final class NewIssueCreated extends IssueEvent {
   List<Object?> get props => [seedStatement, ownerId];
 }
 
-
-
 final class IssueDeletionRequested extends IssueEvent {
   final String issueId;
   final String ownerId;

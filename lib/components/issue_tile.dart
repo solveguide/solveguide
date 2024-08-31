@@ -69,7 +69,11 @@ class _IssueTileState extends State<IssueTile> {
               PlainButton(onPressed: () => widget.firstButton(), text: "Solve"),
               // Delete Issue
               if (widget.secondButton != null)
-                PlainButton(onPressed: widget.secondButton!, text: "Delete", color: Theme.of(context).colorScheme.secondaryContainer,),
+                PlainButton(
+                  onPressed: widget.secondButton!,
+                  text: "Delete",
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                ),
               // View Stakeholders
               //
             ],

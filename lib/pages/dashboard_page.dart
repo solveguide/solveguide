@@ -51,28 +51,28 @@ class _DashboardPageState extends State<DashboardPage> {
         context: context,
         builder: (context) => AlertDialog(
           content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text("Are you sure you want to delete this issue?"),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1.0), // Border
-            borderRadius: BorderRadius.circular(4.0),
-            color: Colors.white,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Are you sure you want to delete this issue?"),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 1.0), // Border
+                  borderRadius: BorderRadius.circular(4.0),
+                  color: Colors.white,
+                ),
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black, // Text color
+                  ),
+                ),
+              ),
+            ],
           ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black, // Text color
-            ),
-          ),
-        ),
-      ],
-    ),
           actions: [
             ElevatedButton(
               onPressed: () {

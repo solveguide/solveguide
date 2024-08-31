@@ -66,7 +66,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-    void _onIssueDeletionRequested(
+  void _onIssueDeletionRequested(
     IssueDeletionRequested event,
     Emitter<IssueState> emit,
   ) async {

@@ -18,7 +18,10 @@ class PlainButton extends StatelessWidget {
       decoration: const BoxDecoration(),
       child: MaterialButton(
         onPressed: onPressed,
-        color: color ?? Theme.of(context).colorScheme.tertiaryContainer, // Use the provided color or default
+        color: color ??
+            Theme.of(context)
+                .colorScheme
+                .tertiaryContainer, // Use the provided color or default
         disabledColor: Colors.grey.shade100,
         disabledTextColor: Colors.grey.shade700,
         child: Text(
