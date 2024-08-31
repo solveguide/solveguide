@@ -30,6 +30,21 @@ final class NewIssueCreated extends IssueEvent {
   List<Object?> get props => [seedStatement, ownerId];
 }
 
+
+
+final class IssueDeletionRequested extends IssueEvent {
+  final String issueId;
+  final String ownerId;
+
+  const IssueDeletionRequested({
+    required this.issueId,
+    required this.ownerId,
+  });
+
+  @override
+  List<Object?> get props => [issueId, ownerId];
+}
+
 /*
 
 THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS

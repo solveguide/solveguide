@@ -17,6 +17,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
+    on<IssueDeletionRequested>(_onIssueDeletionRequested);
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
     on<HypothesisListResorted>(_onHypothesisListResorted);
@@ -58,6 +59,20 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     emit(IssuesListLoading());
     try {
       await issueRepository.addIssue(event.seedStatement, event.ownerId);
+      final issuesList = await issueRepository.getIssueList(event.ownerId);
+      emit(IssuesListSuccess(issueList: issuesList));
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
+    }
+  }
+
+    void _onIssueDeletionRequested(
+    IssueDeletionRequested event,
+    Emitter<IssueState> emit,
+  ) async {
+    emit(IssuesListLoading());
+    try {
+      await issueRepository.deleteIssue(event.issueId);
       final issuesList = await issueRepository.getIssueList(event.ownerId);
       emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {

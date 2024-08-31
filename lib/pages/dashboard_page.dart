@@ -42,6 +42,68 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  void _deleteIssue(String issueId, String label) {
+    // Get the AuthBloc state before showing the dialog
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is AuthSuccess) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text("Are you sure you want to delete this issue?"),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 1.0), // Border
+            borderRadius: BorderRadius.circular(4.0),
+            color: Colors.white,
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black, // Text color
+            ),
+          ),
+        ),
+      ],
+    ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                // Dispatch the new issue creation event
+                BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    IssueDeletionRequested(
+                        issueId: issueId, ownerId: authState.uid));
+                textController.clear();
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .secondaryContainer, // Background color
+                foregroundColor:
+                    Theme.of(context).colorScheme.error, // Text color
+              ),
+              child: const Text('D E L E T E'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Handle the case where the user is not authenticated
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You need to be logged in to add an issue')),
+      );
+    }
+  }
+
   void _addIssue() {
     // Get the AuthBloc state before showing the dialog
     final authState = context.read<AuthBloc>().state;
@@ -178,6 +240,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                               IssuePage(issue: issue)),
                                       (route) => false,
                                     );
+                                  },
+                                  secondButton: () {
+                                    _deleteIssue(issue.issueId!, issue.label);
                                   },
                                 );
                               },

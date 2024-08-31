@@ -12,11 +12,13 @@ import 'package:guide_solve/models/issue.dart';
 class IssueTile extends StatefulWidget {
   final Issue issue;
   final VoidCallback firstButton;
+  final VoidCallback? secondButton;
 
   const IssueTile({
     super.key,
     required this.issue,
     required this.firstButton,
+    this.secondButton,
   });
 
   @override
@@ -60,10 +62,14 @@ class _IssueTileState extends State<IssueTile> {
             height: 20.0,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Actions --
               // Start solving Issue
-              PlainButton(onPressed: () => widget.firstButton(), text: "Solve")
+              PlainButton(onPressed: () => widget.firstButton(), text: "Solve"),
+              // Delete Issue
+              if (widget.secondButton != null)
+                PlainButton(onPressed: widget.secondButton!, text: "Delete", color: Theme.of(context).colorScheme.secondaryContainer,),
               // View Stakeholders
               //
             ],
