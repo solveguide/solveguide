@@ -28,9 +28,15 @@ class IssueRepository {
           .get(); // Use get() instead of snapshots()
 
       // Convert the snapshot into a List of Issue objects
-      return snapshot.docs.map((doc) {
+      List<Issue> issuesList = snapshot.docs.map((doc) {
         return Issue.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
+
+      // Sort the list by the lastUpdatedTimestamp field
+      issuesList.sort(
+          (a, b) => b.lastUpdatedTimestamp.compareTo(a.lastUpdatedTimestamp));
+
+      return issuesList;
     } catch (error) {
       // Handle any errors that occur
       throw error.toString();
