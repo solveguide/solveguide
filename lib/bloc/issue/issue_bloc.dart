@@ -26,8 +26,9 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<SolutionListResorted>(_onSolutionListResorted);
-    on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<SolutionUpdated>(_onSolutionUpdated);
+    on<FocusSolveConfirmed>(_focusSolveConfirmed);
+    on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
     //Solution Proving Events
     on<SolveProvenByOwner>(_onSolveProvenByOwner);
     on<SolveDisprovenByOwner>(_onSolveDisprovenByOwner);
@@ -371,7 +372,31 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       );
       await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
       issueRepository.setFocusIssue(updatedIssue);
-      emit(IssueInFocusSolved(focusedIssue: updatedIssue));
+      emit(IssueInFocusSolutionIdentified(focusedIssue: updatedIssue, solution: event.confirmedSolve));
+    }
+  }
+
+    void _onFocusSolveScopeSubmitted(
+      FocusSolveScopeSubmitted event, Emitter<IssueState> emit) async {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(const IssuesListFailure("No Issue Selected"));
+    } else {
+      try {
+  List<Solution> updatedSolution = List.from(focusIssue.solutions);
+  updatedSolution.removeAt(0);
+  updatedSolution.insert(0, event.confirmedSolve);
+  Issue updatedIssue = focusIssue.copyWith(
+    solve: event.confirmedSolve.desc,
+    solutions: updatedSolution,
+  );
+  await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
+  issueRepository.setFocusIssue(updatedIssue);
+  emit(IssueInFocusSolved(focusedIssue: updatedIssue));
+} catch (e) {
+  emit(IssuesListFailure(e.toString()));
+}
     }
   }
 

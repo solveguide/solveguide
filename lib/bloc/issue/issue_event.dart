@@ -167,6 +167,19 @@ class SolutionListResorted<T> extends IssueEvent {
   List<Object?> get props => [items, oldIndex, newIndex];
 }
 
+
+
+final class FocusSolveScopeSubmitted extends IssueEvent {
+  final Solution confirmedSolve;
+
+  const FocusSolveScopeSubmitted({
+    required this.confirmedSolve,
+  });
+
+  @override
+  List<Object?> get props => [confirmedSolve];
+}
+
 final class FocusSolveConfirmed extends IssueEvent {
   final String confirmedSolve;
 

@@ -18,6 +18,16 @@ class ActionItem {
         description: json['description'],
         isCompleted: json['isCompleted'] ?? false,
       );
+
+  ActionItem copyWith({
+    String? description,
+    bool? isCompleted,
+  }) {
+    return ActionItem(
+      description: description ?? this.description,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
 }
 
 class Solution {

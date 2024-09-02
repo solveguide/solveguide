@@ -46,14 +46,14 @@ class IssueRepository {
   // Create an issue
   Future<void> addIssue(String seedStatement, String ownerId) async {
     final newIssue = Issue(
-      label: seedStatement,
-      seedStatement: seedStatement,
-      ownerId: ownerId, // Use ownerId from AuthState
-      createdTimestamp: DateTime.now(),
-      lastUpdatedTimestamp: DateTime.now(),
-      invitedUserIds: [ownerId]
-      //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
-    );
+        label: seedStatement,
+        seedStatement: seedStatement,
+        ownerId: ownerId, // Use ownerId from AuthState
+        createdTimestamp: DateTime.now(),
+        lastUpdatedTimestamp: DateTime.now(),
+        invitedUserIds: [ownerId]
+        //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
+        );
     try {
       final docRef = await _issuesCollection.add(newIssue.toJson());
       await docRef.update({'issueId': docRef.id});

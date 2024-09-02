@@ -127,7 +127,7 @@ class SolveSummaryWidget extends StatelessWidget {
                       text: 'I will: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
-                    text: '${issue.solve}.',
+                    text: issue.solve,
                     style: const TextStyle(fontWeight: FontWeight.normal),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
@@ -140,7 +140,7 @@ class SolveSummaryWidget extends StatelessWidget {
                       text: '\n\nResolving that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
-                      text: '${issue.root}.',
+                      text: issue.root,
                       style: const TextStyle(fontWeight: FontWeight.normal)),
                   const TextSpan(
                       text: '\n\nChanging that: ',
