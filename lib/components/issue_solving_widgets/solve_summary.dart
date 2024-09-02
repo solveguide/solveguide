@@ -134,7 +134,7 @@ class SolveSummaryWidget extends StatelessWidget {
                       text: '\n\nChanging that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
-                      text: issue.label,
+                      text: issue.seedStatement,
                       style: const TextStyle(fontWeight: FontWeight.normal)),
                 ],
               ),

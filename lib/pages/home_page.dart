@@ -90,7 +90,10 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             logoTitle(30),
             SizedBox(height: 30),
-            _buildDetailedText(),
+            Container(
+              constraints: BoxConstraints(maxWidth: 500),
+              child: _buildDetailedText(),
+            ),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: MaterialButton(
@@ -173,32 +176,33 @@ class _HomePageState extends State<HomePage> {
               children: <TextSpan>[
                 TextSpan(
                     text:
-                        'Issues persist because solving them requires us to efficiently alternate between two very different modes of thinking, in precise coordination with others.\n\n'),
+                        'Your issues persist because solving them requires you to alternate between two different modes of thinking, often in coordination with others.\n\n'),
                 TextSpan(
                     text:
-                        'Getting out of sync with others while solving issues together will cause distractions that have little to do with the issue at hand. '),
+                        'Getting out of sync while solving issues together can lead to offending or misleading your peers without you even noticing. '),
                 TextSpan(
-                    text: 'But they will prevent you from solving it!\n\n',
+                    text: 'Small miscommunications lead to big issues!\n\n',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(
                     text:
-                        'Solve Guide is a project intended to orchestrate your thinkin in concert with the people in your life to solve issues for good. For now, you can try Solve Guide on your own.\n\n'),
+                        'Solve Guide is a tool that coordinates communal issue solving. For now you can create an account and solve issues solo. Multiplayer mode is coming!\n\n'),
                 TextSpan(text: 'The two modes of thinking are:\n'),
               ],
             ),
           ),
           widenInstructionText('Widening',
-              text: 'is creative; imagining possibilities without judgement.'),
+              text:
+                  'is creative; imagine all the possibilities without judgement.'),
           SizedBox(height: 8),
           narrowInstructionText('Narrowing',
-              text: 'is critical; choosing the best available path forward.'),
+              text: 'is critical; choose the best available path forward.'),
           RichText(
             text: TextSpan(
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
                 TextSpan(
                     text:
-                        '\nYou will solve more issues for good if you can observe reality creatively, and navigate it critically.\n'),
+                        '\nYou will solve more issues for good if you can observe reality creatively, and navigate it critically.\n\n'),
               ],
             ),
           ),
@@ -208,11 +212,12 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.black), // Default text style
               children: <TextSpan>[
                 TextSpan(
-                  text: 'Visit about.solve.guide to learn more.',
+                  text: 'Visit about.solve.guide to learn more.\n',
                   style: TextStyle(
-                      color: Colors.blueGrey,
+                      color: Colors.blue.shade900,
                       decoration: TextDecoration.underline,
-                      fontSize: 10),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(Uri.parse('https://about.solve.guide'));
