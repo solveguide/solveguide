@@ -1,5 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
+import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/models/issue.dart';
+import 'package:guide_solve/pages/issue_page.dart';
 
 class SolveSummaryWidget extends StatelessWidget {
   final Issue issue;
@@ -123,7 +128,14 @@ class SolveSummaryWidget extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text: '${issue.solve}.',
-                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                      style: const TextStyle(fontWeight: FontWeight.normal),
+                      recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    FocusRootConfirmed( confirmedRoot: issue.root));
+                    // You can also navigate or do anything else
+                  },
+                      ),
                   const TextSpan(
                       text: '\n\nResolving that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
@@ -136,6 +148,26 @@ class SolveSummaryWidget extends StatelessWidget {
                   TextSpan(
                       text: issue.seedStatement,
                       style: const TextStyle(fontWeight: FontWeight.normal)),
+                      TextSpan(
+                      text: '\n\nReconsider this Solve',
+                      style: const TextStyle(fontWeight: FontWeight.normal, decoration: TextDecoration.underline,),
+                      recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    final authState = context.read<AuthBloc>().state;
+
+              if (authState is AuthSuccess) {
+                    BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    FocusIssueSelected(issueID: issue.issueId!, userId: authState.uid));
+                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              IssuePage(issue: issue)),
+                                      (route) => false,
+                                    );
+                    }
+                  },
+                      ),
                 ],
               ),
             )

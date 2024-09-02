@@ -412,7 +412,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     emit(IssuesListSuccess(issueList: issuesList));
   }
 
-    void _onSolveDisprovenByOwner(
+  void _onSolveDisprovenByOwner(
     SolveDisprovenByOwner event,
     Emitter<IssueState> emit,
   ) async {
@@ -436,7 +436,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
 
 // Add the issueId to the list of provenIssueIds on that solution
     List<String> updatedDisrovenIssueIds =
-        List.from(disprovenSolve.disprovenIssueIds ?? [])..add(event.issue.issueId!);
+        List.from(disprovenSolve.disprovenIssueIds ?? [])
+          ..add(event.issue.issueId!);
     Solution updatedDisprovenSolve =
         disprovenSolve.copyWith(provenIssueIds: updatedDisrovenIssueIds);
     event.issue.solutions.removeAt(0);

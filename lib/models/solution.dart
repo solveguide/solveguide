@@ -72,7 +72,7 @@ class Solution {
             json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
       );
 
-      // CopyWith function
+  // CopyWith function
   Solution copyWith({
     String? desc,
     bool? isSolve,

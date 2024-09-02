@@ -197,7 +197,6 @@ final class SolveProvenByOwner extends IssueEvent {
   List<Object?> get props => [issue, userId];
 }
 
-
 final class SolveDisprovenByOwner extends IssueEvent {
   final Issue issue;
   final String userId;

@@ -114,62 +114,64 @@ class _IssueTileState extends State<IssueTile> {
   }
 
   void _showReveiwDialog(issue) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      contentPadding: EdgeInsets.zero, // Optional: Adjust padding for custom layout
-      content: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SolveSummaryWidget(issue: issue),
-          ),
-          Positioned(
-            right: 0.0,
-            top: 0.0,
-            child: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        contentPadding:
+            EdgeInsets.zero, // Optional: Adjust padding for custom layout
+        content: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SolveSummaryWidget(issue: issue),
             ),
-          ),
-        ],
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            final authState = context.read<AuthBloc>().state;
+            Positioned(
+              right: 0.0,
+              top: 0.0,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              final authState = context.read<AuthBloc>().state;
 
-    if (authState is AuthSuccess) {
-            BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    SolveProvenByOwner(
-                        issue: issue, userId: authState.uid));
-            /*
+              if (authState is AuthSuccess) {
+                BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    SolveProvenByOwner(issue: issue, userId: authState.uid));
+                /*
             Find the solution that matches the solve
             Check that the current UserId matches the assignedStakeholderUserId
             Add the issueId to the list of provenIssueIds on that solution
             Ask the user if they discovered more spin-off issues.
 
             */
-            Navigator.pop(context);
-    }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer, // Background color
-            foregroundColor: Theme.of(context).colorScheme.onSurface, // Text color
+                Navigator.pop(context);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .tertiaryContainer, // Background color
+              foregroundColor:
+                  Theme.of(context).colorScheme.onSurface, // Text color
+            ),
+            child: const Text('This worked!'),
           ),
-          child: const Text('This worked!'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            final authState = context.read<AuthBloc>().state;
+          ElevatedButton(
+            onPressed: () {
+              final authState = context.read<AuthBloc>().state;
 
-    if (authState is AuthSuccess) {
-            BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    SolveDisprovenByOwner(
-                        issue: issue, userId: authState.uid));
-            /*
+              if (authState is AuthSuccess) {
+                BlocProvider.of<IssueBloc>(context, listen: false).add(
+                    SolveDisprovenByOwner(issue: issue, userId: authState.uid));
+                /*
             Find the solution that matches the solve
             Add the issueId to the list of disprovenIssueIds on that solution
             delete the issue.solve field, so the issue can be re-assessed.
@@ -177,18 +179,20 @@ class _IssueTileState extends State<IssueTile> {
              Yes - Do they have an idea for a new solution
              No - Do they have an idea for a new hypothesis
             */
-            Navigator.pop(context);
-    }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.secondaryContainer, // Background color
-            foregroundColor: Theme.of(context).colorScheme.onSurface, // Text color
+                Navigator.pop(context);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer, // Background color
+              foregroundColor:
+                  Theme.of(context).colorScheme.onSurface, // Text color
+            ),
+            child: const Text('This didn\'t work.'),
           ),
-          child: const Text('This didn\'t work.'),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 }
