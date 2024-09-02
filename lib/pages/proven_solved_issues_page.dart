@@ -79,38 +79,40 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
           ),
         ],
         child: BlocBuilder<IssueBloc, IssueState>(
-                builder: (context, issueState) {
-                  if (issueState is IssuesListLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (issueState is IssuesListSuccess) {
-                    List<Issue> issuesList = issueState.issueList.where((issue) => issue.proven = true).toList();
-                    return Column(
-                      children: [
-                        Expanded(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              maxWidth: 1000.0,
-                            ),
-                            child: ListView.builder(
-                              itemCount: issuesList.length,
-                              itemBuilder: (context, index) {
-                                Issue issue = issuesList[index];
-                                return IssueTile(
-                                  issue: issue,
-                                  firstButton: () {},
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return const Center(
-                        child: Text("Problem with IssueInitial State"));
-                  }
-                },
-              ),
+          builder: (context, issueState) {
+            if (issueState is IssuesListLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (issueState is IssuesListSuccess) {
+              List<Issue> solutionsList = issueState.issueList
+                  .where((issue) => issue.proven == true)
+                  .toList();
+              return Column(
+                children: [
+                  Expanded(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 1000.0,
+                      ),
+                      child: ListView.builder(
+                        itemCount: solutionsList.length,
+                        itemBuilder: (context, index) {
+                          Issue issue = solutionsList[index];
+                          return IssueTile(
+                            issue: issue,
+                            firstButton: () {},
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return const Center(
+                  child: Text("Problem with IssueInitial State"));
+            }
+          },
+        ),
       ),
     );
   }

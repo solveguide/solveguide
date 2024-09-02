@@ -51,6 +51,7 @@ class IssueRepository {
       ownerId: ownerId, // Use ownerId from AuthState
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),
+      invitedUserIds: [ownerId]
       //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
     );
     try {

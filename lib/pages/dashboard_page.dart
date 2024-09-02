@@ -208,7 +208,9 @@ class _DashboardPageState extends State<DashboardPage> {
                   } else if (issueState is IssuesListFailure) {
                     return Center(child: Text('Error: ${issueState.error}'));
                   } else if (issueState is IssuesListSuccess) {
-                    List<Issue> issuesList = issueState.issueList.where((issue) => issue.proven != true).toList();
+                    List<Issue> issuesList = issueState.issueList
+                        .where((issue) => issue.proven != true)
+                        .toList();
                     return Column(
                       children: [
                         Center(
