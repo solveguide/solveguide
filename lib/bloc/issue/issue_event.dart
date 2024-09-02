@@ -180,6 +180,39 @@ final class FocusSolveConfirmed extends IssueEvent {
 
 /*
 
+THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS
+
+*/
+
+final class SolveProvenByOwner extends IssueEvent {
+  final Issue issue;
+  final String userId;
+
+  const SolveProvenByOwner({
+    required this.issue,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [issue, userId];
+}
+
+
+final class SolveDisprovenByOwner extends IssueEvent {
+  final Issue issue;
+  final String userId;
+
+  const SolveDisprovenByOwner({
+    required this.issue,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [issue, userId];
+}
+
+/*
+
 AS OF YET UNUSED DEMO EVENTS
 
 */

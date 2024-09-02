@@ -28,6 +28,9 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<SolutionListResorted>(_onSolutionListResorted);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<SolutionUpdated>(_onSolutionUpdated);
+    //Solution Proving Events
+    on<SolveProvenByOwner>(_onSolveProvenByOwner);
+    on<SolveDisprovenByOwner>(_onSolveDisprovenByOwner);
   }
 
   Future<void> _fetchIssues(
@@ -366,5 +369,88 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       issueRepository.setFocusIssue(updatedIssue);
       emit(IssueInFocusSolved(focusedIssue: updatedIssue));
     }
+  }
+
+  void _onSolveProvenByOwner(
+    SolveProvenByOwner event,
+    Emitter<IssueState> emit,
+  ) async {
+// Find the solution that matches the solve
+    Solution? provenSolve;
+
+    try {
+      provenSolve = event.issue.solutions.firstWhere(
+        (solution) => solution.desc == event.issue.solve,
+      );
+    } catch (e) {
+      emit(IssuesListFailure("Could not find matching Solution: $e"));
+      return;
+    }
+// Check that the current UserId matches the assignedStakeholderUserId
+    if (provenSolve.assignedStakeholderUserId != event.userId) {
+      emit(const IssuesListFailure(
+          "You are not the person assigned to this solve and cannot mark it proven."));
+      return;
+    }
+
+// Add the issueId to the list of provenIssueIds on that solution
+    List<String> updatedProvenIssueIds =
+        List.from(provenSolve.provenIssueIds ?? [])..add(event.issue.issueId!);
+    Solution updatedProvenSolve =
+        provenSolve.copyWith(provenIssueIds: updatedProvenIssueIds);
+    event.issue.solutions.removeAt(0);
+    final updatedSolutions = List<Solution>.from(event.issue.solutions);
+    updatedSolutions.insert(0, updatedProvenSolve);
+
+    Issue updatedIssue = event.issue.copyWith(
+      solutions: updatedSolutions,
+      proven: true,
+    );
+    await issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
+
+    final issuesList = await issueRepository.getIssueList(event.userId);
+    emit(IssuesListSuccess(issueList: issuesList));
+  }
+
+    void _onSolveDisprovenByOwner(
+    SolveDisprovenByOwner event,
+    Emitter<IssueState> emit,
+  ) async {
+// Find the solution that matches the solve
+    Solution? disprovenSolve;
+
+    try {
+      disprovenSolve = event.issue.solutions.firstWhere(
+        (solution) => solution.desc == event.issue.solve,
+      );
+    } catch (e) {
+      emit(IssuesListFailure("Could not find matching Solution: $e"));
+      return;
+    }
+// Check that the current UserId matches the assignedStakeholderUserId
+    if (disprovenSolve.assignedStakeholderUserId != event.userId) {
+      emit(const IssuesListFailure(
+          "You are not the person assigned to this solve and cannot mark it disproven."));
+      return;
+    }
+
+// Add the issueId to the list of provenIssueIds on that solution
+    List<String> updatedDisrovenIssueIds =
+        List.from(disprovenSolve.disprovenIssueIds ?? [])..add(event.issue.issueId!);
+    Solution updatedDisprovenSolve =
+        disprovenSolve.copyWith(provenIssueIds: updatedDisrovenIssueIds);
+    event.issue.solutions.removeAt(0);
+    final updatedSolutions = List<Solution>.from(event.issue.solutions);
+    updatedSolutions.add(updatedDisprovenSolve);
+
+    Issue updatedIssue = event.issue.copyWith(
+      solutions: updatedSolutions,
+      solve: "",
+      proven: false,
+    );
+    await issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
+
+    final issuesList = await issueRepository.getIssueList(event.userId);
+    emit(IssuesListSuccess(issueList: issuesList));
   }
 }
