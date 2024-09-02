@@ -315,7 +315,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       emit(const IssuesListFailure("No Issue Selected"));
     } else {
       List<Solution> updatedSolutions = focusIssue.solutions;
-      updatedSolutions.insert(0, Solution(desc: event.newSolution));
+      updatedSolutions.insert(0, Solution(desc: event.newSolution, assignedStakeholderUserId: focusIssue.ownerId));
       Issue updatedIssue = focusIssue.copyWith(
         solutions: updatedSolutions,
       );

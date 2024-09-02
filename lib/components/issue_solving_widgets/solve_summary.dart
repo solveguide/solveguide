@@ -127,15 +127,15 @@ class SolveSummaryWidget extends StatelessWidget {
                       text: 'I will: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
-                      text: '${issue.solve}.',
-                      style: const TextStyle(fontWeight: FontWeight.normal),
-                      recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    FocusRootConfirmed( confirmedRoot: issue.root));
-                    // You can also navigate or do anything else
-                  },
-                      ),
+                    text: '${issue.solve}.',
+                    style: const TextStyle(fontWeight: FontWeight.normal),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        BlocProvider.of<IssueBloc>(context, listen: false)
+                            .add(FocusRootConfirmed(confirmedRoot: issue.root));
+                        // You can also navigate or do anything else
+                      },
+                  ),
                   const TextSpan(
                       text: '\n\nResolving that: ',
                       style: TextStyle(fontWeight: FontWeight.bold)),
@@ -148,26 +148,31 @@ class SolveSummaryWidget extends StatelessWidget {
                   TextSpan(
                       text: issue.seedStatement,
                       style: const TextStyle(fontWeight: FontWeight.normal)),
-                      TextSpan(
-                      text: '\n\nReconsider this Solve',
-                      style: const TextStyle(fontWeight: FontWeight.normal, decoration: TextDecoration.underline,),
-                      recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    final authState = context.read<AuthBloc>().state;
+                  TextSpan(
+                    text: '\n\n\nReconsider this Solve',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      decoration: TextDecoration.underline,
+                      fontSize: 12,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        final authState = context.read<AuthBloc>().state;
 
-              if (authState is AuthSuccess) {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    FocusIssueSelected(issueID: issue.issueId!, userId: authState.uid));
-                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              IssuePage(issue: issue)),
-                                      (route) => false,
-                                    );
-                    }
-                  },
-                      ),
+                        if (authState is AuthSuccess) {
+                          BlocProvider.of<IssueBloc>(context, listen: false)
+                              .add(FocusIssueSelected(
+                                  issueID: issue.issueId!,
+                                  userId: authState.uid));
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => IssuePage(issue: issue)),
+                            (route) => false,
+                          );
+                        }
+                      },
+                  ),
                 ],
               ),
             )
