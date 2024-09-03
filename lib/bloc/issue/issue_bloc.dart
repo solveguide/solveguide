@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
+import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 part 'issue_event.dart';
@@ -13,7 +14,8 @@ part 'issue_state.dart';
 
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final IssueRepository issueRepository;
-  IssueBloc(this.issueRepository) : super(IssueInitial()) {
+    final AuthRepository authRepository;
+  IssueBloc(this.issueRepository, this.authRepository,) : super(IssueInitial()) {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
@@ -48,8 +50,14 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
 
     emit(IssuesListLoading());
     try {
+      // get userId from AuthBloc
+      final userId = await authRepository.getUserUid();
+        if (userId == null) {
+          emit(const IssuesListFailure('User not authenticated'));
+          return;
+        }
       // Use getIssuesList for a one-time fetch
-      final issuesList = await issueRepository.getIssueList(event.userId);
+      final issuesList = await issueRepository.getIssueList(userId);
       emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {
       emit(IssuesListFailure(error.toString()));

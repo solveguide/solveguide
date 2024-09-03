@@ -9,12 +9,11 @@ abstract class IssueEvent extends Equatable {
 }
 
 final class IssuesFetched extends IssueEvent {
-  final String userId;
 
-  const IssuesFetched({required this.userId});
+  const IssuesFetched();
 
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [];
 }
 
 final class NewIssueCreated extends IssueEvent {

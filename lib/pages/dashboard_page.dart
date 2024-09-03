@@ -25,21 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _fetchIssuesIfAuthenticated();
-  }
-
-  void _fetchIssuesIfAuthenticated() {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is AuthSuccess) {
-      BlocProvider.of<IssueBloc>(context, listen: false)
-          .add(IssuesFetched(userId: authState.uid));
-    } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-        (route) => false,
-      );
-    }
+    BlocProvider.of<IssueBloc>(context, listen: false).add(const IssuesFetched());
   }
 
   void _deleteIssue(String issueId, String label) {

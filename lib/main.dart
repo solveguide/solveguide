@@ -32,14 +32,17 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+        // Create a single instance of AuthRepository
+    final authRepository = AuthRepository();
+    final issueRepository = IssueRepository();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthBloc(authRepository: AuthRepository())
+          create: (context) => AuthBloc(authRepository: authRepository)
             ..add(const AppStarted()),
         ),
         BlocProvider(
-          create: (context) => IssueBloc(IssueRepository()),
+          create: (context) => IssueBloc(issueRepository, authRepository),
         ),
       ],
       child: MaterialApp(
