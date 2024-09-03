@@ -167,8 +167,6 @@ class SolutionListResorted<T> extends IssueEvent {
   List<Object?> get props => [items, oldIndex, newIndex];
 }
 
-
-
 final class FocusSolveScopeSubmitted extends IssueEvent {
   final Solution confirmedSolve;
 

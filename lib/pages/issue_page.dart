@@ -133,12 +133,14 @@ class IssuePage extends StatelessWidget {
                 } else if (state is IssueInFocusSolved) {
                   return SolveSummaryWidget(issue: state.focusedIssue);
                 } else if (state is IssueInFocusSolutionIdentified) {
-                  return SolutionScopingWidget(issue: state.focusedIssue,
+                  return SolutionScopingWidget(
+                    issue: state.focusedIssue,
                     onSubmitted: (updatedSolution) {
                       BlocProvider.of<IssueBloc>(context, listen: false).add(
                           FocusSolveScopeSubmitted(
                               confirmedSolve: updatedSolution));
-                    }, focusNode: _focusNode,
+                    },
+                    focusNode: _focusNode,
                   );
                 } else if (state is IssueInFocusInitial) {
                   return ConfirmationWidget(

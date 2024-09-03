@@ -34,7 +34,8 @@ class SolutionScopingWidgetState extends State<SolutionScopingWidget> {
     selectedStakeholderId = solution.assignedStakeholderUserId;
     selectedDueDate = solution.dueDate;
     actionItems = List.from(solution.actionItems ?? []);
-    _internalFocusNode = widget.focusNode ?? FocusNode(); // Use provided focus node or create a new one
+    _internalFocusNode = widget.focusNode ??
+        FocusNode(); // Use provided focus node or create a new one
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _internalFocusNode.requestFocus();
     });
@@ -90,12 +91,11 @@ class SolutionScopingWidgetState extends State<SolutionScopingWidget> {
               Row(
                 children: [
                   Text(
-                      selectedDueDate == null
-                          ? 'Select Due Date'
-                          : 'Due Date: ${selectedDueDate!.toLocal().toString().split(' ')[0]}',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-
+                    selectedDueDate == null
+                        ? 'Select Due Date'
+                        : 'Due Date: ${selectedDueDate!.toLocal().toString().split(' ')[0]}',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                   IconButton(
                     icon: const Icon(Icons.calendar_today),
                     onPressed: () async {
@@ -161,8 +161,8 @@ class SolutionScopingWidgetState extends State<SolutionScopingWidget> {
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            actionItems[index] = actionItem
-                                                .copyWith(
+                                            actionItems[index] =
+                                                actionItem.copyWith(
                                                     description:
                                                         actionItemController
                                                             .text);
@@ -194,7 +194,7 @@ class SolutionScopingWidgetState extends State<SolutionScopingWidget> {
                 )
               else
                 //const Text("No action items added yet."),
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
               // Add New Action Item
               InputWidget(
@@ -216,15 +216,19 @@ class SolutionScopingWidgetState extends State<SolutionScopingWidget> {
               const SizedBox(height: 20),
 
               // Confirm Solve Scope Button
-              PlainButton(onPressed: () {
+              PlainButton(
+                onPressed: () {
                   final updatedSolution = widget.issue.solutions[0].copyWith(
                     assignedStakeholderUserId: selectedStakeholderId,
                     dueDate: selectedDueDate,
                     actionItems: actionItems,
                   );
-                  widget.onSubmitted(updatedSolution); // Pass the updated solution
-                }, text: "Confirm Solve Scope", color: Theme.of(context).colorScheme.primaryContainer,)
-              
+                  widget.onSubmitted(
+                      updatedSolution); // Pass the updated solution
+                },
+                text: "Confirm Solve Scope",
+                color: Theme.of(context).colorScheme.primaryContainer,
+              )
             ],
           ),
         ),
