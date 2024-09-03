@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(
                     text:
-                        'Solve Guide is a tool that coordinates communal issue solving. For now you can create an account and solve issues solo. Multiplayer mode is coming!\n\n'),
+                        'Solve Guide coordinates group issue solving. For now you can create an account and solve issues solo. Multiplayer mode is coming!\n\n'),
                 TextSpan(text: 'The two modes of thinking are:\n'),
               ],
             ),
