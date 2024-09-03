@@ -6,7 +6,6 @@ Any issue that is not currently in focus will be displayed using this issue tile
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/core.dart';
 import 'package:guide_solve/components/issue_solving_widgets/solve_summary.dart';
@@ -140,20 +139,16 @@ class _IssueTileState extends State<IssueTile> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              final authState = context.read<AuthBloc>().state;
-
-              if (authState is AuthSuccess) {
-                BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    SolveProvenByOwner(issue: issue, userId: authState.uid));
-                /*
+              BlocProvider.of<IssueBloc>(context, listen: false)
+                  .add(SolveProvenByOwner(issue: issue));
+              /*
             Find the solution that matches the solve
             Check that the current UserId matches the assignedStakeholderUserId
             Add the issueId to the list of provenIssueIds on that solution
             Ask the user if they discovered more spin-off issues.
 
             */
-                Navigator.pop(context);
-              }
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context)
@@ -166,12 +161,9 @@ class _IssueTileState extends State<IssueTile> {
           ),
           ElevatedButton(
             onPressed: () {
-              final authState = context.read<AuthBloc>().state;
-
-              if (authState is AuthSuccess) {
-                BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    SolveDisprovenByOwner(issue: issue, userId: authState.uid));
-                /*
+              BlocProvider.of<IssueBloc>(context, listen: false)
+                  .add(SolveDisprovenByOwner(issue: issue));
+              /*
             Find the solution that matches the solve
             Add the issueId to the list of disprovenIssueIds on that solution
             delete the issue.solve field, so the issue can be re-assessed.
@@ -179,8 +171,7 @@ class _IssueTileState extends State<IssueTile> {
              Yes - Do they have an idea for a new solution
              No - Do they have an idea for a new hypothesis
             */
-                Navigator.pop(context);
-              }
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context)

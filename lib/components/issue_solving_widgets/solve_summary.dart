@@ -161,9 +161,7 @@ class SolveSummaryWidget extends StatelessWidget {
 
                         if (authState is AuthSuccess) {
                           BlocProvider.of<IssueBloc>(context, listen: false)
-                              .add(FocusIssueSelected(
-                                  issueID: issue.issueId!,
-                                  userId: authState.uid));
+                              .add(FocusIssueSelected(issueID: issue.issueId!));
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(

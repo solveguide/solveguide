@@ -47,7 +47,6 @@ class IssuePage extends StatelessWidget {
                   index: index,
                   hypothesis: hypothesis,
                   newIssuePrioritized: false,
-                  ownerId: authState.uid,
                 ),
               );
             } else {

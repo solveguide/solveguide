@@ -30,118 +30,91 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _deleteIssue(String issueId, String label) {
-    // Get the AuthBloc state before showing the dialog
-    final authState = context.read<AuthBloc>().state;
-
-    if (authState is AuthSuccess) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Are you sure you want to delete this issue?"),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1.0), // Border
-                  borderRadius: BorderRadius.circular(4.0),
-                  color: Colors.white,
-                ),
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black, // Text color
-                  ),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Are you sure you want to delete this issue?"),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1.0), // Border
+                borderRadius: BorderRadius.circular(4.0),
+                color: Colors.white,
+              ),
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // Text color
                 ),
               ),
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                // Dispatch the new issue creation event
-                BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    IssueDeletionRequested(
-                        issueId: issueId, ownerId: authState.uid));
-                textController.clear();
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context)
-                    .colorScheme
-                    .secondaryContainer, // Background color
-                foregroundColor:
-                    Theme.of(context).colorScheme.error, // Text color
-              ),
-              child: const Text('D E L E T E'),
             ),
           ],
         ),
-      );
-    } else {
-      // Handle the case where the user is not authenticated
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('You need to be logged in to add an issue')),
-      );
-    }
-  }
-
-  void _addIssue() {
-    // Get the AuthBloc state before showing the dialog
-    final authState = context.read<AuthBloc>().state;
-
-    if (authState is AuthSuccess) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          content: PlainTextField(
-            hintText: "I feel . .  when . .",
-            controller: textController,
-            obscureText: false,
-            onSubmit: () {
-              BlocProvider.of<IssueBloc>(context, listen: false).add(
-                  NewIssueCreated(
-                      seedStatement: textController.text,
-                      ownerId: authState.uid));
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              // Dispatch the new issue creation event
+              BlocProvider.of<IssueBloc>(context, listen: false)
+                  .add(IssueDeletionRequested(issueId: issueId));
               textController.clear();
               Navigator.pop(context);
             },
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                // Dispatch the new issue creation event
-                BlocProvider.of<IssueBloc>(context, listen: false).add(
-                    NewIssueCreated(
-                        seedStatement: textController.text,
-                        ownerId: authState.uid));
-                textController.clear();
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context)
-                    .colorScheme
-                    .tertiaryContainer, // Background color
-                foregroundColor:
-                    Theme.of(context).colorScheme.onSurface, // Text color
-              ),
-              child: const Text('Add'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer, // Background color
+              foregroundColor:
+                  Theme.of(context).colorScheme.error, // Text color
             ),
-          ],
+            child: const Text('D E L E T E'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addIssue() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: PlainTextField(
+          hintText: "I feel . .  when . .",
+          controller: textController,
+          obscureText: false,
+          onSubmit: () {
+            BlocProvider.of<IssueBloc>(context, listen: false)
+                .add(NewIssueCreated(seedStatement: textController.text));
+            textController.clear();
+            Navigator.pop(context);
+          },
         ),
-      );
-    } else {
-      // Handle the case where the user is not authenticated
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('You need to be logged in to add an issue')),
-      );
-    }
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              // Dispatch the new issue creation event
+              BlocProvider.of<IssueBloc>(context, listen: false)
+                  .add(NewIssueCreated(seedStatement: textController.text));
+              textController.clear();
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .tertiaryContainer, // Background color
+              foregroundColor:
+                  Theme.of(context).colorScheme.onSurface, // Text color
+            ),
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -192,8 +165,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 builder: (context, issueState) {
                   if (issueState is IssuesListLoading) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (issueState is IssuesListFailure) {
-                    return Center(child: Text('Error: ${issueState.error}'));
                   } else if (issueState is IssuesListSuccess) {
                     List<Issue> issuesList = issueState.issueList
                         .where((issue) => issue.proven != true)
@@ -220,7 +191,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                     BlocProvider.of<IssueBloc>(context,
                                             listen: false)
                                         .add(FocusIssueSelected(
-                                            userId: authState.uid,
                                             issueID: issue.issueId!));
                                     Navigator.pushAndRemoveUntil(
                                       context,

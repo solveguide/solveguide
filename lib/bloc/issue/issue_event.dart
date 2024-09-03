@@ -17,28 +17,24 @@ final class IssuesFetched extends IssueEvent {
 
 final class NewIssueCreated extends IssueEvent {
   final String seedStatement;
-  final String ownerId;
 
   const NewIssueCreated({
     required this.seedStatement,
-    required this.ownerId,
   });
 
   @override
-  List<Object?> get props => [seedStatement, ownerId];
+  List<Object?> get props => [seedStatement];
 }
 
 final class IssueDeletionRequested extends IssueEvent {
   final String issueId;
-  final String ownerId;
 
   const IssueDeletionRequested({
     required this.issueId,
-    required this.ownerId,
   });
 
   @override
-  List<Object?> get props => [issueId, ownerId];
+  List<Object?> get props => [issueId];
 }
 
 /*
@@ -48,15 +44,13 @@ THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
 */
 final class FocusIssueSelected extends IssueEvent {
   final String issueID;
-  final String userId;
 
   const FocusIssueSelected({
     required this.issueID,
-    required this.userId,
   });
 
   @override
-  List<Object?> get props => [issueID, userId];
+  List<Object?> get props => [issueID];
 }
 
 final class NewHypothesisCreated extends IssueEvent {
@@ -87,17 +81,15 @@ class CreateSeparateIssueFromHypothesis extends IssueEvent {
   final int index;
   final Hypothesis hypothesis;
   final bool newIssuePrioritized;
-  final String ownerId;
 
   const CreateSeparateIssueFromHypothesis({
     required this.index,
     required this.hypothesis,
     required this.newIssuePrioritized,
-    required this.ownerId,
   });
 
   @override
-  List<Object?> get props => [index, hypothesis, newIssuePrioritized, ownerId];
+  List<Object?> get props => [index, hypothesis, newIssuePrioritized];
 }
 
 class HypothesisListResorted<T> extends IssueEvent {
@@ -195,28 +187,24 @@ THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS
 
 final class SolveProvenByOwner extends IssueEvent {
   final Issue issue;
-  final String userId;
 
   const SolveProvenByOwner({
     required this.issue,
-    required this.userId,
   });
 
   @override
-  List<Object?> get props => [issue, userId];
+  List<Object?> get props => [issue];
 }
 
 final class SolveDisprovenByOwner extends IssueEvent {
   final Issue issue;
-  final String userId;
 
   const SolveDisprovenByOwner({
     required this.issue,
-    required this.userId,
   });
 
   @override
-  List<Object?> get props => [issue, userId];
+  List<Object?> get props => [issue];
 }
 
 /*
