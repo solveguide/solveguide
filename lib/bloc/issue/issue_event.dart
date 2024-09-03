@@ -9,25 +9,32 @@ abstract class IssueEvent extends Equatable {
 }
 
 final class IssuesFetched extends IssueEvent {
-  final String userId;
-
-  const IssuesFetched({required this.userId});
+  const IssuesFetched();
 
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [];
 }
 
 final class NewIssueCreated extends IssueEvent {
   final String seedStatement;
-  final String ownerId;
 
   const NewIssueCreated({
     required this.seedStatement,
-    required this.ownerId,
   });
 
   @override
-  List<Object?> get props => [seedStatement, ownerId];
+  List<Object?> get props => [seedStatement];
+}
+
+final class IssueDeletionRequested extends IssueEvent {
+  final String issueId;
+
+  const IssueDeletionRequested({
+    required this.issueId,
+  });
+
+  @override
+  List<Object?> get props => [issueId];
 }
 
 /*
@@ -37,15 +44,13 @@ THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
 */
 final class FocusIssueSelected extends IssueEvent {
   final String issueID;
-  final String userId;
 
   const FocusIssueSelected({
     required this.issueID,
-    required this.userId,
   });
 
   @override
-  List<Object?> get props => [issueID, userId];
+  List<Object?> get props => [issueID];
 }
 
 final class NewHypothesisCreated extends IssueEvent {
@@ -76,17 +81,15 @@ class CreateSeparateIssueFromHypothesis extends IssueEvent {
   final int index;
   final Hypothesis hypothesis;
   final bool newIssuePrioritized;
-  final String ownerId;
 
   const CreateSeparateIssueFromHypothesis({
     required this.index,
     required this.hypothesis,
     required this.newIssuePrioritized,
-    required this.ownerId,
   });
 
   @override
-  List<Object?> get props => [index, hypothesis, newIssuePrioritized, ownerId];
+  List<Object?> get props => [index, hypothesis, newIssuePrioritized];
 }
 
 class HypothesisListResorted<T> extends IssueEvent {
@@ -154,6 +157,17 @@ class SolutionListResorted<T> extends IssueEvent {
   List<Object?> get props => [items, oldIndex, newIndex];
 }
 
+final class FocusSolveScopeSubmitted extends IssueEvent {
+  final Solution confirmedSolve;
+
+  const FocusSolveScopeSubmitted({
+    required this.confirmedSolve,
+  });
+
+  @override
+  List<Object?> get props => [confirmedSolve];
+}
+
 final class FocusSolveConfirmed extends IssueEvent {
   final String confirmedSolve;
 
@@ -163,6 +177,34 @@ final class FocusSolveConfirmed extends IssueEvent {
 
   @override
   List<Object?> get props => [confirmedSolve];
+}
+
+/*
+
+THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS
+
+*/
+
+final class SolveProvenByOwner extends IssueEvent {
+  final Issue issue;
+
+  const SolveProvenByOwner({
+    required this.issue,
+  });
+
+  @override
+  List<Object?> get props => [issue];
+}
+
+final class SolveDisprovenByOwner extends IssueEvent {
+  final Issue issue;
+
+  const SolveDisprovenByOwner({
+    required this.issue,
+  });
+
+  @override
+  List<Object?> get props => [issue];
 }
 
 /*

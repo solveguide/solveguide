@@ -28,9 +28,15 @@ class IssueRepository {
           .get(); // Use get() instead of snapshots()
 
       // Convert the snapshot into a List of Issue objects
-      return snapshot.docs.map((doc) {
+      List<Issue> issuesList = snapshot.docs.map((doc) {
         return Issue.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
+
+      // Sort the list by the lastUpdatedTimestamp field
+      issuesList.sort(
+          (a, b) => b.lastUpdatedTimestamp.compareTo(a.lastUpdatedTimestamp));
+
+      return issuesList;
     } catch (error) {
       // Handle any errors that occur
       throw error.toString();
@@ -40,13 +46,14 @@ class IssueRepository {
   // Create an issue
   Future<void> addIssue(String seedStatement, String ownerId) async {
     final newIssue = Issue(
-      label: seedStatement,
-      seedStatement: seedStatement,
-      ownerId: ownerId, // Use ownerId from AuthState
-      createdTimestamp: DateTime.now(),
-      lastUpdatedTimestamp: DateTime.now(),
-      //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
-    );
+        label: seedStatement,
+        seedStatement: seedStatement,
+        ownerId: ownerId, // Use ownerId from AuthState
+        createdTimestamp: DateTime.now(),
+        lastUpdatedTimestamp: DateTime.now(),
+        invitedUserIds: [ownerId]
+        //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
+        );
     try {
       final docRef = await _issuesCollection.add(newIssue.toJson());
       await docRef.update({'issueId': docRef.id});

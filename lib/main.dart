@@ -5,6 +5,8 @@ import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 //import 'package:guide_solve/components/app_bloc_observer.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
+import 'package:guide_solve/pages/login_page.dart';
+import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/themes/light_mode.dart';
@@ -30,14 +32,17 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    // Create a single instance of AuthRepository
+    final authRepository = AuthRepository();
+    final issueRepository = IssueRepository();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthBloc(authRepository: AuthRepository())
-            ..add(const AppStarted()),
+          create: (context) =>
+              AuthBloc(authRepository: authRepository)..add(const AppStarted()),
         ),
         BlocProvider(
-          create: (context) => IssueBloc(IssueRepository()),
+          create: (context) => IssueBloc(issueRepository, authRepository),
         ),
       ],
       child: MaterialApp(
@@ -52,6 +57,11 @@ class MyAppState extends State<MyApp> {
             }
           },
         ),
+        routes: {
+          '/dashboard': (context) => const DashboardPage(),
+          '/login': (context) => LoginPage(),
+          '/profile': (context) => ProfilePage(),
+        },
       ),
     );
   }

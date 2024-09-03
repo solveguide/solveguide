@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
+import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 part 'issue_event.dart';
@@ -13,10 +14,15 @@ part 'issue_state.dart';
 
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final IssueRepository issueRepository;
-  IssueBloc(this.issueRepository) : super(IssueInitial()) {
+  final AuthRepository authRepository;
+  IssueBloc(
+    this.issueRepository,
+    this.authRepository,
+  ) : super(IssueInitial()) {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
+    on<IssueDeletionRequested>(_onIssueDeletionRequested);
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
     on<HypothesisListResorted>(_onHypothesisListResorted);
@@ -25,26 +31,28 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<SolutionListResorted>(_onSolutionListResorted);
-    on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<SolutionUpdated>(_onSolutionUpdated);
+    on<FocusSolveConfirmed>(_focusSolveConfirmed);
+    on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
+    //Solution Proving Events
+    on<SolveProvenByOwner>(_onSolveProvenByOwner);
+    on<SolveDisprovenByOwner>(_onSolveDisprovenByOwner);
   }
 
   Future<void> _fetchIssues(
     IssuesFetched event,
     Emitter<IssueState> emit,
   ) async {
-    // Check if the current state is related to an issue being in focus
-    // if (state is IssueInFocusInitial ||
-    //     state is IssueInFocusRootIdentified ||
-    //     state is IssueInFocusSolved) {
-    //   // Return early to prevent fetching issues and changing the state
-    //   return;
-    // }
-
     emit(IssuesListLoading());
     try {
+      // get userId from AuthBloc
+      final userId = await authRepository.getUserUid();
+      if (userId == null) {
+        emit(const IssuesListFailure('User not authenticated'));
+        return;
+      }
       // Use getIssuesList for a one-time fetch
-      final issuesList = await issueRepository.getIssueList(event.userId);
+      final issuesList = await issueRepository.getIssueList(userId);
       emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
@@ -57,8 +65,34 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   ) async {
     emit(IssuesListLoading());
     try {
-      await issueRepository.addIssue(event.seedStatement, event.ownerId);
-      final issuesList = await issueRepository.getIssueList(event.ownerId);
+      // get userId from AuthBloc
+      final userId = await authRepository.getUserUid();
+      if (userId == null) {
+        emit(const IssuesListFailure('User not authenticated'));
+        return;
+      }
+      await issueRepository.addIssue(event.seedStatement, userId);
+      final issuesList = await issueRepository.getIssueList(userId);
+      emit(IssuesListSuccess(issueList: issuesList));
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
+    }
+  }
+
+  void _onIssueDeletionRequested(
+    IssueDeletionRequested event,
+    Emitter<IssueState> emit,
+  ) async {
+    emit(IssuesListLoading());
+    try {
+      // get userId from AuthBloc
+      final userId = await authRepository.getUserUid();
+      if (userId == null) {
+        emit(const IssuesListFailure('User not authenticated'));
+        return;
+      }
+      await issueRepository.deleteIssue(event.issueId);
+      final issuesList = await issueRepository.getIssueList(userId);
       emit(IssuesListSuccess(issueList: issuesList));
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
@@ -70,8 +104,13 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     Emitter<IssueState> emit,
   ) async {
     try {
-      final List<Issue> issuesList =
-          await issueRepository.getIssueList(event.userId);
+      // get userId from AuthBloc
+      final userId = await authRepository.getUserUid();
+      if (userId == null) {
+        emit(const IssuesListFailure('User not authenticated'));
+        return;
+      }
+      final List<Issue> issuesList = await issueRepository.getIssueList(userId);
       final focusedIssue = issuesList.firstWhere(
         (issue) => issue.issueId == event.issueID,
       );
@@ -153,6 +192,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     } else {
       String spinoffId = "";
       try {
+        //get userId from AuthBloc
+        final userId = await authRepository.getUserUid();
+        if (userId == null) {
+          emit(const IssuesListFailure('User not authenticated'));
+          return;
+        }
         //update focus issue to db
         issueRepository.updateIssue(focusIssue.issueId!, focusIssue);
 
@@ -160,7 +205,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         spinoffId = await issueRepository.addSpinoffIssue(
           focusIssue,
           event.hypothesis.desc,
-          event.ownerId,
+          userId,
         );
       } catch (e) {
         emit(const IssuesListFailure(
@@ -297,7 +342,11 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       emit(const IssuesListFailure("No Issue Selected"));
     } else {
       List<Solution> updatedSolutions = focusIssue.solutions;
-      updatedSolutions.insert(0, Solution(desc: event.newSolution));
+      updatedSolutions.insert(
+          0,
+          Solution(
+              desc: event.newSolution,
+              assignedStakeholderUserId: focusIssue.ownerId));
       Issue updatedIssue = focusIssue.copyWith(
         solutions: updatedSolutions,
       );
@@ -349,7 +398,128 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       );
       await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
       issueRepository.setFocusIssue(updatedIssue);
-      emit(IssueInFocusSolved(focusedIssue: updatedIssue));
+      emit(IssueInFocusSolutionIdentified(
+          focusedIssue: updatedIssue, solution: event.confirmedSolve));
     }
+  }
+
+  void _onFocusSolveScopeSubmitted(
+      FocusSolveScopeSubmitted event, Emitter<IssueState> emit) async {
+    Issue? focusIssue = issueRepository.getFocusIssue();
+
+    if (focusIssue == null) {
+      emit(const IssuesListFailure("No Issue Selected"));
+    } else {
+      try {
+        List<Solution> updatedSolution = List.from(focusIssue.solutions);
+        updatedSolution.removeAt(0);
+        updatedSolution.insert(0, event.confirmedSolve);
+        Issue updatedIssue = focusIssue.copyWith(
+          solve: event.confirmedSolve.desc,
+          solutions: updatedSolution,
+        );
+        await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
+        issueRepository.setFocusIssue(updatedIssue);
+        emit(IssueInFocusSolved(focusedIssue: updatedIssue));
+      } catch (e) {
+        emit(IssuesListFailure(e.toString()));
+      }
+    }
+  }
+
+  void _onSolveProvenByOwner(
+    SolveProvenByOwner event,
+    Emitter<IssueState> emit,
+  ) async {
+// Find the solution that matches the solve
+    Solution? provenSolve;
+
+    try {
+      provenSolve = event.issue.solutions.firstWhere(
+        (solution) => solution.desc == event.issue.solve,
+      );
+    } catch (e) {
+      emit(IssuesListFailure("Could not find matching Solution: $e"));
+      return;
+    }
+    //get userId from AuthBloc
+    final userId = await authRepository.getUserUid();
+    if (userId == null) {
+      emit(const IssuesListFailure('User not authenticated'));
+      return;
+    }
+// Check that the current UserId matches the assignedStakeholderUserId
+    if (provenSolve.assignedStakeholderUserId != userId) {
+      emit(const IssuesListFailure(
+          "You are not the person assigned to this solve and cannot mark it proven."));
+      return;
+    }
+
+// Add the issueId to the list of provenIssueIds on that solution
+    List<String> updatedProvenIssueIds =
+        List.from(provenSolve.provenIssueIds ?? [])..add(event.issue.issueId!);
+    Solution updatedProvenSolve =
+        provenSolve.copyWith(provenIssueIds: updatedProvenIssueIds);
+    event.issue.solutions.removeAt(0);
+    final updatedSolutions = List<Solution>.from(event.issue.solutions);
+    updatedSolutions.insert(0, updatedProvenSolve);
+
+    Issue updatedIssue = event.issue.copyWith(
+      solutions: updatedSolutions,
+      proven: true,
+    );
+    await issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
+
+    final issuesList = await issueRepository.getIssueList(userId);
+    emit(IssuesListSuccess(issueList: issuesList));
+  }
+
+  void _onSolveDisprovenByOwner(
+    SolveDisprovenByOwner event,
+    Emitter<IssueState> emit,
+  ) async {
+// Find the solution that matches the solve
+    Solution? disprovenSolve;
+
+    try {
+      disprovenSolve = event.issue.solutions.firstWhere(
+        (solution) => solution.desc == event.issue.solve,
+      );
+    } catch (e) {
+      emit(IssuesListFailure("Could not find matching Solution: $e"));
+      return;
+    }
+//get userId from AuthBloc
+    final userId = await authRepository.getUserUid();
+    if (userId == null) {
+      emit(const IssuesListFailure('User not authenticated'));
+      return;
+    }
+// Check that the current UserId matches the assignedStakeholderUserId
+    if (disprovenSolve.assignedStakeholderUserId != userId) {
+      emit(const IssuesListFailure(
+          "You are not the person assigned to this solve and cannot mark it disproven."));
+      return;
+    }
+
+// Add the issueId to the list of provenIssueIds on that solution
+    List<String> updatedDisrovenIssueIds =
+        List.from(disprovenSolve.disprovenIssueIds ?? [])
+          ..add(event.issue.issueId!);
+    Solution updatedDisprovenSolve =
+        disprovenSolve.copyWith(provenIssueIds: updatedDisrovenIssueIds);
+    event.issue.solutions.removeAt(0);
+    final updatedSolutions = List<Solution>.from(event.issue.solutions);
+    updatedSolutions.add(updatedDisprovenSolve);
+
+    Issue updatedIssue = event.issue.copyWith(
+      solutions: updatedSolutions,
+      solve: "",
+      proven: false,
+    );
+    await issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
+
+    final issuesList = await issueRepository.getIssueList(userId);
+    emit(IssuesListSuccess(issueList: issuesList));
   }
 }

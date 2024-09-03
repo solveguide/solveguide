@@ -32,7 +32,7 @@ class ProfilePage extends StatelessWidget {
                   builder: (context) => LoginPage(),
                 ),
                 (route) => false);
-          }else if (state is AuthInitial){
+          } else if (state is AuthInitial) {
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(

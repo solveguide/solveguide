@@ -8,6 +8,7 @@ class Issue {
   final String seedStatement; // The original thought input by the user
   String root;
   String solve;
+  bool proven;
   List<Hypothesis> hypotheses;
   List<Solution> solutions;
   final String ownerId; // ID of the user who owns the issue
@@ -22,6 +23,7 @@ class Issue {
     required this.seedStatement,
     this.root = "",
     this.solve = "",
+    this.proven = false,
     List<Hypothesis>? hypotheses,
     List<Solution>? solutions,
     required this.ownerId,
@@ -40,6 +42,7 @@ class Issue {
         'seedStatement': seedStatement,
         'root': root,
         'solve': solve,
+        'proven': proven,
         'hypotheses': hypotheses.map((h) => h.toJson()).toList(),
         'solutions': solutions.map((s) => s.toJson()).toList(),
         'ownerId': ownerId,
@@ -56,6 +59,7 @@ class Issue {
         seedStatement: json['seedStatement'],
         root: json['root'] ?? "I cannot accept this.",
         solve: json['solve'] ?? "Accept this.",
+        proven: json['proven'] ?? false,
         hypotheses: (json['hypotheses'] as List)
             .map((h) => Hypothesis.fromJson(h))
             .toList(),
@@ -76,6 +80,7 @@ class Issue {
     String? seedStatement,
     String? root,
     String? solve,
+    bool? proven,
     List<Hypothesis>? hypotheses,
     List<Solution>? solutions,
     String? ownerId,
@@ -90,6 +95,7 @@ class Issue {
       seedStatement: seedStatement ?? this.seedStatement,
       root: root ?? this.root,
       solve: solve ?? this.solve,
+      proven: proven ?? this.proven,
       hypotheses: hypotheses ?? this.hypotheses,
       solutions: solutions ?? this.solutions,
       ownerId: ownerId ?? this.ownerId,

@@ -7,6 +7,7 @@ import 'package:guide_solve/components/issue_solving_widgets/edit_hypothesis_dia
 import 'package:guide_solve/components/issue_solving_widgets/help_text_widget.dart';
 import 'package:guide_solve/components/issue_solving_widgets/input_widget.dart';
 import 'package:guide_solve/components/issue_solving_widgets/resortable_list_widget.dart';
+import 'package:guide_solve/components/issue_solving_widgets/solution_scoping_widget.dart';
 import 'package:guide_solve/components/issue_solving_widgets/solve_summary.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/models/hypothesis.dart';
@@ -46,7 +47,6 @@ class IssuePage extends StatelessWidget {
                   index: index,
                   hypothesis: hypothesis,
                   newIssuePrioritized: false,
-                  ownerId: authState.uid,
                 ),
               );
             } else {
@@ -131,6 +131,16 @@ class IssuePage extends StatelessWidget {
                   return Center(child: Text('Error: ${state.error}'));
                 } else if (state is IssueInFocusSolved) {
                   return SolveSummaryWidget(issue: state.focusedIssue);
+                } else if (state is IssueInFocusSolutionIdentified) {
+                  return SolutionScopingWidget(
+                    issue: state.focusedIssue,
+                    onSubmitted: (updatedSolution) {
+                      BlocProvider.of<IssueBloc>(context, listen: false).add(
+                          FocusSolveScopeSubmitted(
+                              confirmedSolve: updatedSolution));
+                    },
+                    focusNode: _focusNode,
+                  );
                 } else if (state is IssueInFocusInitial) {
                   return ConfirmationWidget(
                     issue: state.focusedIssue,
