@@ -14,8 +14,11 @@ part 'issue_state.dart';
 
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final IssueRepository issueRepository;
-    final AuthRepository authRepository;
-  IssueBloc(this.issueRepository, this.authRepository,) : super(IssueInitial()) {
+  final AuthRepository authRepository;
+  IssueBloc(
+    this.issueRepository,
+    this.authRepository,
+  ) : super(IssueInitial()) {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
@@ -52,10 +55,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     try {
       // get userId from AuthBloc
       final userId = await authRepository.getUserUid();
-        if (userId == null) {
-          emit(const IssuesListFailure('User not authenticated'));
-          return;
-        }
+      if (userId == null) {
+        emit(const IssuesListFailure('User not authenticated'));
+        return;
+      }
       // Use getIssuesList for a one-time fetch
       final issuesList = await issueRepository.getIssueList(userId);
       emit(IssuesListSuccess(issueList: issuesList));

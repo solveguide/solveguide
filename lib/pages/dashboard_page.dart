@@ -25,7 +25,8 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<IssueBloc>(context, listen: false).add(const IssuesFetched());
+    BlocProvider.of<IssueBloc>(context, listen: false)
+        .add(const IssuesFetched());
   }
 
   void _deleteIssue(String issueId, String label) {

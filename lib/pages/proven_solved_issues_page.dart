@@ -22,7 +22,8 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<IssueBloc>(context, listen: false).add(const IssuesFetched());
+    BlocProvider.of<IssueBloc>(context, listen: false)
+        .add(const IssuesFetched());
   }
 
   @override

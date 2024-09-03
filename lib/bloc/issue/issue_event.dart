@@ -9,7 +9,6 @@ abstract class IssueEvent extends Equatable {
 }
 
 final class IssuesFetched extends IssueEvent {
-
   const IssuesFetched();
 
   @override
