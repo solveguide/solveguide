@@ -53,6 +53,15 @@ final class FocusIssueSelected extends IssueEvent {
   List<Object?> get props => [issueID];
 }
 
+class FocusedIssueUpdated extends IssueEvent {
+  final Issue focusedIssue;
+
+  const FocusedIssueUpdated(this.focusedIssue);
+
+  @override
+  List<Object?> get props => [focusedIssue];
+}
+
 final class NewHypothesisCreated extends IssueEvent {
   final String newHypothesis;
 
@@ -65,57 +74,40 @@ final class NewHypothesisCreated extends IssueEvent {
 }
 
 class HypothesisUpdated extends IssueEvent {
-  final int index;
-  final Hypothesis updatedHypothesis;
+  final String hypothesisId;
+  final String updatedDescription;
 
   const HypothesisUpdated({
-    required this.index,
-    required this.updatedHypothesis,
+    required this.hypothesisId,
+    required this.updatedDescription,
   });
 
   @override
-  List<Object?> get props => [index, updatedHypothesis];
+  List<Object?> get props => [hypothesisId, updatedDescription];
 }
 
 class CreateSeparateIssueFromHypothesis extends IssueEvent {
-  final int index;
-  final Hypothesis hypothesis;
+  final String hypothesisId;
   final bool newIssuePrioritized;
 
   const CreateSeparateIssueFromHypothesis({
-    required this.index,
-    required this.hypothesis,
+    required this.hypothesisId,
     required this.newIssuePrioritized,
   });
 
   @override
-  List<Object?> get props => [index, hypothesis, newIssuePrioritized];
-}
-
-class HypothesisListResorted<T> extends IssueEvent {
-  final List<Hypothesis> items;
-  final int oldIndex;
-  final int newIndex;
-
-  const HypothesisListResorted({
-    required this.items,
-    required this.oldIndex,
-    required this.newIndex,
-  });
-
-  @override
-  List<Object?> get props => [items, oldIndex, newIndex];
+  List<Object?> get props => [hypothesisId, newIssuePrioritized];
 }
 
 final class FocusRootConfirmed extends IssueEvent {
-  final String confirmedRoot;
+  final String confirmedRootHypothesisId;
 
   const FocusRootConfirmed({
-    required this.confirmedRoot,
+    required this.confirmedRootHypothesisId,
   });
 
   @override
-  List<Object?> get props => [confirmedRoot];
+  List<Object?> get props => [confirmedRootHypothesisId];
 }
 
 final class NewSolutionCreated extends IssueEvent {
@@ -130,53 +122,36 @@ final class NewSolutionCreated extends IssueEvent {
 }
 
 class SolutionUpdated extends IssueEvent {
-  final int index;
-  final Solution updatedSolution;
+  final String solutionId;
+  final String updatedDescription;
 
   const SolutionUpdated({
-    required this.index,
-    required this.updatedSolution,
+    required this.solutionId,
+    required this.updatedDescription,
   });
 
   @override
-  List<Object?> get props => [index, updatedSolution];
-}
-
-class SolutionListResorted<T> extends IssueEvent {
-  final List<Solution> items;
-  final int oldIndex;
-  final int newIndex;
-
-  const SolutionListResorted({
-    required this.items,
-    required this.oldIndex,
-    required this.newIndex,
-  });
-
-  @override
-  List<Object?> get props => [items, oldIndex, newIndex];
+  List<Object?> get props => [solutionId, updatedDescription];
 }
 
 final class FocusSolveScopeSubmitted extends IssueEvent {
-  final Solution confirmedSolve;
+  final String solutionId;
 
   const FocusSolveScopeSubmitted({
-    required this.confirmedSolve,
+    required this.solutionId,
   });
 
   @override
-  List<Object?> get props => [confirmedSolve];
+  List<Object?> get props => [solutionId];
 }
 
 final class FocusSolveConfirmed extends IssueEvent {
-  final String confirmedSolve;
+  final String solutionId;
 
-  const FocusSolveConfirmed({
-    required this.confirmedSolve,
-  });
+  const FocusSolveConfirmed({required this.solutionId});
 
   @override
-  List<Object?> get props => [confirmedSolve];
+  List<Object?> get props => [solutionId];
 }
 
 /*

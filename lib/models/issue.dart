@@ -9,8 +9,6 @@ class Issue {
   String root;
   String solve;
   bool proven;
-  List<Hypothesis> hypotheses;
-  List<Solution> solutions;
   final String ownerId; // ID of the user who owns the issue
   List<String>? invitedUserIds; // List of user IDs with limited permissions
   final DateTime createdTimestamp;
@@ -24,15 +22,11 @@ class Issue {
     this.root = "",
     this.solve = "",
     this.proven = false,
-    List<Hypothesis>? hypotheses,
-    List<Solution>? solutions,
     required this.ownerId,
     List<String>? invitedUserIds,
     required this.createdTimestamp,
     required this.lastUpdatedTimestamp,
-  })  : hypotheses = hypotheses ?? [],
-        solutions = solutions ?? [],
-        invitedUserIds = invitedUserIds ?? [];
+  }) : invitedUserIds = invitedUserIds ?? [];
 
   // Convert an Issue to a Map
   Map<String, dynamic> toJson() => {
@@ -43,8 +37,6 @@ class Issue {
         'root': root,
         'solve': solve,
         'proven': proven,
-        'hypotheses': hypotheses.map((h) => h.toJson()).toList(),
-        'solutions': solutions.map((s) => s.toJson()).toList(),
         'ownerId': ownerId,
         'invitedUserIds': invitedUserIds,
         'createdTimestamp': createdTimestamp.toIso8601String(),
@@ -60,12 +52,6 @@ class Issue {
         root: json['root'] ?? "I cannot accept this.",
         solve: json['solve'] ?? "Accept this.",
         proven: json['proven'] ?? false,
-        hypotheses: (json['hypotheses'] as List)
-            .map((h) => Hypothesis.fromJson(h))
-            .toList(),
-        solutions: (json['solutions'] as List)
-            .map((s) => Solution.fromJson(s))
-            .toList(),
         ownerId: json['ownerId'],
         invitedUserIds: List<String>.from(json['invitedUserIds'] ?? []),
         createdTimestamp: DateTime.parse(json['createdTimestamp']),
@@ -81,8 +67,6 @@ class Issue {
     String? root,
     String? solve,
     bool? proven,
-    List<Hypothesis>? hypotheses,
-    List<Solution>? solutions,
     String? ownerId,
     List<String>? invitedUserIds,
     DateTime? createdTimestamp,
@@ -96,8 +80,6 @@ class Issue {
       root: root ?? this.root,
       solve: solve ?? this.solve,
       proven: proven ?? this.proven,
-      hypotheses: hypotheses ?? this.hypotheses,
-      solutions: solutions ?? this.solutions,
       ownerId: ownerId ?? this.ownerId,
       invitedUserIds: invitedUserIds ?? this.invitedUserIds,
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,

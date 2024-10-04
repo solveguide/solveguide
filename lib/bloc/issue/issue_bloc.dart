@@ -15,6 +15,10 @@ part 'issue_state.dart';
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final IssueRepository issueRepository;
   final AuthRepository authRepository;
+  StreamSubscription<Issue>? _focusedIssueSubscription;
+  Issue? _focusedIssue;
+  String? _currentIssueId;
+
   IssueBloc(
     this.issueRepository,
     this.authRepository,
@@ -22,22 +26,23 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
+    on<FocusedIssueUpdated>(_onFocusedIssueUpdated);
     on<IssueDeletionRequested>(_onIssueDeletionRequested);
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
-    on<HypothesisListResorted>(_onHypothesisListResorted);
     on<HypothesisUpdated>(_onHypothesisUpdated);
     on<CreateSeparateIssueFromHypothesis>(_onCreateSeparateIssueFromHypothesis);
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
-    on<SolutionListResorted>(_onSolutionListResorted);
     on<SolutionUpdated>(_onSolutionUpdated);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
-    on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
+    //on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
     //Solution Proving Events
-    on<SolveProvenByOwner>(_onSolveProvenByOwner);
-    on<SolveDisprovenByOwner>(_onSolveDisprovenByOwner);
+    //on<SolveProvenByOwner>(_onSolveProvenByOwner);
+    //on<SolveDisprovenByOwner>(_onSolveDisprovenByOwner);
   }
+
+  Issue? get focusedIssue => _focusedIssue;
 
   Future<void> _fetchIssues(
     IssuesFetched event,
@@ -103,80 +108,108 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     FocusIssueSelected event,
     Emitter<IssueState> emit,
   ) async {
-    try {
-      // get userId from AuthBloc
-      final userId = await authRepository.getUserUid();
-      if (userId == null) {
-        emit(const IssuesListFailure('User not authenticated'));
-        return;
-      }
-      final List<Issue> issuesList = await issueRepository.getIssueList(userId);
-      final focusedIssue = issuesList.firstWhere(
-        (issue) => issue.issueId == event.issueID,
-      );
-      issueRepository.setFocusIssue(focusedIssue);
-      emit(IssueInFocusInitial(focusedIssue: focusedIssue));
-    } catch (e) {
-      emit(const IssuesListFailure("Issue not found"));
+    // Cancel any existing subscription
+    await _focusedIssueSubscription?.cancel();
+
+    _currentIssueId = event.issueID;
+
+    // Start listening to the focused issue stream
+    _focusedIssueSubscription =
+        issueRepository.getFocusedIssueStream(event.issueID).listen((issue) {
+      // Store the latest issue from the stream
+      _focusedIssue = issue;
+      // Emit states based on the issue's data
+      add(FocusedIssueUpdated(issue));
+    }, onError: (error) {
+      emit(IssuesListFailure(error.toString()));
+    });
+  }
+
+  // Handle the new event when the focused issue is updated
+  void _onFocusedIssueUpdated(
+    FocusedIssueUpdated event,
+    Emitter<IssueState> emit,
+  ) async {
+    final issue = event.focusedIssue;
+    List<Hypothesis> hypotheses =
+        await issueRepository.getHypotheses(issue.issueId!).first;
+    List<Solution> solutions =
+        await issueRepository.getSolutions(issue.issueId!).first;
+
+    IssueProcessStage stage;
+
+    if (issue.root.isEmpty && hypotheses.length < 2) {
+      stage = IssueProcessStage.wideningHypotheses;
+    } else if (issue.root.isEmpty && hypotheses.length >= 2) {
+      stage = IssueProcessStage.narrowingToRootCause;
+    } else if (issue.solve.isEmpty && solutions.length < 2) {
+      stage = IssueProcessStage.wideningSolutions;
+    } else if (issue.solve.isEmpty && solutions.length >= 2) {
+      stage = IssueProcessStage.narrowingToSolve;
+    } else if (!issue.proven) {
+      stage = IssueProcessStage.scopingSolve;
+    } else {
+      stage = IssueProcessStage.solveSummaryReview;
     }
+
+    emit(IssueProcessState(stage));
   }
 
   void _newHypothesisCreated(
     NewHypothesisCreated event,
     Emitter<IssueState> emit,
-  ) {
-    final currentState = state;
+  ) async {
+    // Get the current issue ID
+    final issueId =
+        _currentIssueId; // You'll need to store the current issue ID in the Bloc
 
-    if (currentState is IssueInFocusInitial) {
-      // Create a new hypothesis
-      final newHypothesis = Hypothesis(desc: event.newHypothesis);
-
-      // Create a copy of the current hypotheses list and add the new hypothesis at the top
-      final updatedHypotheses =
-          List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
-      updatedHypotheses.insert(0, newHypothesis);
-
-      // Create a new focused issue with the updated hypotheses list
-      final updatedIssue = currentState.focusedIssue.copyWith(
-        hypotheses: updatedHypotheses,
-      );
-
-      // Emit the new state
-      issueRepository.setFocusIssue(updatedIssue);
-      emit(IssueInFocusInitial(focusedIssue: updatedIssue));
-    } else {
+    if (issueId == null) {
       emit(const IssuesListFailure("No Issue Selected"));
+      return;
+    }
+
+    // Get userId from AuthRepository
+    final userId = await authRepository.getUserUid();
+    if (userId == null) {
+      emit(const IssuesListFailure('User not authenticated'));
+      return;
+    }
+
+    try {
+      // Add the new hypothesis using the repository
+      await issueRepository.addHypothesis(issueId, event.newHypothesis, userId);
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
     }
   }
 
   void _onHypothesisUpdated(
     HypothesisUpdated event,
     Emitter<IssueState> emit,
-  ) {
-    final currentState = state;
+  ) async {
+    // Get the current issue ID
+    final issueId = _currentIssueId;
 
-    if (currentState is IssueInFocusInitial) {
-      // Create a copy of the current hypotheses list
-      final updatedHypotheses =
-          List<Hypothesis>.from(currentState.focusedIssue.hypotheses);
-
-      // Remove the old hypothesis, add the new one at the top of the list
-      updatedHypotheses.removeAt(event.index);
-      updatedHypotheses.insert(0, event.updatedHypothesis);
-
-      // Create a new focused issue with the updated hypotheses
-      final updatedIssue = currentState.focusedIssue.copyWith(
-        hypotheses: updatedHypotheses,
+    if (issueId == null) {
+      emit(const IssuesListFailure("No Issue Selected"));
+      return;
+    }
+//TODO: use copyWith() to pull the existing hypothesis and add the new desc. When no votes are present.
+    try {
+      // Update the hypothesis using the repository
+      await issueRepository.updateHypothesis(
+        issueId,
+        Hypothesis(
+          hypothesisId: event.hypothesisId,
+          desc: event.updatedDescription,
+          lastUpdatedTimestamp: DateTime.now(),
+          // Include other necessary fields
+        ),
       );
-
-      // Emit the new state
-      try {
-        issueRepository.setFocusIssue(updatedIssue);
-        issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
-        emit(IssueInFocusInitial(focusedIssue: updatedIssue));
-      } catch (e) {
-        emit(IssuesListFailure(e.toString()));
-      }
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
     }
   }
 
@@ -184,248 +217,196 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     CreateSeparateIssueFromHypothesis event,
     Emitter<IssueState> emit,
   ) async {
-    Issue? focusIssue = issueRepository.getFocusIssue();
+    final issueId = _currentIssueId;
 
-    if (focusIssue == null) {
-      emit(const IssuesListFailure(
-          "An Error Occurred while spinning off your issue."));
-    } else {
-      String spinoffId = "";
-      try {
-        //get userId from AuthBloc
-        final userId = await authRepository.getUserUid();
-        if (userId == null) {
-          emit(const IssuesListFailure('User not authenticated'));
-          return;
-        }
-        //update focus issue to db
-        issueRepository.updateIssue(focusIssue.issueId!, focusIssue);
-
-        //create a new spinoff issue in the db
-        spinoffId = await issueRepository.addSpinoffIssue(
-          focusIssue,
-          event.hypothesis.desc,
-          userId,
-        );
-      } catch (e) {
-        emit(const IssuesListFailure(
-            "Error occurred while spinning off the issue."));
-      }
-      try {
-        Hypothesis updatedHypothesis = event.hypothesis.copyWith(
-          isSpinoffIssue: true,
-          spinoffIssueId: spinoffId,
-        );
-        List<Hypothesis> updatedHypotheses = focusIssue.hypotheses;
-        updatedHypotheses.removeAt(event.index);
-        updatedHypotheses.add(updatedHypothesis);
-
-        Issue updatedIssue = focusIssue.copyWith(
-          hypotheses: updatedHypotheses,
-        );
-
-        //update focus issue to db
-        issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-        issueRepository.setFocusIssue(updatedIssue);
-        emit(IssueInFocusInitial(focusedIssue: updatedIssue));
-      } catch (e) {
-        emit(IssuesListFailure(e.toString()));
-      }
-    }
-  }
-
-  void _onHypothesisListResorted(
-    HypothesisListResorted event,
-    Emitter<IssueState> emit,
-  ) {
-    final Issue? focusIssue = issueRepository.getFocusIssue();
-
-    if (focusIssue == null) {
+    if (issueId == null) {
       emit(const IssuesListFailure("No Issue Selected"));
       return;
     }
+    final Issue? originalIssue = await issueRepository.getIssueById(issueId);
 
-    // Step 1: Create a copy of the list
-    final List<Hypothesis> updatedItems = List.from(event.items);
-
-    // Step 2: Remove the item at the old index and insert it at the new index
-    final item = updatedItems.removeAt(event.oldIndex);
-
-    int newIndex = event.newIndex;
-    if (newIndex > event.oldIndex) {
-      newIndex -= 1;
-    }
-
-    updatedItems.insert(newIndex, item);
-
-    // Step 3: Update the Issue object with the new list
-    final updatedIssue = focusIssue.copyWith(
-      hypotheses: updatedItems,
-    );
-
-    // Step 4: Emit the new state with the updated issue
-    issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-    issueRepository.setFocusIssue(updatedIssue);
-    emit(IssueInFocusInitial(focusedIssue: updatedIssue));
-  }
-
-  void _onSolutionListResorted(
-    SolutionListResorted event,
-    Emitter<IssueState> emit,
-  ) {
-    final Issue? focusIssue = issueRepository.getFocusIssue();
-
-    if (focusIssue == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+    if (originalIssue == null) {
+      emit(const IssuesListFailure("Selected Issue is Null"));
       return;
     }
 
-    // Step 1: Create a copy of the list
-    final List<Solution> updatedItems = List.from(event.items);
+    try {
+      // Get userId from AuthRepository
+      final userId = await authRepository.getUserUid();
+      if (userId == null) {
+        emit(const IssuesListFailure('User not authenticated'));
+        return;
+      }
 
-    // Step 2: Remove the item at the old index and insert it at the new index
-    final item = updatedItems.removeAt(event.oldIndex);
+      // Fetch the hypothesis from the repository
+      final hypothesis =
+          await issueRepository.getHypothesisById(issueId, event.hypothesisId);
 
-    int newIndex = event.newIndex;
-    if (newIndex > event.oldIndex) {
-      newIndex -= 1;
+      if (hypothesis == null) {
+        emit(const IssuesListFailure("Hypothesis not found"));
+        return;
+      }
+
+      // Create a new issue as a spinoff
+      final spinoffId = await issueRepository.addSpinoffIssue(
+        originalIssue,
+        hypothesis.desc,
+        userId,
+      );
+
+      // Update the original hypothesis to mark it as a spinoff
+      final updatedHypothesis = hypothesis.copyWith(
+        isSpinoffIssue: true,
+        spinoffIssueId: spinoffId,
+      );
+
+      await issueRepository.updateHypothesis(issueId, updatedHypothesis);
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
     }
-
-    updatedItems.insert(newIndex, item);
-
-    // Step 3: Update the Issue object with the new list
-    final updatedIssue = focusIssue.copyWith(
-      solutions: updatedItems,
-    );
-
-    // Step 4: Emit the new state with the updated issue
-    issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-    issueRepository.setFocusIssue(updatedIssue);
-    emit(IssueInFocusRootIdentified(
-        focusedIssue: updatedIssue, rootCause: updatedIssue.root));
   }
 
   void _onFocusRootConfirmed(
     FocusRootConfirmed event,
     Emitter<IssueState> emit,
   ) async {
-    Issue? focusIssue = issueRepository.getFocusIssue();
+    final issueId = _currentIssueId;
 
-    if (focusIssue == null) {
+    if (issueId == null) {
       emit(const IssuesListFailure("No Issue Selected"));
-    } else {
-      // Update the local copy of the issue
-      Issue updatedIssue = focusIssue.copyWith(
-        root: event.confirmedRoot,
-        label: event.confirmedRoot,
-      );
-      issueRepository.setFocusIssue(updatedIssue);
-      try {
-        // Push the updated issue to Firebase
-        await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-        // Emit the updated state
-        emit(IssueInFocusRootIdentified(
-          focusedIssue: updatedIssue,
-          rootCause: updatedIssue.root,
-        ));
-      } catch (error) {
-        emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
-      }
+      return;
+    }
+
+    try {
+      // Update the issue's root in Firestore
+      await issueRepository.updateIssueRoot(
+          issueId, event.confirmedRootHypothesisId);
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
     }
   }
 
   void _onNewSolutionCreated(
-      NewSolutionCreated event, Emitter<IssueState> emit) {
-    Issue? focusIssue = issueRepository.getFocusIssue();
+    NewSolutionCreated event,
+    Emitter<IssueState> emit,
+  ) async {
+    final issueId = _currentIssueId;
 
-    if (focusIssue == null) {
+    if (issueId == null) {
       emit(const IssuesListFailure("No Issue Selected"));
-    } else {
-      List<Solution> updatedSolutions = focusIssue.solutions;
-      updatedSolutions.insert(
-          0,
-          Solution(
-              desc: event.newSolution,
-              assignedStakeholderUserId: focusIssue.ownerId));
-      Issue updatedIssue = focusIssue.copyWith(
-        solutions: updatedSolutions,
-      );
-      issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-      issueRepository.setFocusIssue(updatedIssue);
-      emit(IssueInFocusRootIdentified(
-        focusedIssue: updatedIssue,
-        rootCause: updatedIssue.root,
-      ));
+      return;
+    }
+
+    // Get userId from AuthRepository
+    final userId = await authRepository.getUserUid();
+    if (userId == null) {
+      emit(const IssuesListFailure('User not authenticated'));
+      return;
+    }
+
+    try {
+      // Add the new solution using the repository
+      await issueRepository.addSolution(issueId, event.newSolution, userId);
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
     }
   }
 
-  void _onSolutionUpdated(SolutionUpdated event, Emitter<IssueState> emit) {
-    final currentState = state;
+  void _onSolutionUpdated(
+    SolutionUpdated event,
+    Emitter<IssueState> emit,
+  ) async {
+    final issueId = _currentIssueId;
 
-    if (currentState is IssueInFocusRootIdentified) {
-      // Create a copy of the current hypotheses list
-      final updatedSolutions =
-          List<Solution>.from(currentState.focusedIssue.solutions);
+    if (issueId == null) {
+      emit(const IssuesListFailure("No Issue Selected"));
+      return;
+    }
 
-      // Update the hypothesis at the given index
-      updatedSolutions[event.index] = event.updatedSolution;
-
-      // Move the updated hypothesis to the top of the list
-      final solution = updatedSolutions.removeAt(event.index);
-      updatedSolutions.insert(0, solution);
-
-      // Create a new focused issue with the updated hypotheses
-      final updatedIssue = currentState.focusedIssue.copyWith(
-        solutions: updatedSolutions,
+    try {
+      // Update the solution using the repository
+      await issueRepository.updateSolution(
+        issueId,
+        //TODO: use copyWith() to pull the existing solution and add the new desc. When no votes are present.
+        Solution(
+          solutionId: event.solutionId,
+          desc: event.updatedDescription,
+          lastUpdatedTimestamp: DateTime.now(),
+          // Include other necessary fields
+        ),
       );
-      issueRepository.updateIssue(updatedIssue.issueId!, updatedIssue);
-      issueRepository.setFocusIssue(updatedIssue);
-      // Emit the new state
-      emit(IssueInFocusRootIdentified(
-          rootCause: updatedIssue.root, focusedIssue: updatedIssue));
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
     }
   }
 
   void _focusSolveConfirmed(
-      FocusSolveConfirmed event, Emitter<IssueState> emit) async {
-    Issue? focusIssue = issueRepository.getFocusIssue();
+    FocusSolveConfirmed event,
+    Emitter<IssueState> emit,
+  ) async {
+    final issueId = _currentIssueId;
 
-    if (focusIssue == null) {
+    if (issueId == null) {
       emit(const IssuesListFailure("No Issue Selected"));
-    } else {
-      Issue updatedIssue = focusIssue.copyWith(
-        solve: event.confirmedSolve,
-      );
-      await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-      issueRepository.setFocusIssue(updatedIssue);
-      emit(IssueInFocusSolutionIdentified(
-          focusedIssue: updatedIssue, solution: event.confirmedSolve));
+      return;
+    }
+
+    try {
+      // Update the issue's solve in Firestore
+      await issueRepository.updateIssueSolve(issueId, event.solutionId);
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
     }
   }
 
-  void _onFocusSolveScopeSubmitted(
-      FocusSolveScopeSubmitted event, Emitter<IssueState> emit) async {
-    Issue? focusIssue = issueRepository.getFocusIssue();
+/*
 
-    if (focusIssue == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
-    } else {
-      try {
-        List<Solution> updatedSolution = List.from(focusIssue.solutions);
-        updatedSolution.removeAt(0);
-        updatedSolution.insert(0, event.confirmedSolve);
-        Issue updatedIssue = focusIssue.copyWith(
-          solve: event.confirmedSolve.desc,
-          solutions: updatedSolution,
-        );
-        await issueRepository.updateIssue(focusIssue.issueId!, updatedIssue);
-        issueRepository.setFocusIssue(updatedIssue);
-        emit(IssueInFocusSolved(focusedIssue: updatedIssue));
-      } catch (e) {
-        emit(IssuesListFailure(e.toString()));
-      }
-    }
+void _onFocusSolveScopeSubmitted(
+  FocusSolveScopeSubmitted event,
+  Emitter<IssueState> emit,
+) async {
+  final issueId = _currentIssueId;
+
+  if (issueId == null) {
+    emit(const IssuesListFailure("No Issue Selected"));
+    return;
   }
+
+  try {
+    // Assuming scope details are included in the event or need to be updated in the solution
+    // Update the solution with the scope details
+    // You might need to define what scope submission involves
+    // For example:
+
+    // Fetch the solution
+    final solution = await issueRepository.getSolutionById(issueId, event.solutionId);
+
+    if (solution == null) {
+      emit(const IssuesListFailure("Solution not found"));
+      return;
+    }
+
+    // Update the solution with scope details (assuming you have such a field)
+    final updatedSolution = solution.copyWith(
+      scopeDetails: event.scopeDetails, // If applicable
+    );
+
+    await issueRepository.updateSolution(issueId, updatedSolution);
+
+    // Update the issue's state if necessary
+    // For example, mark it as in the "Defining Solve" stage
+
+    // No need to emit a new state; the UI will update via the stream
+  } catch (e) {
+    emit(IssuesListFailure(e.toString()));
+  }
+}
+
 
   void _onSolveProvenByOwner(
     SolveProvenByOwner event,
@@ -521,5 +502,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
 
     final issuesList = await issueRepository.getIssueList(userId);
     emit(IssuesListSuccess(issueList: issuesList));
+  }
+
+  */
+  @override
+  Future<void> close() {
+    _focusedIssueSubscription?.cancel();
+    return super.close();
   }
 }

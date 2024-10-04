@@ -46,14 +46,6 @@ class _HomePageState extends State<HomePage> {
         context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
-  void createDemoIssue(String demoIssueLabel) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      Provider.of<IssueData>(context, listen: false)
-          .addDemoIssue(demoIssueLabel, user.uid);
-    }
-  }
-
   //UI
   @override
   Widget build(BuildContext context) {

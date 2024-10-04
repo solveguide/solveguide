@@ -195,8 +195,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              IssuePage(issue: issue)),
+                                          builder: (context) => IssuePage(
+                                              issueId: issue.issueId!)),
                                       (route) => false,
                                     );
                                   },

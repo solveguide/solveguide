@@ -30,45 +30,65 @@ final class IssuesListFailure extends IssueState {
   List<Object?> get props => [error];
 }
 
-abstract class IssueInFocus extends IssueState {
-  final Issue focusedIssue;
+// States related to the issue-solving process
+class IssueProcessState extends IssueState {
+  final IssueProcessStage stage;
 
-  const IssueInFocus({required this.focusedIssue});
-
-  @override
-  List<Object?> get props => [focusedIssue];
-}
-
-final class IssueInFocusInitial extends IssueInFocus {
-  const IssueInFocusInitial({required super.focusedIssue});
-}
-
-final class IssueInFocusRootIdentified extends IssueInFocus {
-  final String rootCause;
-
-  const IssueInFocusRootIdentified({
-    required super.focusedIssue,
-    required this.rootCause,
-  });
+  const IssueProcessState(this.stage);
 
   @override
-  List<Object?> get props => [focusedIssue, rootCause];
+  List<Object?> get props => [stage];
 }
 
-final class IssueInFocusSolutionIdentified extends IssueInFocus {
-  final String solution;
-
-  const IssueInFocusSolutionIdentified({
-    required super.focusedIssue,
-    required this.solution,
-  });
-
-  @override
-  List<Object?> get props => [focusedIssue, solution];
+enum IssueProcessStage {
+  wideningHypotheses,
+  establishingFacts,
+  narrowingToRootCause,
+  wideningSolutions,
+  narrowingToSolve,
+  scopingSolve,
+  solveSummaryReview,
 }
 
-final class IssueInFocusSolved extends IssueInFocus {
-  const IssueInFocusSolved({
-    required super.focusedIssue,
-  });
-}
+// abstract class IssueInFocus extends IssueState {
+//   final Issue focusedIssue;
+
+//   const IssueInFocus({required this.focusedIssue});
+
+//   @override
+//   List<Object?> get props => [focusedIssue];
+// }
+
+// final class IssueInFocusInitial extends IssueInFocus {
+//   const IssueInFocusInitial({required super.focusedIssue});
+// }
+
+// final class IssueInFocusRootIdentified extends IssueInFocus {
+//   final String rootCause;
+
+//   const IssueInFocusRootIdentified({
+//     required super.focusedIssue,
+//     required this.rootCause,
+//   });
+
+//   @override
+//   List<Object?> get props => [focusedIssue, rootCause];
+// }
+
+// final class IssueInFocusSolutionIdentified extends IssueInFocus {
+//   final String solution;
+
+//   const IssueInFocusSolutionIdentified({
+//     required super.focusedIssue,
+//     required this.solution,
+//   });
+
+//   @override
+//   List<Object?> get props => [focusedIssue, solution];
+// }
+
+// final class IssueInFocusSolved extends IssueInFocus {
+//   const IssueInFocusSolved({
+//     required super.focusedIssue,
+//   });
+// }

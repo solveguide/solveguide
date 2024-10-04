@@ -5,13 +5,15 @@ import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
 
 class SolutionScopingWidget extends StatefulWidget {
-  final Issue issue;
+  final String issueId;
+  final String solutionId;
   final FocusNode? focusNode;
   final void Function(Solution updatedSolution) onSubmitted;
 
   const SolutionScopingWidget({
     super.key,
-    required this.issue,
+    required this.issueId,
+    required this.solutionId,
     this.focusNode,
     required this.onSubmitted,
   });
