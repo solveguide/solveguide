@@ -154,6 +154,24 @@ final class FocusSolveConfirmed extends IssueEvent {
   List<Object?> get props => [solutionId];
 }
 
+
+final class NewFactCreated extends IssueEvent {
+  final String newFact; // The fact description
+  final String newFactContext; // Context or reasoning for the fact
+  final String referenceObjectId; // The ID of the object being referenced
+  final ReferenceObjectType referenceObjectType; // The type of object being referenced
+
+  const NewFactCreated({
+    required this.newFact,
+    required this.newFactContext,
+    required this.referenceObjectId,
+    required this.referenceObjectType,
+  });
+
+  @override
+  List<Object?> get props => [newFact, newFactContext, referenceObjectId, referenceObjectType];
+}
+
 /*
 
 THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS

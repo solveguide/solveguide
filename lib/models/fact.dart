@@ -3,7 +3,7 @@ class Fact {
   final String authorId; // ID of the user who authored the fact
   final String desc; // The actual fact description
   final DateTime createdTimestamp; // Timestamp when the fact was created
-  final DateTime updatedTimestamp; // Timestamp for the last update
+  final DateTime lastUpdatedTimestamp; // Timestamp for the last update
   final Map<String, List<String>>
       referenceObjects; // Map of reference types to their IDs
   final String? parentIssueId; // ID of the parent issue, optional
@@ -15,7 +15,7 @@ class Fact {
     required this.authorId,
     required this.desc,
     required this.createdTimestamp,
-    required this.updatedTimestamp,
+    required this.lastUpdatedTimestamp,
     this.referenceObjects = const {}, // Default empty map
     this.parentIssueId,
     this.supportingContext,
@@ -28,7 +28,7 @@ class Fact {
         'authorId': authorId,
         'desc': desc,
         'createdTimestamp': createdTimestamp.toIso8601String(),
-        'updatedTimestamp': updatedTimestamp.toIso8601String(),
+        'updatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
         'referenceObjects': referenceObjects,
         'parentIssueId': parentIssueId,
         'supportingContext': supportingContext,
@@ -41,7 +41,7 @@ class Fact {
         authorId: json['authorId'],
         desc: json['desc'],
         createdTimestamp: DateTime.parse(json['createdTimestamp']),
-        updatedTimestamp: DateTime.parse(json['updatedTimestamp']),
+        lastUpdatedTimestamp: DateTime.parse(json['updatedTimestamp']),
         referenceObjects:
             Map<String, List<String>>.from(json['referenceObjects'] ?? {}),
         parentIssueId: json['parentIssueId'],
@@ -65,7 +65,7 @@ class Fact {
     String? authorId,
     String? desc,
     DateTime? createdTimestamp,
-    DateTime? updatedTimestamp,
+    DateTime? lastUpdatedTimestamp,
     Map<String, List<String>>? referenceObjects,
     String? parentIssueId,
     String? supportingContext,
@@ -76,7 +76,7 @@ class Fact {
       authorId: authorId ?? this.authorId,
       desc: desc ?? this.desc,
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,
-      updatedTimestamp: updatedTimestamp ?? this.updatedTimestamp,
+      lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
       referenceObjects: referenceObjects ?? this.referenceObjects,
       parentIssueId: parentIssueId ?? this.parentIssueId,
       supportingContext: supportingContext ?? this.supportingContext,

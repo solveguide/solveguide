@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/models/fact.dart'; // Assuming you have a Fact model
+import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class EstablishingFactsView extends StatelessWidget {
@@ -14,6 +15,7 @@ class EstablishingFactsView extends StatelessWidget {
   Widget build(BuildContext context) {
     // Start listening to facts stream
     final issueRepository = context.read<IssueRepository>();
+    final authRepository = context.read<AuthRepository>();
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -28,8 +30,9 @@ class EstablishingFactsView extends StatelessWidget {
             ),
             onSubmitted: (value) {
               if (value.isNotEmpty) {
+                String factContext = "${authRepository.getUserUid()} believes:";
                 context.read<IssueBloc>().add(
-                      NewFactCreated(factDescription: value),
+                      NewFactCreated(newFact: _textController.toString(), newFactContext: factContext, referenceObjectId: issueId, referenceObjectType: ReferenceObjectType.issue ),
                     );
                 _textController.clear();
               }
@@ -39,7 +42,7 @@ class EstablishingFactsView extends StatelessWidget {
           // List of facts
           Expanded(
             child: StreamBuilder<List<Fact>>(
-              stream: issueRepository.getFactsStream(issueId),
+              stream: issueRepository.getFacts(issueId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(child: Text('Error loading facts'));
@@ -57,7 +60,7 @@ class EstablishingFactsView extends StatelessWidget {
                     final fact = facts[index];
                     String dropdownValue = "";
                     return ListTile(
-                      title: Text(fact.description),
+                      title: Text(fact.desc),
                       trailing: DropdownButton(
                         items: const [
                           DropdownMenuItem(

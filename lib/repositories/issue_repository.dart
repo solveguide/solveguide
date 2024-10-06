@@ -1,7 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:guide_solve/models/fact.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
+
+enum ReferenceObjectType {
+  issue,
+  hypothesis,
+  solution,
+  fact,
+}
 
 class IssueRepository {
   // Get collection of issues
@@ -135,7 +143,7 @@ class IssueRepository {
       Hypothesis? rootHypothesis =
           await getHypothesisById(issueId, rootHypothesisId);
       String updatedRoot = rootHypothesis!.desc;
-      Issue updatedIssue = currentIssue.copyWith(root: updatedRoot);
+      Issue updatedIssue = currentIssue.copyWith(root: updatedRoot, rootHypothesisId: rootHypothesisId);
       updateIssue(issueId, updatedIssue);
     } catch (error) {
       throw error.toString();
@@ -150,7 +158,7 @@ class IssueRepository {
       }
       Solution? solveSolution = await getSolutionById(issueId, solveSolutionId);
       String updatedSolve = solveSolution!.desc;
-      Issue updatedIssue = currentIssue.copyWith(root: updatedSolve);
+      Issue updatedIssue = currentIssue.copyWith(root: updatedSolve, solveSolutionId: solveSolutionId);
       updateIssue(issueId, updatedIssue);
     } catch (error) {
       throw error.toString();
@@ -185,6 +193,16 @@ class IssueRepository {
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Solution.fromJson(doc.data())).toList());
+  }
+
+    // Fetch all facts for a specific issue
+  Stream<List<Fact>> getFacts(String issueId) {
+    return _issuesCollection
+        .doc(issueId)
+        .collection('facts')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Fact.fromJson(doc.data())).toList());
   }
 
 /*
@@ -234,6 +252,34 @@ SUBCOLLECTION FUNCTIONS
 
       // Update the solutionId field with the generated document ID
       await docRef.update({'solutionId': docRef.id});
+    } catch (error) {
+      throw Exception('Failed to add solution: $error');
+    }
+  }
+
+//Add a new Fact to an Issue
+Future<void> addFact(
+      String issueId, ReferenceObjectType refObjectType, String refObjectId, String factContext, String factDesc, String authorId) async {
+    final newFact = Fact(
+      authorId: authorId, // Use ownerId from AuthState
+      desc: factDesc,
+      referenceObjects: {
+      refObjectType.toString(): [refObjectId]
+    }, 
+      supportingContext: factContext,
+      createdTimestamp: DateTime.now(),
+      lastUpdatedTimestamp: DateTime.now(),
+    );
+    try {
+      // Reference to the solutions subcollection
+      CollectionReference factRef =
+          _issuesCollection.doc(issueId).collection('facts');
+
+      // Add the fact document
+      DocumentReference docRef = await factRef.add(newFact.toJson());
+
+      // Update the factId field with the generated document ID
+      await docRef.update({'factId': docRef.id});
     } catch (error) {
       throw Exception('Failed to add solution: $error');
     }

@@ -36,6 +36,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<SolutionUpdated>(_onSolutionUpdated);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
+    on<NewFactCreated>(_onNewFactCreated);
     //on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
     //Solution Proving Events
     //on<SolveProvenByOwner>(_onSolveProvenByOwner);
@@ -510,4 +511,40 @@ void _onFocusSolveScopeSubmitted(
     _focusedIssueSubscription?.cancel();
     return super.close();
   }
+
+void _onNewFactCreated(
+  NewFactCreated event,
+  Emitter<IssueState> emit,
+) async {
+  final issueId = _currentIssueId;
+
+  if (issueId == null) {
+    emit(const IssuesListFailure("No Issue Selected"));
+    return;
+  }
+
+  // Get userId from AuthRepository
+  final userId = await authRepository.getUserUid();
+  if (userId == null) {
+    emit(const IssuesListFailure('User not authenticated'));
+    return;
+  }
+
+  try {
+    // Call the addFact method, passing the necessary arguments including reference object type
+    await issueRepository.addFact(
+      issueId,
+      event.referenceObjectType, // Pass the reference object type
+      event.referenceObjectId,   // Pass the reference object ID
+      event.newFactContext,      // Pass the fact context
+      event.newFact,             // Pass the fact description
+      userId,                    // Pass the userId
+    );
+
+    // No need to emit a new state; the UI will update via the stream
+  } catch (error) {
+    emit(IssuesListFailure(error.toString()));
+  }
+}
+
 }
