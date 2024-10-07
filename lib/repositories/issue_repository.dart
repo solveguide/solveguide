@@ -85,7 +85,6 @@ class IssueRepository {
         createdTimestamp: DateTime.now(),
         lastUpdatedTimestamp: DateTime.now(),
         invitedUserIds: [ownerId]
-        //issueId: 'dashboard_${DateTime.now().millisecondsSinceEpoch}',
         );
     try {
       final docRef = await _issuesCollection.add(newIssue.toJson());
@@ -107,7 +106,6 @@ class IssueRepository {
       lastUpdatedTimestamp: DateTime.now(),
       root: oldIssue.root,
       solve: oldIssue.solve,
-      //TODO: Make sure subcollections get brought along!
       invitedUserIds: oldIssue.invitedUserIds,
     );
     try {
@@ -143,7 +141,8 @@ class IssueRepository {
       Hypothesis? rootHypothesis =
           await getHypothesisById(issueId, rootHypothesisId);
       String updatedRoot = rootHypothesis!.desc;
-      Issue updatedIssue = currentIssue.copyWith(root: updatedRoot, rootHypothesisId: rootHypothesisId);
+      Issue updatedIssue = currentIssue.copyWith(
+          root: updatedRoot, rootHypothesisId: rootHypothesisId);
       updateIssue(issueId, updatedIssue);
     } catch (error) {
       throw error.toString();
@@ -158,7 +157,8 @@ class IssueRepository {
       }
       Solution? solveSolution = await getSolutionById(issueId, solveSolutionId);
       String updatedSolve = solveSolution!.desc;
-      Issue updatedIssue = currentIssue.copyWith(root: updatedSolve, solveSolutionId: solveSolutionId);
+      Issue updatedIssue = currentIssue.copyWith(
+          root: updatedSolve, solveSolutionId: solveSolutionId);
       updateIssue(issueId, updatedIssue);
     } catch (error) {
       throw error.toString();
@@ -195,13 +195,10 @@ class IssueRepository {
             snapshot.docs.map((doc) => Solution.fromJson(doc.data())).toList());
   }
 
-    // Fetch all facts for a specific issue
+  // Fetch all facts for a specific issue
   Stream<List<Fact>> getFacts(String issueId) {
-    return _issuesCollection
-        .doc(issueId)
-        .collection('facts')
-        .snapshots()
-        .map((snapshot) =>
+    return _issuesCollection.doc(issueId).collection('facts').snapshots().map(
+        (snapshot) =>
             snapshot.docs.map((doc) => Fact.fromJson(doc.data())).toList());
   }
 
@@ -258,14 +255,19 @@ SUBCOLLECTION FUNCTIONS
   }
 
 //Add a new Fact to an Issue
-Future<void> addFact(
-      String issueId, ReferenceObjectType refObjectType, String refObjectId, String factContext, String factDesc, String authorId) async {
+  Future<void> addFact(
+      String issueId,
+      ReferenceObjectType refObjectType,
+      String refObjectId,
+      String factContext,
+      String factDesc,
+      String authorId) async {
     final newFact = Fact(
       authorId: authorId, // Use ownerId from AuthState
       desc: factDesc,
       referenceObjects: {
-      refObjectType.toString(): [refObjectId]
-    }, 
+        refObjectType.toString(): [refObjectId]
+      },
       supportingContext: factContext,
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),

@@ -1,48 +1,51 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-//import 'package:guide_solve/components/app_bloc_observer.dart';
+import 'package:guide_solve/firebase_options.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
+import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/login_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:guide_solve/themes/light_mode.dart';
-import 'firebase_options.dart';
-import 'pages/home_page.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  //Bloc.observer = AppBlocObserver();
+  // Bloc.observer = AppBlocObserver();
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  MyAppState createState() => MyAppState();
-}
-
-class MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
-    // Create a single instance of AuthRepository
+    // Create single instances of repositories
     final authRepository = AuthRepository();
     final issueRepository = IssueRepository();
-    return MultiBlocProvider(
+
+    return MultiProvider(
       providers: [
-        BlocProvider(
+        Provider<AuthRepository>.value(
+          value: authRepository,
+        ),
+        Provider<IssueRepository>.value(
+          value: issueRepository,
+        ),
+        BlocProvider<AuthBloc>(
           create: (context) =>
               AuthBloc(authRepository: authRepository)..add(const AppStarted()),
         ),
-        BlocProvider(
-          create: (context) => IssueBloc(issueRepository, authRepository),
+        BlocProvider<IssueBloc>(
+          create: (context) =>
+              IssueBloc(issueRepository, authRepository),
         ),
       ],
       child: MaterialApp(

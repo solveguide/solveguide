@@ -7,7 +7,7 @@ import 'package:guide_solve/repositories/issue_repository.dart';
 class SolveSummaryReviewView extends StatelessWidget {
   final String issueId;
 
-  SolveSummaryReviewView({Key? key, required this.issueId}) : super(key: key);
+  const SolveSummaryReviewView({super.key, required this.issueId});
 
   @override
   Widget build(BuildContext context) {
@@ -17,35 +17,35 @@ class SolveSummaryReviewView extends StatelessWidget {
       future: issueRepository.getIssueById(issueId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Error loading issue'));
+          return const Center(child: Text('Error loading issue'));
         }
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
         final issue = snapshot.data;
         if (issue == null) {
-          return Center(child: Text('Issue not found.'));
+          return const Center(child: Text('Issue not found.'));
         }
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Text(
+              const Text(
                 'Solution Summary',
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'Root Cause:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
-              Text(issue.root ?? 'No root cause identified.'),
+              Text(issue.root),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'Solution:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
-              Text(issue.solve ?? 'No solution identified.'),
+              Text(issue.solve),
               const SizedBox(height: 20),
               // Buttons to mark as proven or disproven
               Row(
@@ -57,7 +57,7 @@ class SolveSummaryReviewView extends StatelessWidget {
                             SolveProvenByOwner(issue: issue),
                           );
                     },
-                    child: Text('Mark as Proven'),
+                    child: const Text('Mark as Proven'),
                   ),
                   const SizedBox(width: 20),
                   ElevatedButton(
@@ -66,7 +66,7 @@ class SolveSummaryReviewView extends StatelessWidget {
                             SolveDisprovenByOwner(issue: issue),
                           );
                     },
-                    child: Text('Mark as Disproven'),
+                    child: const Text('Mark as Disproven'),
                   ),
                 ],
               ),

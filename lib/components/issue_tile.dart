@@ -122,7 +122,7 @@ class _IssueTileState extends State<IssueTile> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: SolveSummaryWidget(issue: issue),
+              child: SolveSummaryWidget(issueId: issue.issueId),
             ),
             Positioned(
               right: 0.0,

@@ -191,7 +191,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     BlocProvider.of<IssueBloc>(context,
                                             listen: false)
                                         .add(FocusIssueSelected(
-                                            issueID: issue.issueId!));
+                                            issueId: issue.issueId!));
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(

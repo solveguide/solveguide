@@ -32,7 +32,11 @@ class EstablishingFactsView extends StatelessWidget {
               if (value.isNotEmpty) {
                 String factContext = "${authRepository.getUserUid()} believes:";
                 context.read<IssueBloc>().add(
-                      NewFactCreated(newFact: _textController.toString(), newFactContext: factContext, referenceObjectId: issueId, referenceObjectType: ReferenceObjectType.issue ),
+                      NewFactCreated(
+                          newFact: _textController.toString(),
+                          newFactContext: factContext,
+                          referenceObjectId: issueId,
+                          referenceObjectType: ReferenceObjectType.issue),
                     );
                 _textController.clear();
               }
@@ -45,14 +49,14 @@ class EstablishingFactsView extends StatelessWidget {
               stream: issueRepository.getFacts(issueId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error loading facts'));
+                  return const Center(child: Text('Error loading facts'));
                 }
                 if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 final facts = snapshot.data!;
                 if (facts.isEmpty) {
-                  return Center(child: Text('No facts added yet.'));
+                  return const Center(child: Text('No facts added yet.'));
                 }
                 return ListView.builder(
                   itemCount: facts.length,

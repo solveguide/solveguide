@@ -43,14 +43,14 @@ THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
 
 */
 final class FocusIssueSelected extends IssueEvent {
-  final String issueID;
+  final String issueId;
 
   const FocusIssueSelected({
-    required this.issueID,
+    required this.issueId,
   });
 
   @override
-  List<Object?> get props => [issueID];
+  List<Object?> get props => [issueId];
 }
 
 class FocusedIssueUpdated extends IssueEvent {
@@ -154,12 +154,12 @@ final class FocusSolveConfirmed extends IssueEvent {
   List<Object?> get props => [solutionId];
 }
 
-
 final class NewFactCreated extends IssueEvent {
   final String newFact; // The fact description
   final String newFactContext; // Context or reasoning for the fact
   final String referenceObjectId; // The ID of the object being referenced
-  final ReferenceObjectType referenceObjectType; // The type of object being referenced
+  final ReferenceObjectType
+      referenceObjectType; // The type of object being referenced
 
   const NewFactCreated({
     required this.newFact,
@@ -169,7 +169,8 @@ final class NewFactCreated extends IssueEvent {
   });
 
   @override
-  List<Object?> get props => [newFact, newFactContext, referenceObjectId, referenceObjectType];
+  List<Object?> get props =>
+      [newFact, newFactContext, referenceObjectId, referenceObjectType];
 }
 
 /*

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/pages/views/issue_page_views/issue_page_views.dart';
-import 'package:guide_solve/repositories/issue_repository.dart';
 
 class IssuePage extends StatelessWidget {
   final String issueId;
@@ -13,9 +12,9 @@ class IssuePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Start listening to the focused issue when the page is built
-    context.read<IssueBloc>().add(FocusIssueSelected(issueID: issueId));
+    context.read<IssueBloc>().add(FocusIssueSelected(issueId: issueId));
     final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
-    final issueRepository = context.read<IssueRepository>();
+
 
     // Access the current focused issue directly from the bloc
     final focusedIssue = issueBloc.focusedIssue;
@@ -44,8 +43,8 @@ class IssuePage extends StatelessWidget {
               case IssueProcessStage.scopingSolve:
                 return ScopingSolveView(
                   issueId: issueId,
-                  solutionId: focusedIssue!.solve,
-                ); //solve does not hold the solutionId currently, it holds the solution.desc
+                  solutionId: focusedIssue!.solveSolutionId,
+                );
               case IssueProcessStage.solveSummaryReview:
                 return SolveSummaryReviewView(issueId: issueId);
               default:

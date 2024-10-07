@@ -36,14 +36,14 @@ class NarrowingToSolveView extends StatelessWidget {
               stream: issueRepository.getSolutions(issueId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error loading solutions'));
+                  return const Center(child: Text('Error loading solutions'));
                 }
                 if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 final solutions = snapshot.data!;
                 if (solutions.isEmpty) {
-                  return Center(child: Text('No solutions available.'));
+                  return const Center(child: Text('No solutions available.'));
                 }
                 return ListView.builder(
                   itemCount: solutions.length,

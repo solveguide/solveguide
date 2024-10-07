@@ -112,11 +112,11 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     // Cancel any existing subscription
     await _focusedIssueSubscription?.cancel();
 
-    _currentIssueId = event.issueID;
+    _currentIssueId = event.issueId;
 
     // Start listening to the focused issue stream
     _focusedIssueSubscription =
-        issueRepository.getFocusedIssueStream(event.issueID).listen((issue) {
+        issueRepository.getFocusedIssueStream(event.issueId).listen((issue) {
       // Store the latest issue from the stream
       _focusedIssue = issue;
       // Emit states based on the issue's data
@@ -196,16 +196,16 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       emit(const IssuesListFailure("No Issue Selected"));
       return;
     }
-//TODO: use copyWith() to pull the existing hypothesis and add the new desc. When no votes are present.
     try {
       // Update the hypothesis using the repository
       await issueRepository.updateHypothesis(
         issueId,
         Hypothesis(
+          ownerId: _currentIssueId!,
           hypothesisId: event.hypothesisId,
           desc: event.updatedDescription,
           lastUpdatedTimestamp: DateTime.now(),
-          // Include other necessary fields
+          createdTimestamp: DateTime.now(),
         ),
       );
       // No need to emit a new state; the UI will update via the stream
@@ -331,12 +331,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       // Update the solution using the repository
       await issueRepository.updateSolution(
         issueId,
-        //TODO: use copyWith() to pull the existing solution and add the new desc. When no votes are present.
         Solution(
+          ownerId: _currentIssueId!,
           solutionId: event.solutionId,
           desc: event.updatedDescription,
           lastUpdatedTimestamp: DateTime.now(),
-          // Include other necessary fields
+          createdTimestamp: DateTime.now(),
         ),
       );
       // No need to emit a new state; the UI will update via the stream
@@ -512,39 +512,38 @@ void _onFocusSolveScopeSubmitted(
     return super.close();
   }
 
-void _onNewFactCreated(
-  NewFactCreated event,
-  Emitter<IssueState> emit,
-) async {
-  final issueId = _currentIssueId;
+  void _onNewFactCreated(
+    NewFactCreated event,
+    Emitter<IssueState> emit,
+  ) async {
+    final issueId = _currentIssueId;
 
-  if (issueId == null) {
-    emit(const IssuesListFailure("No Issue Selected"));
-    return;
+    if (issueId == null) {
+      emit(const IssuesListFailure("No Issue Selected"));
+      return;
+    }
+
+    // Get userId from AuthRepository
+    final userId = await authRepository.getUserUid();
+    if (userId == null) {
+      emit(const IssuesListFailure('User not authenticated'));
+      return;
+    }
+
+    try {
+      // Call the addFact method, passing the necessary arguments including reference object type
+      await issueRepository.addFact(
+        issueId,
+        event.referenceObjectType, // Pass the reference object type
+        event.referenceObjectId, // Pass the reference object ID
+        event.newFactContext, // Pass the fact context
+        event.newFact, // Pass the fact description
+        userId, // Pass the userId
+      );
+
+      // No need to emit a new state; the UI will update via the stream
+    } catch (error) {
+      emit(IssuesListFailure(error.toString()));
+    }
   }
-
-  // Get userId from AuthRepository
-  final userId = await authRepository.getUserUid();
-  if (userId == null) {
-    emit(const IssuesListFailure('User not authenticated'));
-    return;
-  }
-
-  try {
-    // Call the addFact method, passing the necessary arguments including reference object type
-    await issueRepository.addFact(
-      issueId,
-      event.referenceObjectType, // Pass the reference object type
-      event.referenceObjectId,   // Pass the reference object ID
-      event.newFactContext,      // Pass the fact context
-      event.newFact,             // Pass the fact description
-      userId,                    // Pass the userId
-    );
-
-    // No need to emit a new state; the UI will update via the stream
-  } catch (error) {
-    emit(IssuesListFailure(error.toString()));
-  }
-}
-
 }
