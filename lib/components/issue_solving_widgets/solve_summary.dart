@@ -67,10 +67,12 @@ class SolveSummaryWidget extends StatelessWidget {
                             stream: issueRepository.getHypotheses(issueId),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
-                                return const Center(child: Text('Error loading hypotheses'));
+                                return const Center(
+                                    child: Text('Error loading hypotheses'));
                               }
                               if (!snapshot.hasData) {
-                                return const Center(child: CircularProgressIndicator());
+                                return const Center(
+                                    child: CircularProgressIndicator());
                               }
                               final hypotheses = snapshot.data!;
                               return _buildHypothesesList(hypotheses, issue);
@@ -99,10 +101,12 @@ class SolveSummaryWidget extends StatelessWidget {
                             stream: issueRepository.getSolutions(issueId),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
-                                return const Center(child: Text('Error loading solutions'));
+                                return const Center(
+                                    child: Text('Error loading solutions'));
                               }
                               if (!snapshot.hasData) {
-                                return const Center(child: CircularProgressIndicator());
+                                return const Center(
+                                    child: CircularProgressIndicator());
                               }
                               final solutions = snapshot.data!;
                               return _buildSolutionsList(solutions, issue);
@@ -145,9 +149,8 @@ class SolveSummaryWidget extends StatelessWidget {
   }
 
   Widget _buildSolutionsList(List<Solution> solutions, Issue issue) {
-    final filteredSolutions = solutions
-        .where((solution) => solution.desc != issue.solve)
-        .toList();
+    final filteredSolutions =
+        solutions.where((solution) => solution.desc != issue.solve).toList();
 
     if (filteredSolutions.isEmpty) {
       return const Text('No other solutions considered.');
@@ -199,8 +202,9 @@ class SolveSummaryWidget extends StatelessWidget {
                       ..onTap = () {
                         // Handle tap on the solution
                         // For example, navigate back to the solution selection
-                        BlocProvider.of<IssueBloc>(context, listen: false)
-                            .add(FocusSolveConfirmed(solutionId: issue.solveSolutionId));
+                        BlocProvider.of<IssueBloc>(context, listen: false).add(
+                            FocusSolveConfirmed(
+                                solutionId: issue.solveSolutionId));
                       },
                   ),
                   const TextSpan(
@@ -212,8 +216,10 @@ class SolveSummaryWidget extends StatelessWidget {
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         // Handle tap on the root cause
-                        BlocProvider.of<IssueBloc>(context, listen: false)
-                            .add(FocusRootConfirmed(confirmedRootHypothesisId: issue.rootHypothesisId));
+                        BlocProvider.of<IssueBloc>(context, listen: false).add(
+                            FocusRootConfirmed(
+                                confirmedRootHypothesisId:
+                                    issue.rootHypothesisId));
                       },
                   ),
                   const TextSpan(
@@ -239,14 +245,17 @@ class SolveSummaryWidget extends StatelessWidget {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => IssuePage(issueId: issue.issueId!),
+                              builder: (context) =>
+                                  IssuePage(issueId: issue.issueId!),
                             ),
                             (route) => false,
                           );
                         } else {
                           // Handle unauthenticated state
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('You must be logged in to reconsider the solve.')),
+                            const SnackBar(
+                                content: Text(
+                                    'You must be logged in to reconsider the solve.')),
                           );
                         }
                       },

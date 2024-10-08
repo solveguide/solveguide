@@ -44,8 +44,7 @@ class MyApp extends StatelessWidget {
               AuthBloc(authRepository: authRepository)..add(const AppStarted()),
         ),
         BlocProvider<IssueBloc>(
-          create: (context) =>
-              IssueBloc(issueRepository, authRepository),
+          create: (context) => IssueBloc(issueRepository, authRepository),
         ),
       ],
       child: MaterialApp(

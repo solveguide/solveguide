@@ -105,7 +105,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onFocusIssueSelected(
+void _onFocusIssueSelected(
     FocusIssueSelected event,
     Emitter<IssueState> emit,
   ) async {
@@ -119,8 +119,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         issueRepository.getFocusedIssueStream(event.issueId).listen((issue) {
       // Store the latest issue from the stream
       _focusedIssue = issue;
-      // Emit states based on the issue's data
-      add(FocusedIssueUpdated(issue));
+      
+      // Emit the FocusedIssueUpdated event only after _focusedIssue is set
+      // ignore: prefer_const_constructors
+      add(FocusedIssueUpdated(issue)); // Removed 'const' here since we want the updated data
     }, onError: (error) {
       emit(IssuesListFailure(error.toString()));
     });
@@ -132,6 +134,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     Emitter<IssueState> emit,
   ) async {
     final issue = event.focusedIssue;
+
     List<Hypothesis> hypotheses =
         await issueRepository.getHypotheses(issue.issueId!).first;
     List<Solution> solutions =

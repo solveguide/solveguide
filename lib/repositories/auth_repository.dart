@@ -78,12 +78,16 @@ class AuthRepository {
     }
   }
 
-  Future<String?> getUserUid() async {
-    try {
-      final user = _firebaseAuth.currentUser;
-      return user?.uid;
-    } catch (e) {
-      throw (e.toString());
+Future<String?> getUserUid() async {
+  try {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw Exception("User is not logged in");
     }
+    return user.uid;
+  } catch (e) {
+    throw Exception("Failed to get user UID: ${e.toString()}");
   }
+}
+
 }

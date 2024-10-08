@@ -15,7 +15,6 @@ class IssuePage extends StatelessWidget {
     context.read<IssueBloc>().add(FocusIssueSelected(issueId: issueId));
     final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
 
-
     // Access the current focused issue directly from the bloc
     final focusedIssue = issueBloc.focusedIssue;
 
