@@ -5,10 +5,13 @@ import 'package:guide_solve/models/solution.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class WideningSolutionsView extends StatelessWidget {
+  WideningSolutionsView({
+    required this.issueId,
+    super.key,
+  });
+
   final String issueId;
   final TextEditingController _textController = TextEditingController();
-
-  WideningSolutionsView({super.key, required this.issueId});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class WideningSolutionsView extends StatelessWidget {
     final focusedIssue = issueBloc.focusedIssue;
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           if (focusedIssue != null)
@@ -63,19 +66,27 @@ class WideningSolutionsView extends StatelessWidget {
                   itemCount: solutions.length,
                   itemBuilder: (context, index) {
                     final solution = solutions[index];
-                    String dropdownValue = "";
+                    const dropdownValue = 'Agree';
                     return ListTile(
                       title: Text(solution.desc),
                       trailing: DropdownButton(
                         items: const [
                           DropdownMenuItem(
-                              value: "Agree", child: Text('Agree')),
+                            value: 'Agree',
+                            child: Text('Agree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Disagree", child: Text('Disagree')),
+                            value: 'Disagree',
+                            child: Text('Disagree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Scope", child: Text('Scope')),
+                            value: 'Scope',
+                            child: Text('Scope'),
+                          ),
                           DropdownMenuItem(
-                              value: "Facts", child: Text('Facts')),
+                            value: 'Facts',
+                            child: Text('Facts'),
+                          ),
                         ],
                         value: dropdownValue,
                         onChanged: null,

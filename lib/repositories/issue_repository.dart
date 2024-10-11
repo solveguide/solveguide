@@ -23,52 +23,48 @@ class IssueRepository {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
-        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+        return Issue.fromJson(doc.data()! as Map<String, dynamic>);
       }).toList();
-    }).handleError((error) {
-      throw error.toString();
     });
   }
 
-//Get snapshot of list of issues owned by current user// Get snapshot of list of issues where currentUserId is listed in the invitedUserIds map
+// Get list of issues where currentUserId is listed in the invitedUserIds map
   Future<List<Issue>> getIssueList(String currentUserId) async {
     try {
-      // Fetch the snapshot from Firestore
+      // Fetch the snapshot from Firestore using the cascade operator
       final snapshot = await _issuesCollection
-          .where('invitedUserIds',
-              arrayContains: currentUserId) // Querying the list, not the map
+          .where('invitedUserIds', arrayContains: currentUserId)
           .get();
 
-      // Convert the snapshot into a List of Issue objects
-      List<Issue> issuesList = snapshot.docs.map((doc) {
-        return Issue.fromJson(doc.data() as Map<String, dynamic>);
-      }).toList();
-
-      // Sort the list by the lastUpdatedTimestamp field
-      issuesList.sort(
-          (a, b) => b.lastUpdatedTimestamp.compareTo(a.lastUpdatedTimestamp));
+      // Use cascade operator to streamline map and sort
+      final issuesList = snapshot.docs
+          .map((doc) => Issue.fromJson(doc.data()! as Map<String, dynamic>))
+          .toList()
+        ..sort(
+          (a, b) => b.lastUpdatedTimestamp.compareTo(a.lastUpdatedTimestamp),
+        );
 
       return issuesList;
     } catch (error) {
-      // Handle any errors that occur
-      throw error.toString();
+      // Throwing a proper Exception instead of a string
+      throw Exception('Failed to fetch issue list: $error');
     }
   }
 
   // Stream of the focused issue
   Stream<Issue> getFocusedIssueStream(String issueId) {
     return _issuesCollection.doc(issueId).snapshots().map((snapshot) {
-      return Issue.fromJson(snapshot.data() as Map<String, dynamic>);
+      return Issue.fromJson(snapshot.data()! as Map<String, dynamic>);
     });
   }
 
   //Fetch a Specific Issue by ID
   Future<Issue?> getIssueById(String issueId) async {
     try {
-      DocumentSnapshot doc = await _issuesCollection.doc(issueId).get();
+      final doc = await _issuesCollection.doc(issueId).get();
 
       if (doc.exists) {
-        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+        return Issue.fromJson(doc.data()! as Map<String, dynamic>);
       } else {
         return null;
       }
@@ -94,13 +90,16 @@ class IssueRepository {
       // Update the issue with the generated Firestore document ID
       await docRef.update({'issueId': docRef.id});
     } catch (error) {
-      throw error.toString();
+      throw Exception('Failed to add Issue: $error');
     }
   }
 
   // Spinoff an issue
   Future<String> addSpinoffIssue(
-      Issue oldIssue, String spinoffHypothesis, String ownerId) async {
+    Issue oldIssue,
+    String spinoffHypothesis,
+    String ownerId,
+  ) async {
     final newIssue = Issue(
       label: spinoffHypothesis,
       seedStatement: oldIssue.seedStatement,
@@ -117,13 +116,13 @@ class IssueRepository {
       await docRef.update({'issueId': docRef.id});
       return docRef.id;
     } catch (error) {
-      throw error.toString();
+      throw Exception('Failed to spinoff Issue: $error');
     }
   }
 
   // Update an issue
   Future<void> updateIssue(String issueId, Issue issue) async {
-    Issue updatedIssue = issue.copyWith(
+    final updatedIssue = issue.copyWith(
       root: issue.root,
       solve: issue.solve,
       invitedUserIds: issue.invitedUserIds,
@@ -132,40 +131,44 @@ class IssueRepository {
     try {
       await _issuesCollection.doc(issueId).update(updatedIssue.toJson());
     } catch (error) {
-      throw error.toString();
+      throw Exception('Failed to update Issue: $error');
     }
   }
 
   Future<void> updateIssueRoot(String issueId, String rootHypothesisId) async {
     try {
-      Issue? currentIssue = await getIssueById(issueId);
+      final currentIssue = await getIssueById(issueId);
       if (currentIssue == null) {
-        throw "Issue is null";
+        throw Exception('Issue is null');
       }
-      Hypothesis? rootHypothesis =
+      final rootHypothesis =
           await getHypothesisById(issueId, rootHypothesisId);
-      String updatedRoot = rootHypothesis!.desc;
-      Issue updatedIssue = currentIssue.copyWith(
-          root: updatedRoot, rootHypothesisId: rootHypothesisId);
-      updateIssue(issueId, updatedIssue);
+      final updatedRoot = rootHypothesis!.desc;
+      final updatedIssue = currentIssue.copyWith(
+        root: updatedRoot,
+        rootHypothesisId: rootHypothesisId,
+      );
+      await updateIssue(issueId, updatedIssue);
     } catch (error) {
-      throw error.toString();
+      throw Exception('Failed to update root: $error');
     }
   }
 
   Future<void> updateIssueSolve(String issueId, String solveSolutionId) async {
     try {
-      Issue? currentIssue = await getIssueById(issueId);
+      final currentIssue = await getIssueById(issueId);
       if (currentIssue == null) {
-        throw "Issue is null";
+        throw Exception('Issue is null');
       }
-      Solution? solveSolution = await getSolutionById(issueId, solveSolutionId);
-      String updatedSolve = solveSolution!.desc;
-      Issue updatedIssue = currentIssue.copyWith(
-          root: updatedSolve, solveSolutionId: solveSolutionId);
-      updateIssue(issueId, updatedIssue);
+      final solveSolution = await getSolutionById(issueId, solveSolutionId);
+      final updatedSolve = solveSolution!.desc;
+      final updatedIssue = currentIssue.copyWith(
+        root: updatedSolve,
+        solveSolutionId: solveSolutionId,
+      );
+      await updateIssue(issueId, updatedIssue);
     } catch (error) {
-      throw error.toString();
+      throw Exception('Failed to update solve: $error');
     }
   }
 
@@ -174,7 +177,7 @@ class IssueRepository {
     try {
       await _issuesCollection.doc(issueId).delete();
     } catch (error) {
-      throw error.toString();
+      throw Exception('Failed to delete Issue: $error');
     }
   }
 
@@ -184,9 +187,11 @@ class IssueRepository {
         .doc(issueId)
         .collection('hypotheses')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Hypothesis.fromJson(doc.data()))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Hypothesis.fromJson(doc.data()))
+              .toList(),
+        );
   }
 
   // Fetch all solutions for a specific issue
@@ -195,15 +200,19 @@ class IssueRepository {
         .doc(issueId)
         .collection('solutions')
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Solution.fromJson(doc.data())).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Solution.fromJson(doc.data()))
+              .toList(),
+        );
   }
 
   // Fetch all facts for a specific issue
   Stream<List<Fact>> getFacts(String issueId) {
     return _issuesCollection.doc(issueId).collection('facts').snapshots().map(
-        (snapshot) =>
-            snapshot.docs.map((doc) => Fact.fromJson(doc.data())).toList());
+          (snapshot) =>
+              snapshot.docs.map((doc) => Fact.fromJson(doc.data())).toList(),
+        );
   }
 
 /*
@@ -211,7 +220,10 @@ SUBCOLLECTION FUNCTIONS
 */
 //Add a new Hypothesis to an Issue
   Future<void> addHypothesis(
-      String issueId, String hypothesisDesc, String ownerId) async {
+    String issueId,
+    String hypothesisDesc,
+    String ownerId,
+  ) async {
     final newHypothesis = Hypothesis(
       ownerId: ownerId, // Use ownerId from AuthState
       desc: hypothesisDesc,
@@ -220,11 +232,11 @@ SUBCOLLECTION FUNCTIONS
     );
     try {
       // Reference to the hypotheses subcollection
-      CollectionReference hypothesesRef =
+      final CollectionReference hypothesesRef =
           _issuesCollection.doc(issueId).collection('hypotheses');
 
       // Add the hypothesis document
-      DocumentReference docRef =
+      final docRef =
           await hypothesesRef.add(newHypothesis.toJson());
 
       // Update the hypothesisId field with the generated document ID
@@ -236,7 +248,10 @@ SUBCOLLECTION FUNCTIONS
 
 //Add a new Solution to an Issue
   Future<void> addSolution(
-      String issueId, String solutionDesc, String ownerId) async {
+    String issueId,
+    String solutionDesc,
+    String ownerId,
+  ) async {
     final newSolution = Solution(
       ownerId: ownerId, // Use ownerId from AuthState
       desc: solutionDesc,
@@ -245,11 +260,11 @@ SUBCOLLECTION FUNCTIONS
     );
     try {
       // Reference to the solutions subcollection
-      CollectionReference solutionsRef =
+      final CollectionReference solutionsRef =
           _issuesCollection.doc(issueId).collection('solutions');
 
       // Add the solution document
-      DocumentReference docRef = await solutionsRef.add(newSolution.toJson());
+      final docRef = await solutionsRef.add(newSolution.toJson());
 
       // Update the solutionId field with the generated document ID
       await docRef.update({'solutionId': docRef.id});
@@ -260,17 +275,18 @@ SUBCOLLECTION FUNCTIONS
 
 //Add a new Fact to an Issue
   Future<void> addFact(
-      String issueId,
-      ReferenceObjectType refObjectType,
-      String refObjectId,
-      String factContext,
-      String factDesc,
-      String authorId) async {
+    String issueId,
+    ReferenceObjectType refObjectType,
+    String refObjectId,
+    String factContext,
+    String factDesc,
+    String authorId,
+  ) async {
     final newFact = Fact(
       authorId: authorId, // Use ownerId from AuthState
       desc: factDesc,
       referenceObjects: {
-        refObjectType.toString(): [refObjectId]
+        refObjectType.toString(): [refObjectId],
       },
       supportingContext: factContext,
       createdTimestamp: DateTime.now(),
@@ -278,31 +294,33 @@ SUBCOLLECTION FUNCTIONS
     );
     try {
       // Reference to the solutions subcollection
-      CollectionReference factRef =
+      final CollectionReference factRef =
           _issuesCollection.doc(issueId).collection('facts');
 
       // Add the fact document
-      DocumentReference docRef = await factRef.add(newFact.toJson());
+      final docRef = await factRef.add(newFact.toJson());
 
       // Update the factId field with the generated document ID
       await docRef.update({'factId': docRef.id});
     } catch (error) {
-      throw Exception('Failed to add solution: $error');
+      throw Exception('Failed to add fact: $error');
     }
   }
 
 //Fetch a Specific Hypothesis by ID
   Future<Hypothesis?> getHypothesisById(
-      String issueId, String hypothesisId) async {
+    String issueId,
+    String hypothesisId,
+  ) async {
     try {
-      DocumentSnapshot doc = await _issuesCollection
+      final DocumentSnapshot doc = await _issuesCollection
           .doc(issueId)
           .collection('hypotheses')
           .doc(hypothesisId)
           .get();
 
       if (doc.exists) {
-        return Hypothesis.fromJson(doc.data() as Map<String, dynamic>);
+        return Hypothesis.fromJson(doc.data()! as Map<String, dynamic>);
       } else {
         return null;
       }
@@ -314,14 +332,14 @@ SUBCOLLECTION FUNCTIONS
 //Fetch a Specific Solution by ID
   Future<Solution?> getSolutionById(String issueId, String solutionId) async {
     try {
-      DocumentSnapshot doc = await _issuesCollection
+      final DocumentSnapshot doc = await _issuesCollection
           .doc(issueId)
           .collection('solutions')
           .doc(solutionId)
           .get();
 
       if (doc.exists) {
-        return Solution.fromJson(doc.data() as Map<String, dynamic>);
+        return Solution.fromJson(doc.data()! as Map<String, dynamic>);
       } else {
         return null;
       }
@@ -332,7 +350,7 @@ SUBCOLLECTION FUNCTIONS
 
 //Update an Existing Hypothesis
   Future<void> updateHypothesis(String issueId, Hypothesis hypothesis) async {
-    Hypothesis updatedHypothesis = hypothesis.copyWith(
+    final updatedHypothesis = hypothesis.copyWith(
       lastUpdatedTimestamp: DateTime.now(),
     );
     try {
@@ -348,7 +366,7 @@ SUBCOLLECTION FUNCTIONS
 
 //Update an Existing Solution
   Future<void> updateSolution(String issueId, Solution solution) async {
-    Solution updatedSolution = solution.copyWith(
+    final updatedSolution = solution.copyWith(
       lastUpdatedTimestamp: DateTime.now(),
     );
     try {

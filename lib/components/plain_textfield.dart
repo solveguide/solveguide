@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 
 class PlainTextField extends StatelessWidget {
+  const PlainTextField({
+    required this.hintText,
+    required this.controller,
+    required this.obscureText,
+    super.key,
+    this.onSubmit,
+  });
+
   final String hintText;
   final TextEditingController controller;
   final bool obscureText;
   final VoidCallback? onSubmit;
-  const PlainTextField({
-    super.key,
-    required this.hintText,
-    required this.controller,
-    required this.obscureText,
-    this.onSubmit,
-  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      padding: const EdgeInsets.symmetric(horizontal: 25),
       child: TextField(
         //keyboardType: TextInputType.multiline, // Enables line breaks
         //maxLines: null,
@@ -24,9 +25,7 @@ class PlainTextField extends StatelessWidget {
         obscureText: obscureText,
         onSubmitted: (value) {
           // Call onSubmit if it's not null
-          if (onSubmit != null) {
-            onSubmit!();
-          }
+          onSubmit?.call();
         },
         decoration: InputDecoration(
           hintText: hintText,
@@ -38,11 +37,15 @@ class PlainTextField extends StatelessWidget {
           border: const OutlineInputBorder(),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.tertiary, width: 2.0),
+              color: Theme.of(context).colorScheme.tertiary,
+              width: 2,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary, width: 2.0),
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
           ),
         ),
       ),

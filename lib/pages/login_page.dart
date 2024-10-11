@@ -15,8 +15,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    loginNow() {
-      BlocProvider.of<AuthBloc>(context, listen: false).add(
+    void loginNow() {
+      BlocProvider.of<AuthBloc>(context).add(
         AuthLoginRequested(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
@@ -43,10 +43,10 @@ class LoginPage extends StatelessWidget {
           if (state is AuthSuccess) {
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
+                MaterialPageRoute<Widget>(
                   builder: (context) => const DashboardPage(),
                 ),
-                (route) => false);
+                (route) => false,);
           }
         },
         builder: (context, state) {
@@ -62,7 +62,7 @@ class LoginPage extends StatelessWidget {
                   height: 50,
                 ),
                 //welcome message
-                const Text("Welcome back!"),
+                const Text('Welcome back!'),
                 const SizedBox(
                   height: 25,
                 ),
@@ -70,10 +70,10 @@ class LoginPage extends StatelessWidget {
                 // username text field
                 ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 500.0,
+                    maxWidth: 500,
                   ),
                   child: PlainTextField(
-                    hintText: "email",
+                    hintText: 'email',
                     controller: emailController,
                     obscureText: false,
                   ),
@@ -84,10 +84,10 @@ class LoginPage extends StatelessWidget {
                 // password text field
                 ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 500.0,
+                    maxWidth: 500,
                   ),
                   child: PlainTextField(
-                    hintText: "password",
+                    hintText: 'password',
                     controller: passwordController,
                     obscureText: true,
                     onSubmit: loginNow,
@@ -97,16 +97,16 @@ class LoginPage extends StatelessWidget {
                   height: 10,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        "Forgot Password?",
+                        'Forgot Password?',
                         style: TextStyle(
                           color: Colors.grey.shade600,
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -116,28 +116,28 @@ class LoginPage extends StatelessWidget {
                   children: [
                     PlainButton(
                       onPressed: () {
-                        BlocProvider.of<AuthBloc>(context, listen: false).add(
+                        BlocProvider.of<AuthBloc>(context).add(
                           AuthLoginRequested(
                             email: emailController.text.trim(),
                             password: passwordController.text.trim(),
                           ),
                         );
                       },
-                      text: "Sign In",
+                      text: 'Sign In',
                     ),
                     const SizedBox(
-                      width: 25.0,
+                      width: 25,
                     ),
                     PlainButton(
                       onPressed: () {
-                        BlocProvider.of<AuthBloc>(context, listen: false).add(
+                        BlocProvider.of<AuthBloc>(context).add(
                           AuthRegisterRequested(
                             email: emailController.text.trim(),
                             password: passwordController.text.trim(),
                           ),
                         );
                       },
-                      text: "Register",
+                      text: 'Register',
                     ),
                   ],
                 ),

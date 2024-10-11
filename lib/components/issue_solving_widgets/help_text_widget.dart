@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 class HelpTextWidget extends StatelessWidget {
-  final String helpText;
-
   const HelpTextWidget({
-    super.key,
     required this.helpText,
+    super.key,
   });
+  
+  final String helpText;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.help_outline),
       onPressed: () {
-        showDialog(
+        showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Help'),

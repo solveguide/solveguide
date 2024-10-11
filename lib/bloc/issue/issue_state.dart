@@ -11,9 +11,9 @@ abstract class IssueState extends Equatable {
 final class IssueInitial extends IssueState {}
 
 final class IssuesListSuccess extends IssueState {
-  final List<Issue> issueList;
 
   const IssuesListSuccess({required this.issueList});
+  final List<Issue> issueList;
 
   @override
   List<Object?> get props => [issueList];
@@ -22,9 +22,9 @@ final class IssuesListSuccess extends IssueState {
 final class IssuesListLoading extends IssueState {}
 
 final class IssuesListFailure extends IssueState {
-  final String error;
 
   const IssuesListFailure(this.error);
+  final String error;
 
   @override
   List<Object?> get props => [error];
@@ -32,9 +32,9 @@ final class IssuesListFailure extends IssueState {
 
 // States related to the issue-solving process
 class IssueProcessState extends IssueState {
-  final IssueProcessStage stage;
 
   const IssueProcessState(this.stage);
+  final IssueProcessStage stage;
 
   @override
   List<Object?> get props => [stage];

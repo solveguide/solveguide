@@ -5,9 +5,12 @@ import 'package:guide_solve/models/solution.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class NarrowingToSolveView extends StatelessWidget {
-  final String issueId;
+  const NarrowingToSolveView({
+    required this.issueId,
+    super.key,
+  });
 
-  const NarrowingToSolveView({super.key, required this.issueId});
+  final String issueId;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class NarrowingToSolveView extends StatelessWidget {
     final focusedIssue = issueBloc.focusedIssue;
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           if (focusedIssue != null)
@@ -28,7 +31,7 @@ class NarrowingToSolveView extends StatelessWidget {
           const SizedBox(height: 20),
           const Text(
             'Select the best solution to implement.',
-            style: TextStyle(fontSize: 16.0),
+            style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
           Expanded(
@@ -49,19 +52,27 @@ class NarrowingToSolveView extends StatelessWidget {
                   itemCount: solutions.length,
                   itemBuilder: (context, index) {
                     final solution = solutions[index];
-                    String dropdownValue = "";
+                    const dropdownValue = 'Agree';
                     return ListTile(
                       title: Text(solution.desc),
                       trailing: DropdownButton(
                         items: const [
                           DropdownMenuItem(
-                              value: "Agree", child: Text('Agree')),
+                            value: 'Agree',
+                            child: Text('Agree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Disagree", child: Text('Disagree')),
+                            value: 'Disagree',
+                            child: Text('Disagree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Scope", child: Text('Scope')),
+                            value: 'Scope',
+                            child: Text('Scope'),
+                          ),
                           DropdownMenuItem(
-                              value: "Facts", child: Text('Facts')),
+                            value: 'Facts',
+                            child: Text('Facts'),
+                          ),
                         ],
                         value: dropdownValue,
                         onChanged: null,

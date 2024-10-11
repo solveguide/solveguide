@@ -5,9 +5,12 @@ import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class SolveSummaryReviewView extends StatelessWidget {
-  final String issueId;
+  const SolveSummaryReviewView({
+    required this.issueId,
+    super.key,
+  });
 
-  const SolveSummaryReviewView({super.key, required this.issueId});
+  final String issueId;
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +30,23 @@ class SolveSummaryReviewView extends StatelessWidget {
           return const Center(child: Text('Issue not found.'));
         }
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               const Text(
                 'Solution Summary',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               const Text(
                 'Root Cause:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Text(issue.root),
               const SizedBox(height: 20),
               const Text(
                 'Solution:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Text(issue.solve),
               const SizedBox(height: 20),

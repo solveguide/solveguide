@@ -19,56 +19,57 @@ class MyNavigationDrawer extends StatelessWidget {
               DrawerHeader(
                 child: Center(
                   child: logoTitle(
-                    5.0,
-                    title: true,
+                    5,
                     iconSize: 50,
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0),
+                padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: const Text("D A S H B O A R D"),
+                  title: const Text('D A S H B O A R D'),
                   leading: const Icon(Icons.home),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const DashboardPage()),
+                      MaterialPageRoute<Widget>(
+                        builder: (context) => const DashboardPage(),
+                      ),
                       (route) => false,
                     );
                   },
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 50.0),
+                padding: const EdgeInsets.only(left: 50),
                 child: ListTile(
-                  title: const Text("S O L V E S"),
+                  title: const Text('S O L V E S'),
                   leading: const Icon(Icons.person),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const ProvenSolvesPage()),
+                      MaterialPageRoute<Widget>(
+                        builder: (context) => const ProvenSolvesPage(),
+                      ),
                       (route) => false,
                     );
                   },
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0),
+                padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: const Text("S E T T I N G S"),
+                  title: const Text('S E T T I N G S'),
                   leading: const Icon(Icons.settings),
                   onTap: () {},
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0),
+                padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: const Text("C O N T A C T S"),
+                  title: const Text('C O N T A C T S'),
                   leading: const Icon(Icons.person),
                   onTap: () {},
                 ),
@@ -76,15 +77,17 @@ class MyNavigationDrawer extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 25.0, bottom: 25),
+            padding: const EdgeInsets.only(left: 25, bottom: 25),
             child: ListTile(
-              title: const Text("M Y   A C C O U N T"),
+              title: const Text('M Y   A C C O U N T'),
               leading: const Icon(Icons.logout),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                  MaterialPageRoute<Widget>(
+                    builder: (context) => ProfilePage(),
+                  ),
                 );
               },
             ),

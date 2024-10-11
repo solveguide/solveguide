@@ -5,9 +5,12 @@ import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class NarrowingToRootCauseView extends StatelessWidget {
-  final String issueId;
+  const NarrowingToRootCauseView({
+    required this.issueId,
+    super.key,
+  });
 
-  const NarrowingToRootCauseView({super.key, required this.issueId});
+  final String issueId;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +20,7 @@ class NarrowingToRootCauseView extends StatelessWidget {
     final focusedIssue = issueBloc.focusedIssue;
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           // Consenesus Statement
@@ -28,8 +31,9 @@ class NarrowingToRootCauseView extends StatelessWidget {
           const SizedBox(height: 20),
           // Instructions
           const Text(
-            'Select the most probable root cause from the hypotheses based on the facts established.',
-            style: TextStyle(fontSize: 16.0),
+            'Select the most probable root cause from the hypotheses '
+            'based on the facts established.',
+            style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
           //Hypothesis List
@@ -51,21 +55,31 @@ class NarrowingToRootCauseView extends StatelessWidget {
                   itemCount: hypotheses.length,
                   itemBuilder: (context, index) {
                     final hypothesis = hypotheses[index];
-                    String dropdownValue = "";
+                    const dropdownValue = 'Agree';
                     return ListTile(
                       title: Text(hypothesis.desc),
                       trailing: DropdownButton(
                         items: const [
                           DropdownMenuItem(
-                              value: "Agree", child: Text('Agree')),
+                            value: 'Agree',
+                            child: Text('Agree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Disagree", child: Text('Disagree')),
+                            value: 'Disagree',
+                            child: Text('Disagree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Modify", child: Text('Modify')),
+                            value: 'Modify',
+                            child: Text('Modify'),
+                          ),
                           DropdownMenuItem(
-                              value: "Spinoff", child: Text('Spinoff')),
+                            value: 'Spinoff',
+                            child: Text('Spinoff'),
+                          ),
                           DropdownMenuItem(
-                              value: "Facts", child: Text('Facts')),
+                            value: 'Facts',
+                            child: Text('Facts'),
+                          ),
                         ],
                         value: dropdownValue,
                         onChanged: null,

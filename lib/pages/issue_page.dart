@@ -5,9 +5,9 @@ import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/pages/views/issue_page_views/issue_page_views.dart';
 
 class IssuePage extends StatelessWidget {
-  final String issueId;
+  const IssuePage({required this.issueId, super.key});
 
-  const IssuePage({super.key, required this.issueId});
+  final String issueId;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class IssuePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Issue in Focus"),
+        title: const Text('Issue in Focus'),
         backgroundColor: Colors.orange[50],
       ),
       backgroundColor: Colors.orange[50],
@@ -40,14 +40,18 @@ class IssuePage extends StatelessWidget {
               case IssueProcessStage.narrowingToSolve:
                 return NarrowingToSolveView(issueId: issueId);
               case IssueProcessStage.scopingSolve:
+                // Add a null check for focusedIssue
+                if (focusedIssue == null) {
+                  return const Center(
+                    child: Text('No focused issue available for solving.'),
+                  );
+                }
                 return ScopingSolveView(
                   issueId: issueId,
-                  solutionId: focusedIssue!.solveSolutionId,
+                  solutionId: focusedIssue.solveSolutionId,
                 );
               case IssueProcessStage.solveSummaryReview:
                 return SolveSummaryReviewView(issueId: issueId);
-              default:
-                return const Center(child: Text('Unknown stage'));
             }
           } else if (state is IssuesListFailure) {
             return Center(child: Text('Error: ${state.error}'));

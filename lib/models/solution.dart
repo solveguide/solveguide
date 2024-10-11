@@ -1,23 +1,23 @@
 class ActionItem {
-  final String description;
-  bool isCompleted;
-
   ActionItem({
     required this.description,
     this.isCompleted = false,
   });
+
+  // Create an ActionItem from a Map
+  factory ActionItem.fromJson(Map<String, dynamic> json) => ActionItem(
+        description: json['description'] as String,
+        isCompleted: json['isCompleted'] as bool,
+      );
+
+  final String description;
+  bool isCompleted;
 
   // Convert an ActionItem to a Map
   Map<String, dynamic> toJson() => {
         'description': description,
         'isCompleted': isCompleted,
       };
-
-  // Create an ActionItem from a Map
-  factory ActionItem.fromJson(Map<String, dynamic> json) => ActionItem(
-        description: json['description'],
-        isCompleted: json['isCompleted'] ?? false,
-      );
 
   ActionItem copyWith({
     String? description,
@@ -31,6 +31,58 @@ class ActionItem {
 }
 
 class Solution {
+  // A map to store user votes (userId -> voteValue)
+
+  Solution({
+    required this.ownerId,
+    required this.desc,
+    required this.createdTimestamp,
+    required this.lastUpdatedTimestamp,
+    this.solutionId,
+    this.isSolve = false,
+    this.rank = 0,
+    List<String>? provenIssueIds,
+    List<String>? disprovenIssueIds,
+    this.assignedStakeholderUserId,
+    this.actionItems,
+    this.dueDate,
+    this.votes = const {}, // Initialize with an empty map
+  }) {
+    provenIssueIds = provenIssueIds ?? [];
+    disprovenIssueIds = disprovenIssueIds ?? [];
+    actionItems = actionItems ?? [];
+  }
+
+  // Create a Solution from a Map
+  factory Solution.fromJson(Map<String, dynamic> json) => Solution(
+        solutionId: json['solutionId'] as String?,
+        ownerId: json['ownerId'] as String,
+        desc: json['desc'] as String,
+        isSolve: json['isSolve'] as bool? ?? false,
+        rank: json['rank'] as int? ?? 0,
+        provenIssueIds: (json['provenIssueIds'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        disprovenIssueIds: (json['disprovenIssueIds'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        assignedStakeholderUserId: json['assignedStakeholderUserId'] as String?,
+        actionItems: (json['actionItems'] as List<dynamic>?)
+            ?.map((item) => ActionItem.fromJson(item as Map<String, dynamic>))
+            .toList(),
+        dueDate: json['dueDate'] != null
+            ? DateTime.parse(json['dueDate'] as String)
+            : null,
+        createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
+        lastUpdatedTimestamp:
+            DateTime.parse(json['lastUpdatedTimestamp'] as String),
+        votes: Map<String, String>.from(
+          json['votes'] as Map<String, dynamic>? ?? {},
+        ),
+      );
+
   String? solutionId;
   final String ownerId; // ID of the user who owns the solution
   final String desc;
@@ -43,27 +95,7 @@ class Solution {
   DateTime? dueDate;
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
-  Map<String, String> votes; // A map to store user votes (userId -> voteValue)
-
-  Solution({
-    this.solutionId,
-    required this.ownerId,
-    required this.desc,
-    this.isSolve = false,
-    this.rank = 0,
-    List<String>? provenIssueIds,
-    List<String>? disprovenIssueIds,
-    this.assignedStakeholderUserId,
-    this.actionItems,
-    this.dueDate,
-    required this.createdTimestamp,
-    required this.lastUpdatedTimestamp,
-    this.votes = const {}, // Initialize with an empty map
-  }) {
-    provenIssueIds = provenIssueIds ?? [];
-    disprovenIssueIds = disprovenIssueIds ?? [];
-    actionItems = actionItems ?? [];
-  }
+  Map<String, String> votes;
 
   // Convert a Solution to a Map
   Map<String, dynamic> toJson() => {
@@ -81,26 +113,6 @@ class Solution {
         'lastUpdatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
         'votes': votes, // Store the votes map
       };
-
-  // Create a Solution from a Map
-  factory Solution.fromJson(Map<String, dynamic> json) => Solution(
-        solutionId: json['solutionId'],
-        ownerId: json['ownerId'],
-        desc: json['desc'],
-        isSolve: json['isSolve'] ?? false,
-        rank: json['rank'] ?? 0,
-        provenIssueIds: List<String>.from(json['invitedUserIds'] ?? []),
-        disprovenIssueIds: List<String>.from(json['invitedUserIds'] ?? []),
-        assignedStakeholderUserId: json['assignedStakeholderUserId'],
-        actionItems: (json['actionItems'] as List<dynamic>?)
-            ?.map((item) => ActionItem.fromJson(item))
-            .toList(),
-        dueDate:
-            json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
-        createdTimestamp: DateTime.parse(json['createdTimestamp']),
-        lastUpdatedTimestamp: DateTime.parse(json['lastUpdatedTimestamp']),
-        votes: Map<String, String>.from(json['votes'] ?? {}),
-      );
 
   // CopyWith function
   Solution copyWith({

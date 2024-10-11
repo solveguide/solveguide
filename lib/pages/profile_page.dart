@@ -28,17 +28,17 @@ class ProfilePage extends StatelessWidget {
           if (state is AuthFailure) {
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
+                MaterialPageRoute<Widget>(
                   builder: (context) => LoginPage(),
                 ),
-                (route) => false);
+                (route) => false,);
           } else if (state is AuthInitial) {
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
+                MaterialPageRoute<Widget>(
                   builder: (context) => const HomePage(),
                 ),
-                (route) => false);
+                (route) => false,);
           }
         },
         builder: (context, state) {
@@ -54,7 +54,7 @@ class ProfilePage extends StatelessWidget {
                   height: 50,
                 ),
                 //welcome message
-                const Text("Account Details"),
+                const Text('Account Details'),
                 const SizedBox(
                   height: 25,
                 ),
@@ -73,14 +73,14 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     PlainButton(
                       onPressed: () {
-                        BlocProvider.of<AuthBloc>(context, listen: false).add(
+                        BlocProvider.of<AuthBloc>(context).add(
                           const AuthLogoutRequested(),
                         );
                       },
-                      text: "Sign Out",
+                      text: 'Sign Out',
                     ),
                     const SizedBox(
-                      width: 25.0,
+                      width: 25,
                     ),
                   ],
                 ),

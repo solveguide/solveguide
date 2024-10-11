@@ -6,7 +6,6 @@ import 'package:guide_solve/components/issue_tile.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
-import 'package:guide_solve/models/issue.dart';
 
 class ProvenSolvesPage extends StatefulWidget {
   const ProvenSolvesPage({super.key});
@@ -22,8 +21,7 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<IssueBloc>(context, listen: false)
-        .add(const IssuesFetched());
+    BlocProvider.of<IssueBloc>(context).add(const IssuesFetched());
   }
 
   @override
@@ -31,15 +29,15 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
     return Scaffold(
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
-        title: const Text("Proven Solved Issues"),
+        title: const Text('Proven Solved Issues'),
         actions: [
           IconButton(
             onPressed: () {
-              BlocProvider.of<AuthBloc>(context, listen: false)
+              BlocProvider.of<AuthBloc>(context)
                   .add(const AuthLogoutRequested());
             },
             icon: const Icon(Icons.logout),
-          )
+          ),
         ],
       ),
       drawer: const MyNavigationDrawer(),
@@ -49,9 +47,11 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
             listener: (context, authState) {
               if (authState is AuthInitial) {
                 Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                    (route) => false);
+                  context,
+                  MaterialPageRoute<Widget>(
+                      builder: (context) => const HomePage(),),
+                  (route) => false,
+                );
               }
             },
           ),
@@ -70,7 +70,7 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
             if (issueState is IssuesListLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (issueState is IssuesListSuccess) {
-              List<Issue> solutionsList = issueState.issueList
+              final solutionsList = issueState.issueList
                   .where((issue) => issue.proven == true)
                   .toList();
               return Column(
@@ -78,12 +78,12 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
                   Expanded(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxWidth: 1000.0,
+                        maxWidth: 1000,
                       ),
                       child: ListView.builder(
                         itemCount: solutionsList.length,
                         itemBuilder: (context, index) {
-                          Issue issue = solutionsList[index];
+                          final issue = solutionsList[index];
                           return IssueTile(
                             issue: issue,
                             firstButton: () {},
@@ -96,7 +96,8 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
               );
             } else {
               return const Center(
-                  child: Text("Problem with IssueInitial State"));
+                child: Text('Problem with IssueInitial State'),
+              );
             }
           },
         ),

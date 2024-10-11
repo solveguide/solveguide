@@ -1,6 +1,6 @@
 /*
 
-Any issue that is not currently in focus will be displayed using this issue tile.
+Any issue that is not currently in focus will be displayed using this issue tile
 
 */
 
@@ -13,16 +13,16 @@ import 'package:guide_solve/components/plain_button.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class IssueTile extends StatefulWidget {
+  const IssueTile({
+    required this.issue,
+    required this.firstButton,
+    super.key,
+    this.secondButton,
+  });
+
   final Issue issue;
   final VoidCallback firstButton;
   final VoidCallback? secondButton;
-
-  const IssueTile({
-    super.key,
-    required this.issue,
-    required this.firstButton,
-    this.secondButton,
-  });
 
   @override
   State<IssueTile> createState() => _IssueTileState();
@@ -31,7 +31,7 @@ class IssueTile extends StatefulWidget {
 class _IssueTileState extends State<IssueTile> {
   @override
   Widget build(BuildContext context) {
-    bool solved = false;
+    var solved = false;
     if (widget.issue.solve.isNotEmpty) {
       solved = true;
     }
@@ -40,14 +40,16 @@ class _IssueTileState extends State<IssueTile> {
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-          //color of the tile
-          color: solved
-              ? Theme.of(context).colorScheme.tertiaryContainer
-              : Theme.of(context).colorScheme.primaryContainer,
-          border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface, width: 1),
-          //curve corners
-          borderRadius: BorderRadius.circular(8)),
+        //color of the tile
+        color: solved
+            ? Theme.of(context).colorScheme.tertiaryContainer
+            : Theme.of(context).colorScheme.primaryContainer,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        //curve corners
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,12 +69,12 @@ class _IssueTileState extends State<IssueTile> {
               // Age
               Text(
                 'Updated: ${formattedDate(widget.issue.lastUpdatedTimestamp)}',
-                style: const TextStyle(fontSize: 10.0),
+                style: const TextStyle(fontSize: 10),
               ),
             ],
           ),
           const SizedBox(
-            height: 20.0,
+            height: 20,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,7 +85,7 @@ class _IssueTileState extends State<IssueTile> {
                 onPressed: solved
                     ? () => _showReveiwDialog(widget.issue)
                     : () => widget.firstButton(),
-                text: solved ? "Review" : "Solve",
+                text: solved ? 'Review' : 'Solve',
                 color: solved
                     ? Theme.of(context).colorScheme.primaryContainer
                     : Theme.of(context).colorScheme.tertiaryContainer,
@@ -91,14 +93,14 @@ class _IssueTileState extends State<IssueTile> {
               // Delete Issue
               if (widget.secondButton != null)
                 IconButton(
-                  onPressed: widget.secondButton!,
+                  onPressed: widget.secondButton,
                   icon: const Icon(Icons.delete),
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               // View Stakeholders
               //
             ],
-          )
+          ),
         ],
       ),
     );
@@ -112,8 +114,8 @@ class _IssueTileState extends State<IssueTile> {
     }
   }
 
-  void _showReveiwDialog(issue) {
-    showDialog(
+  void _showReveiwDialog(Issue issue) {
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         contentPadding:
@@ -121,12 +123,12 @@ class _IssueTileState extends State<IssueTile> {
         content: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SolveSummaryWidget(issueId: issue.issueId),
+              padding: const EdgeInsets.all(16),
+              child: SolveSummaryWidget(issueId: issue.issueId!),
             ),
             Positioned(
-              right: 0.0,
-              top: 0.0,
+              right: 0,
+              top: 0,
               child: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () {
@@ -139,7 +141,7 @@ class _IssueTileState extends State<IssueTile> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              BlocProvider.of<IssueBloc>(context, listen: false)
+              BlocProvider.of<IssueBloc>(context)
                   .add(SolveProvenByOwner(issue: issue));
               /*
             Find the solution that matches the solve
@@ -161,7 +163,7 @@ class _IssueTileState extends State<IssueTile> {
           ),
           ElevatedButton(
             onPressed: () {
-              BlocProvider.of<IssueBloc>(context, listen: false)
+              BlocProvider.of<IssueBloc>(context)
                   .add(SolveDisprovenByOwner(issue: issue));
               /*
             Find the solution that matches the solve
@@ -180,7 +182,7 @@ class _IssueTileState extends State<IssueTile> {
               foregroundColor:
                   Theme.of(context).colorScheme.onSurface, // Text color
             ),
-            child: const Text('This didn\'t work.'),
+            child: const Text("This didn't work."),
           ),
         ],
       ),

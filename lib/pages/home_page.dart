@@ -1,4 +1,5 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors,
+//  prefer_const_literals_to_create_immutables
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> ensureAnonymousLogin() async {
-    User? user = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       await FirebaseAuth.instance.signInAnonymously();
     }
@@ -41,7 +42,9 @@ class _HomePageState extends State<HomePage> {
 // go to signup page
   void goToLoginPage() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginPage()));
+      context,
+      MaterialPageRoute<Widget>(builder: (context) => LoginPage()),
+    );
   }
 
   //UI
@@ -51,10 +54,10 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
         backgroundColor: Colors.orange[50],
-        title: Text("Home"),
+        title: Text('Home'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15),
         child: ListView(
           children: [
             _buildMainContainer(),
@@ -68,7 +71,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMainContainer() {
     return Align(
-      alignment: Alignment.center,
       child: Container(
         width: double.infinity,
         constraints: BoxConstraints(maxWidth: 1000),
@@ -85,13 +87,14 @@ class _HomePageState extends State<HomePage> {
               child: _buildDetailedText(),
             ),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(15),
               child: MaterialButton(
-                onPressed: () => goToLoginPage(),
+                onPressed: goToLoginPage,
                 color: Colors.red,
-                child: Text("Login",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Login',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -114,7 +117,8 @@ class _HomePageState extends State<HomePage> {
             narrowInstructionText('Narrow in on a single issue.'),
             SizedBox(height: 6),
             Text(
-              'Try using a recent example of a personal experience you\'d like to avoid in the future.',
+              'Try using a recent example of a personal experience '
+              "you'd like to avoid in the future.",
               textAlign: TextAlign.center,
               softWrap: true,
               style: TextStyle(fontSize: 12),
@@ -126,22 +130,23 @@ class _HomePageState extends State<HomePage> {
               // keyboardType: TextInputType.multiline, // Enables line breaks
               //maxLines: null,
               decoration: InputDecoration(
-                hintText: "I feel concerned/hurt when... ",
+                hintText: 'I feel concerned/hurt when... ',
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.green, width: 2.0),
+                  borderSide: BorderSide(color: Colors.green, width: 2),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(15),
               child: MaterialButton(
                 onPressed: isButtonEnabled ? () => {} : null,
                 color: Colors.red,
                 disabledColor: Colors.grey,
-                child: Text("Start!",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Start!',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -154,7 +159,7 @@ class _HomePageState extends State<HomePage> {
     return BoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(width: 5, color: Colors.black),
+      border: Border.all(width: 5),
     );
   }
 
@@ -163,36 +168,53 @@ class _HomePageState extends State<HomePage> {
           RichText(
             text: TextSpan(
               style: TextStyle(color: Colors.black), // Default text style
-              children: <TextSpan>[
+              children: const <TextSpan>[
                 TextSpan(
-                    text:
-                        'Your issues persist because solving them requires you to alternate between two different modes of thinking, often in coordination with others.\n\n'),
+                  text:
+                      'Your issues persist because solving them requires you '
+                      'to alternate between two different modes of thinking, '
+                      'often in coordination with others.\n\n',
+                ),
                 TextSpan(
-                    text:
-                        'Getting out of sync while solving issues together can lead to offending or misleading your peers without you even noticing. '),
+                  text:
+                      'Getting out of sync while solving issues together can '
+                      'lead to offending or misleading your peers without you '
+                      'even noticing. ',
+                ),
                 TextSpan(
-                    text: 'Small miscommunications lead to big issues!\n\n',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                  text: 'Small miscommunications lead to big issues!\n\n',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 TextSpan(
-                    text:
-                        'Solve Guide coordinates group issue solving. For now you can create an account and solve issues solo. Multiplayer mode is coming!\n\n'),
+                  text:
+                      'Solve Guide coordinates group issue solving. For now '
+                      'you can create an account and solve issues solo. '
+                      'Multiplayer mode is coming!\n\n',
+                ),
                 TextSpan(text: 'The two modes of thinking are:\n'),
               ],
             ),
           ),
-          widenInstructionText('Widening',
-              text:
-                  'is creative; imagine all the possibilities without judgement.'),
+          widenInstructionText(
+            'Widening',
+            text:
+                'is creative; imagine all the possibilities without judgement.',
+          ),
           SizedBox(height: 8),
-          narrowInstructionText('Narrowing',
-              text: 'is critical; choose the best available path forward.'),
+          narrowInstructionText(
+            'Narrowing',
+            text: 'is critical; choose the best available path forward.',
+          ),
           RichText(
             text: TextSpan(
               style: TextStyle(color: Colors.black), // Default text style
-              children: <TextSpan>[
+              children: const <TextSpan>[
                 TextSpan(
-                    text:
-                        '\nYou will solve more issues for good if you can observe reality creatively, and navigate it critically.\n\n'),
+                  text:
+                      '\nYou will solve more issues for good if you can '
+                      'observe reality creatively, '
+                      'and navigate it critically.\n\n',
+                ),
               ],
             ),
           ),
@@ -204,10 +226,11 @@ class _HomePageState extends State<HomePage> {
                 TextSpan(
                   text: 'Visit about.solve.guide to learn more.\n',
                   style: TextStyle(
-                      color: Colors.blue.shade900,
-                      decoration: TextDecoration.underline,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14),
+                    color: Colors.blue.shade900,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(Uri.parse('https://about.solve.guide'));

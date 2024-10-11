@@ -1,4 +1,39 @@
 class Fact {
+  // A map to store user votes (userId -> voteValue)
+
+  Fact({
+    required this.authorId,
+    required this.desc,
+    required this.createdTimestamp,
+    required this.lastUpdatedTimestamp,
+    this.factId,
+    this.referenceObjects = const {}, // Default empty map
+    this.parentIssueId,
+    this.supportingContext,
+    this.votes = const {}, // Initialize with an empty map
+  });
+
+// Create a Fact object from JSON (from Firestore or other storage)
+  factory Fact.fromJson(Map<String, dynamic> json) => Fact(
+        factId: json['factId'] as String?,
+        authorId: json['authorId'] as String,
+        desc: json['desc'] as String,
+        createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
+        lastUpdatedTimestamp:
+            DateTime.parse(json['updatedTimestamp'] as String),
+        referenceObjects:
+            (json['referenceObjects'] as Map<String, dynamic>?)?.map(
+                  (key, value) =>
+                      MapEntry(key, List<String>.from(value as List<dynamic>)),
+                ) ??
+                {},
+        parentIssueId: json['parentIssueId'] as String?,
+        supportingContext: json['supportingContext'] as String?,
+        votes: Map<String, String>.from(
+          json['votes'] as Map<String, dynamic>? ?? {},
+        ),
+      );
+
   final String? factId; // Unique ID for the fact
   final String authorId; // ID of the user who authored the fact
   final String desc; // The actual fact description
@@ -8,19 +43,7 @@ class Fact {
       referenceObjects; // Map of reference types to their IDs
   final String? parentIssueId; // ID of the parent issue, optional
   final String? supportingContext; // Additional context for the fact
-  Map<String, String> votes; // A map to store user votes (userId -> voteValue)
-
-  Fact({
-    this.factId,
-    required this.authorId,
-    required this.desc,
-    required this.createdTimestamp,
-    required this.lastUpdatedTimestamp,
-    this.referenceObjects = const {}, // Default empty map
-    this.parentIssueId,
-    this.supportingContext,
-    this.votes = const {}, // Initialize with an empty map
-  });
+  Map<String, String> votes;
 
   // Convert a Fact object to JSON (for Firestore or other storage)
   Map<String, dynamic> toJson() => {
@@ -34,20 +57,6 @@ class Fact {
         'supportingContext': supportingContext,
         'votes': votes, // Store the votes map
       };
-
-  // Create a Fact object from JSON (from Firestore or other storage)
-  factory Fact.fromJson(Map<String, dynamic> json) => Fact(
-        factId: json['factId'],
-        authorId: json['authorId'],
-        desc: json['desc'],
-        createdTimestamp: DateTime.parse(json['createdTimestamp']),
-        lastUpdatedTimestamp: DateTime.parse(json['updatedTimestamp']),
-        referenceObjects:
-            Map<String, List<String>>.from(json['referenceObjects'] ?? {}),
-        parentIssueId: json['parentIssueId'],
-        supportingContext: json['supportingContext'],
-        votes: Map<String, String>.from(json['votes'] ?? {}),
-      );
 
   // Update the votes map (e.g., add or reverse a user's vote)
   void updateVote(String userId, String voteValue) {

@@ -1,20 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRepository {
-  final FirebaseAuth _firebaseAuth;
   AuthRepository({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+
+  final FirebaseAuth _firebaseAuth;
 // validate email
   bool isValidEmail(String email) {
     final emailRegExp = RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    );
     return emailRegExp.hasMatch(email);
   }
 
 // send verification email
   Future<void> sendEmailVerification() async {
     try {
-      User? user = _firebaseAuth.currentUser;
+      final user = _firebaseAuth.currentUser;
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
@@ -25,10 +27,11 @@ class AuthRepository {
 
 // register
   Future<User?> registerWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.createUserWithEmailAndPassword(
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -41,10 +44,11 @@ class AuthRepository {
 
 // sign in
   Future<User?> signInWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -71,10 +75,10 @@ class AuthRepository {
       if (currentUser != null) {
         return currentUser;
       } else {
-        throw "current user is null";
+        throw Exception('The current user is null');
       }
     } catch (error) {
-      throw (error.toString());
+      throw Exception('Failed to get current user: $error');
     }
   }
 
@@ -82,11 +86,11 @@ class AuthRepository {
     try {
       final user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw Exception("User is not logged in");
+        throw Exception('User is not logged in');
       }
       return user.uid;
     } catch (e) {
-      throw Exception("Failed to get user UID: ${e.toString()}");
+      throw Exception('Failed to get user UID: $e');
     }
   }
 }

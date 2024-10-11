@@ -1,4 +1,41 @@
 class Issue {
+  Issue({
+    required this.label,
+    required this.seedStatement,
+    required this.ownerId,
+    required this.createdTimestamp,
+    required this.lastUpdatedTimestamp,
+    this.issueId,
+    this.spinoffSourceIssueId,
+    this.root = '',
+    this.rootHypothesisId = '',
+    this.solve = '',
+    this.solveSolutionId = '',
+    this.proven = false,
+    List<String>? invitedUserIds,
+  }) : invitedUserIds = invitedUserIds ?? [];
+
+  // Create an Issue from a Map
+  factory Issue.fromJson(Map<String, dynamic> json) => Issue(
+        issueId: json['issueId'] as String?,
+        spinoffSourceIssueId: json['spinoffSourceIssueId'] as String?,
+        label: json['label'] as String,
+        seedStatement: json['seedStatement'] as String,
+        root: json['root'] as String? ?? 'No root selected.',
+        rootHypothesisId: json['rootHypothesisId'] as String? ?? '',
+        solve: json['solve'] as String? ?? 'No solve selected.',
+        solveSolutionId: json['solveSolutionId'] as String? ?? '',
+        proven: json['proven'] as bool? ?? false,
+        ownerId: json['ownerId'] as String,
+        invitedUserIds: (json['invitedUserIds'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
+        lastUpdatedTimestamp:
+            DateTime.parse(json['lastUpdatedTimestamp'] as String),
+      );
+
   String? issueId; // Firebase ID once the issue is saved
   String? spinoffSourceIssueId; // ID of the original issue if it's a spinoff
   String label;
@@ -12,22 +49,6 @@ class Issue {
   List<String>? invitedUserIds; // List of user IDs with limited permissions
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
-
-  Issue({
-    this.issueId,
-    this.spinoffSourceIssueId,
-    required this.label,
-    required this.seedStatement,
-    this.root = "",
-    this.rootHypothesisId = "",
-    this.solve = "",
-    this.solveSolutionId = "",
-    this.proven = false,
-    required this.ownerId,
-    List<String>? invitedUserIds,
-    required this.createdTimestamp,
-    required this.lastUpdatedTimestamp,
-  }) : invitedUserIds = invitedUserIds ?? [];
 
   // Convert an Issue to a Map
   Map<String, dynamic> toJson() => {
@@ -45,23 +66,6 @@ class Issue {
         'createdTimestamp': createdTimestamp.toIso8601String(),
         'lastUpdatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
       };
-
-  // Create an Issue from a Map
-  factory Issue.fromJson(Map<String, dynamic> json) => Issue(
-        issueId: json['issueId'],
-        spinoffSourceIssueId: json['spinoffSourceIssueId'],
-        label: json['label'],
-        seedStatement: json['seedStatement'],
-        root: json['root'] ?? "No root selected.",
-        rootHypothesisId: json['rootHypothesisId'] ?? "",
-        solve: json['solve'] ?? "No solve selected.",
-        solveSolutionId: json['solveSolutionId'] ?? "",
-        proven: json['proven'] ?? false,
-        ownerId: json['ownerId'],
-        invitedUserIds: List<String>.from(json['invitedUserIds'] ?? []),
-        createdTimestamp: DateTime.parse(json['createdTimestamp']),
-        lastUpdatedTimestamp: DateTime.parse(json['lastUpdatedTimestamp']),
-      );
 
 // Provide a new copy of this issue with modified data.
   Issue copyWith({

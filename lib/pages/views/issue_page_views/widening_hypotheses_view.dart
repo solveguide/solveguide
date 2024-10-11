@@ -5,10 +5,13 @@ import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class WideningHypothesesView extends StatelessWidget {
+  WideningHypothesesView({
+    required this.issueId,
+    super.key,
+  });
+
   final String issueId;
   final TextEditingController _textController = TextEditingController();
-
-  WideningHypothesesView({super.key, required this.issueId});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class WideningHypothesesView extends StatelessWidget {
     final focusedIssue = issueBloc.focusedIssue;
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           if (focusedIssue != null)
@@ -53,26 +56,35 @@ class WideningHypothesesView extends StatelessWidget {
                 }
                 if (!snapshot.hasData) {
                   return const Center(
-                      child: Text('Submit a root issue theory.'));
+                    child: Text('Submit a root issue theory.'),
+                  );
                 }
                 final hypotheses = snapshot.data!;
                 return ListView.builder(
                   itemCount: hypotheses.length,
                   itemBuilder: (context, index) {
                     final hypothesis = hypotheses[index];
-                    String dropdownValue = "Agree";
+                    const dropdownValue = 'Agree';
                     return ListTile(
                       title: Text(hypothesis.desc),
                       trailing: DropdownButton(
                         items: const [
                           DropdownMenuItem(
-                              value: "Agree", child: Text('Agree')),
+                            value: 'Agree',
+                            child: Text('Agree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Disagree", child: Text('Disagree')),
+                            value: 'Disagree',
+                            child: Text('Disagree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Modify", child: Text('Modify')),
+                            value: 'Modify',
+                            child: Text('Modify'),
+                          ),
                           DropdownMenuItem(
-                              value: "Spinoff", child: Text('Spinoff')),
+                            value: 'Spinoff',
+                            child: Text('Spinoff'),
+                          ),
                         ],
                         value: dropdownValue,
                         onChanged: null,

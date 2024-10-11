@@ -6,10 +6,13 @@ import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 
 class EstablishingFactsView extends StatelessWidget {
+  EstablishingFactsView({
+    required this.issueId,
+    super.key,
+  });
+
   final String issueId;
   final TextEditingController _textController = TextEditingController();
-
-  EstablishingFactsView({super.key, required this.issueId});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class EstablishingFactsView extends StatelessWidget {
     final authRepository = context.read<AuthRepository>();
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           // Input field for adding new facts
@@ -30,13 +33,14 @@ class EstablishingFactsView extends StatelessWidget {
             ),
             onSubmitted: (value) {
               if (value.isNotEmpty) {
-                String factContext = "${authRepository.getUserUid()} believes:";
+                final factContext = '${authRepository.getUserUid()} believes:';
                 context.read<IssueBloc>().add(
                       NewFactCreated(
-                          newFact: _textController.toString(),
-                          newFactContext: factContext,
-                          referenceObjectId: issueId,
-                          referenceObjectType: ReferenceObjectType.issue),
+                        newFact: _textController.toString(),
+                        newFactContext: factContext,
+                        referenceObjectId: issueId,
+                        referenceObjectType: ReferenceObjectType.issue,
+                      ),
                     );
                 _textController.clear();
               }
@@ -62,15 +66,19 @@ class EstablishingFactsView extends StatelessWidget {
                   itemCount: facts.length,
                   itemBuilder: (context, index) {
                     final fact = facts[index];
-                    String dropdownValue = "";
+                    const dropdownValue = 'Agree';
                     return ListTile(
                       title: Text(fact.desc),
                       trailing: DropdownButton(
                         items: const [
                           DropdownMenuItem(
-                              value: "Agree", child: Text('Agree')),
+                            value: 'Agree',
+                            child: Text('Agree'),
+                          ),
                           DropdownMenuItem(
-                              value: "Disagree", child: Text('Disagree')),
+                            value: 'Disagree',
+                            child: Text('Disagree'),
+                          ),
                         ],
                         value: dropdownValue,
                         onChanged: null,

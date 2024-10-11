@@ -13,12 +13,6 @@ part 'issue_event.dart';
 part 'issue_state.dart';
 
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
-  final IssueRepository issueRepository;
-  final AuthRepository authRepository;
-  StreamSubscription<Issue>? _focusedIssueSubscription;
-  Issue? _focusedIssue;
-  String? _currentIssueId;
-
   IssueBloc(
     this.issueRepository,
     this.authRepository,
@@ -43,6 +37,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     //on<SolveDisprovenByOwner>(_onSolveDisprovenByOwner);
   }
 
+  final IssueRepository issueRepository;
+  final AuthRepository authRepository;
+  StreamSubscription<Issue>? _focusedIssueSubscription;
+  Issue? _focusedIssue;
+  String? _currentIssueId;
+
   Issue? get focusedIssue => _focusedIssue;
 
   Future<void> _fetchIssues(
@@ -65,7 +65,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _addNewIssue(
+  Future<void> _addNewIssue(
     NewIssueCreated event,
     Emitter<IssueState> emit,
   ) async {
@@ -85,7 +85,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onIssueDeletionRequested(
+  Future<void> _onIssueDeletionRequested(
     IssueDeletionRequested event,
     Emitter<IssueState> emit,
   ) async {
@@ -105,7 +105,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onFocusIssueSelected(
+  Future<void> _onFocusIssueSelected(
     FocusIssueSelected event,
     Emitter<IssueState> emit,
   ) async {
@@ -116,30 +116,35 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
 
     // Start listening to the focused issue stream
     _focusedIssueSubscription =
-        issueRepository.getFocusedIssueStream(event.issueId).listen((issue) {
-      // Store the latest issue from the stream
-      _focusedIssue = issue;
+        issueRepository.getFocusedIssueStream(event.issueId).listen(
+      (issue) {
+        // Store the latest issue from the stream
+        _focusedIssue = issue;
 
-      // Emit the FocusedIssueUpdated event only after _focusedIssue is set
-      // ignore: prefer_const_constructors
-      add(FocusedIssueUpdated(
-          issue)); // Removed 'const' here since we want the updated data
-    }, onError: (error) {
-      emit(IssuesListFailure(error.toString()));
-    });
+        // Emit the FocusedIssueUpdated event only after _focusedIssue is set
+        // ignore: prefer_const_constructors
+        add(
+          FocusedIssueUpdated(
+            issue,
+          ),
+        ); // Removed 'const' here since we want the updated data
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        emit(IssuesListFailure(error.toString()));
+      },
+    );
   }
 
   // Handle the new event when the focused issue is updated
-  void _onFocusedIssueUpdated(
+  Future<void> _onFocusedIssueUpdated(
     FocusedIssueUpdated event,
     Emitter<IssueState> emit,
   ) async {
     final issue = event.focusedIssue;
 
-    List<Hypothesis> hypotheses =
+    final hypotheses =
         await issueRepository.getHypotheses(issue.issueId!).first;
-    List<Solution> solutions =
-        await issueRepository.getSolutions(issue.issueId!).first;
+    final solutions = await issueRepository.getSolutions(issue.issueId!).first;
 
     IssueProcessStage stage;
 
@@ -160,16 +165,16 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     emit(IssueProcessState(stage));
   }
 
-  void _newHypothesisCreated(
+  Future<void> _newHypothesisCreated(
     NewHypothesisCreated event,
     Emitter<IssueState> emit,
   ) async {
     // Get the current issue ID
     final issueId =
-        _currentIssueId; // You'll need to store the current issue ID in the Bloc
+        _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
 
@@ -189,7 +194,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onHypothesisUpdated(
+  Future<void> _onHypothesisUpdated(
     HypothesisUpdated event,
     Emitter<IssueState> emit,
   ) async {
@@ -197,7 +202,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
     try {
@@ -225,13 +230,13 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
-    final Issue? originalIssue = await issueRepository.getIssueById(issueId);
+    final originalIssue = await issueRepository.getIssueById(issueId);
 
     if (originalIssue == null) {
-      emit(const IssuesListFailure("Selected Issue is Null"));
+      emit(const IssuesListFailure('Selected Issue is Null'));
       return;
     }
 
@@ -248,7 +253,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           await issueRepository.getHypothesisById(issueId, event.hypothesisId);
 
       if (hypothesis == null) {
-        emit(const IssuesListFailure("Hypothesis not found"));
+        emit(const IssuesListFailure('Hypothesis not found'));
         return;
       }
 
@@ -272,35 +277,37 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onFocusRootConfirmed(
+  Future<void> _onFocusRootConfirmed(
     FocusRootConfirmed event,
     Emitter<IssueState> emit,
   ) async {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
 
     try {
       // Update the issue's root in Firestore
       await issueRepository.updateIssueRoot(
-          issueId, event.confirmedRootHypothesisId);
+        issueId,
+        event.confirmedRootHypothesisId,
+      );
       // No need to emit a new state; the UI will update via the stream
     } catch (error) {
-      emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
+      emit(IssuesListFailure('Failed to update issue in Firebase: $error'));
     }
   }
 
-  void _onNewSolutionCreated(
+  Future<void> _onNewSolutionCreated(
     NewSolutionCreated event,
     Emitter<IssueState> emit,
   ) async {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
 
@@ -320,14 +327,14 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _onSolutionUpdated(
+  Future<void> _onSolutionUpdated(
     SolutionUpdated event,
     Emitter<IssueState> emit,
   ) async {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
 
@@ -349,14 +356,14 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-  void _focusSolveConfirmed(
+  Future<void> _focusSolveConfirmed(
     FocusSolveConfirmed event,
     Emitter<IssueState> emit,
   ) async {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
 
@@ -365,7 +372,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       await issueRepository.updateIssueSolve(issueId, event.solutionId);
       // No need to emit a new state; the UI will update via the stream
     } catch (error) {
-      emit(IssuesListFailure("Failed to update issue in Firebase: $error"));
+      emit(IssuesListFailure('Failed to update issue in Firebase: $error'));
     }
   }
 
@@ -389,7 +396,10 @@ void _onFocusSolveScopeSubmitted(
     // For example:
 
     // Fetch the solution
-    final solution = await issueRepository.getSolutionById(issueId, event.solutionId);
+    final solution = await issueRepository.getSolutionById(
+    issueId, 
+    event.solutionId,
+    );
 
     if (solution == null) {
       emit(const IssuesListFailure("Solution not found"));
@@ -437,7 +447,10 @@ void _onFocusSolveScopeSubmitted(
 // Check that the current UserId matches the assignedStakeholderUserId
     if (provenSolve.assignedStakeholderUserId != userId) {
       emit(const IssuesListFailure(
-          "You are not the person assigned to this solve and cannot mark it proven."));
+          
+    "You are not the person assigned to this solve and cannot mark it proven.",
+        //  ),
+          );
       return;
     }
 
@@ -484,7 +497,9 @@ void _onFocusSolveScopeSubmitted(
 // Check that the current UserId matches the assignedStakeholderUserId
     if (disprovenSolve.assignedStakeholderUserId != userId) {
       emit(const IssuesListFailure(
-          "You are not the person assigned to this solve and cannot mark it disproven."));
+          
+  "You are not the person assigned to this solve and cannot mark it disproven.",
+  ),);
       return;
     }
 
@@ -516,14 +531,14 @@ void _onFocusSolveScopeSubmitted(
     return super.close();
   }
 
-  void _onNewFactCreated(
+  Future<void> _onNewFactCreated(
     NewFactCreated event,
     Emitter<IssueState> emit,
   ) async {
     final issueId = _currentIssueId;
 
     if (issueId == null) {
-      emit(const IssuesListFailure("No Issue Selected"));
+      emit(const IssuesListFailure('No Issue Selected'));
       return;
     }
 
@@ -535,7 +550,7 @@ void _onFocusSolveScopeSubmitted(
     }
 
     try {
-      // Call the addFact method, passing the necessary arguments including reference object type
+      // Call the addFact method
       await issueRepository.addFact(
         issueId,
         event.referenceObjectType, // Pass the reference object type

@@ -1,3 +1,5 @@
+// ignore_for_file: sort_constructors_first
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +15,8 @@ class SolveSummaryWidget extends StatelessWidget {
   final String issueId;
 
   const SolveSummaryWidget({
-    super.key,
     required this.issueId,
+    super.key,
   });
 
   @override
@@ -41,7 +43,7 @@ class SolveSummaryWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.grey[300] ?? Colors.orange,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 5, color: Colors.black),
+                  border: Border.all(width: 5),
                 ),
                 padding: const EdgeInsets.all(15),
                 child: Row(
@@ -53,9 +55,9 @@ class SolveSummaryWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            padding: EdgeInsets.symmetric(vertical: 8),
                             child: Text(
-                              "Root Theories Considered:",
+                              'Root Theories Considered:',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -68,11 +70,13 @@ class SolveSummaryWidget extends StatelessWidget {
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return const Center(
-                                    child: Text('Error loading hypotheses'));
+                                  child: Text('Error loading hypotheses'),
+                                );
                               }
                               if (!snapshot.hasData) {
                                 return const Center(
-                                    child: CircularProgressIndicator());
+                                  child: CircularProgressIndicator(),
+                                );
                               }
                               final hypotheses = snapshot.data!;
                               return _buildHypothesesList(hypotheses, issue);
@@ -87,9 +91,9 @@ class SolveSummaryWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            padding: EdgeInsets.symmetric(vertical: 8),
                             child: Text(
-                              "Solutions Considered:",
+                              'Solutions Considered:',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -102,11 +106,13 @@ class SolveSummaryWidget extends StatelessWidget {
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return const Center(
-                                    child: Text('Error loading solutions'));
+                                  child: Text('Error loading solutions'),
+                                );
                               }
                               if (!snapshot.hasData) {
                                 return const Center(
-                                    child: CircularProgressIndicator());
+                                  child: CircularProgressIndicator(),
+                                );
                               }
                               final solutions = snapshot.data!;
                               return _buildSolutionsList(solutions, issue);
@@ -139,10 +145,12 @@ class SolveSummaryWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: filteredHypotheses
-            .map((hypothesis) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(hypothesis.desc),
-                ))
+            .map(
+              (hypothesis) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(hypothesis.desc),
+              ),
+            )
             .toList(),
       ),
     );
@@ -161,10 +169,12 @@ class SolveSummaryWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: filteredSolutions
-            .map((solution) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(solution.desc),
-                ))
+            .map(
+              (solution) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(solution.desc),
+              ),
+            )
             .toList(),
       ),
     );
@@ -177,7 +187,7 @@ class SolveSummaryWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.lightBlue[200] ?? Colors.orange,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(width: 5, color: Colors.black),
+          border: Border.all(width: 5),
         ),
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -193,8 +203,9 @@ class SolveSummaryWidget extends StatelessWidget {
                 style: const TextStyle(fontSize: 16, color: Colors.black),
                 children: [
                   const TextSpan(
-                      text: 'I will: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                    text: 'I will: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(
                     text: issue.solve,
                     style: const TextStyle(fontWeight: FontWeight.normal),
@@ -202,32 +213,38 @@ class SolveSummaryWidget extends StatelessWidget {
                       ..onTap = () {
                         // Handle tap on the solution
                         // For example, navigate back to the solution selection
-                        BlocProvider.of<IssueBloc>(context, listen: false).add(
-                            FocusSolveConfirmed(
-                                solutionId: issue.solveSolutionId));
+                        BlocProvider.of<IssueBloc>(context).add(
+                          FocusSolveConfirmed(
+                            solutionId: issue.solveSolutionId,
+                          ),
+                        );
                       },
                   ),
                   const TextSpan(
-                      text: '\n\nResolving that: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                    text: '\n\nResolving that: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(
                     text: issue.root,
                     style: const TextStyle(fontWeight: FontWeight.normal),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         // Handle tap on the root cause
-                        BlocProvider.of<IssueBloc>(context, listen: false).add(
-                            FocusRootConfirmed(
-                                confirmedRootHypothesisId:
-                                    issue.rootHypothesisId));
+                        BlocProvider.of<IssueBloc>(context).add(
+                          FocusRootConfirmed(
+                            confirmedRootHypothesisId: issue.rootHypothesisId,
+                          ),
+                        );
                       },
                   ),
                   const TextSpan(
-                      text: '\n\nChanging that: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                    text: '\n\nChanging that: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   TextSpan(
-                      text: issue.seedStatement,
-                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                    text: issue.seedStatement,
+                    style: const TextStyle(fontWeight: FontWeight.normal),
+                  ),
                   TextSpan(
                     text: '\n\n\nReconsider this Solve',
                     style: const TextStyle(
@@ -240,11 +257,11 @@ class SolveSummaryWidget extends StatelessWidget {
                         final authState = context.read<AuthBloc>().state;
 
                         if (authState is AuthSuccess) {
-                          BlocProvider.of<IssueBloc>(context, listen: false)
+                          BlocProvider.of<IssueBloc>(context)
                               .add(FocusIssueSelected(issueId: issue.issueId!));
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(
+                            MaterialPageRoute<Widget>(
                               builder: (context) =>
                                   IssuePage(issueId: issue.issueId!),
                             ),
@@ -254,15 +271,17 @@ class SolveSummaryWidget extends StatelessWidget {
                           // Handle unauthenticated state
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text(
-                                    'You must be logged in to reconsider the solve.')),
+                              content: Text(
+                              'You must be logged in to reconsider the solve.',
+                              ),
+                            ),
                           );
                         }
                       },
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

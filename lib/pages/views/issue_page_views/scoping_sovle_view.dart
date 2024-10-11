@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 // import 'package:guide_solve/repositories/issue_repository.dart';
 
 class ScopingSolveView extends StatelessWidget {
-  final String issueId;
-  final String solutionId;
   //final TextEditingController _scopeController = TextEditingController();
 
   const ScopingSolveView({
-    super.key,
     required this.issueId,
     required this.solutionId,
+    super.key,
   });
+
+  final String issueId;
+  final String solutionId;
 
   @override
   Widget build(BuildContext context) {
@@ -23,20 +24,20 @@ class ScopingSolveView extends StatelessWidget {
     //final focusedIssue = issueBloc.focusedIssue;
 
     return const Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16),
       child: Column(
         children: [
           //Solution.desc
-          Text("Solution Description"),
+          Text('Solution Description'),
           SizedBox(height: 10),
           //Assigned Stakeholder selection
-          Text("Assigned Stakeholder"),
+          Text('Assigned Stakeholder'),
           SizedBox(height: 10),
           //Due Date for Solution -- date picker
-          Text("Due Date Picker"),
+          Text('Due Date Picker'),
           SizedBox(height: 10),
           //Action Item List
-          Text("Action Item List"),
+          Text('Action Item List'),
         ],
       ),
     );
