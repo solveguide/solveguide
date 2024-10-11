@@ -272,7 +272,7 @@ class SolveSummaryWidget extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                              'You must be logged in to reconsider the solve.',
+                                'Log in to reconsider the solve.',
                               ),
                             ),
                           );
