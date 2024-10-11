@@ -49,7 +49,8 @@ class _ProvenSolvesPageState extends State<ProvenSolvesPage> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute<Widget>(
-                      builder: (context) => const HomePage(),),
+                    builder: (context) => const HomePage(),
+                  ),
                   (route) => false,
                 );
               }

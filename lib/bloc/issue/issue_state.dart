@@ -11,7 +11,6 @@ abstract class IssueState extends Equatable {
 final class IssueInitial extends IssueState {}
 
 final class IssuesListSuccess extends IssueState {
-
   const IssuesListSuccess({required this.issueList});
   final List<Issue> issueList;
 
@@ -22,7 +21,6 @@ final class IssuesListSuccess extends IssueState {
 final class IssuesListLoading extends IssueState {}
 
 final class IssuesListFailure extends IssueState {
-
   const IssuesListFailure(this.error);
   final String error;
 
@@ -32,7 +30,6 @@ final class IssuesListFailure extends IssueState {
 
 // States related to the issue-solving process
 class IssueProcessState extends IssueState {
-
   const IssueProcessState(this.stage);
   final IssueProcessStage stage;
 

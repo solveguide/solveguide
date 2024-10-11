@@ -170,14 +170,12 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.black), // Default text style
               children: const <TextSpan>[
                 TextSpan(
-                  text:
-                      'Your issues persist because solving them requires you '
+                  text: 'Your issues persist because solving them requires you '
                       'to alternate between two different modes of thinking, '
                       'often in coordination with others.\n\n',
                 ),
                 TextSpan(
-                  text:
-                      'Getting out of sync while solving issues together can '
+                  text: 'Getting out of sync while solving issues together can '
                       'lead to offending or misleading your peers without you '
                       'even noticing. ',
                 ),
@@ -186,8 +184,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text:
-                      'Solve Guide coordinates group issue solving. For now '
+                  text: 'Solve Guide coordinates group issue solving. For now '
                       'you can create an account and solve issues solo. '
                       'Multiplayer mode is coming!\n\n',
                 ),
@@ -210,8 +207,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.black), // Default text style
               children: const <TextSpan>[
                 TextSpan(
-                  text:
-                      '\nYou will solve more issues for good if you can '
+                  text: '\nYou will solve more issues for good if you can '
                       'observe reality creatively, '
                       'and navigate it critically.\n\n',
                 ),

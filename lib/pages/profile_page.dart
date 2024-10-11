@@ -27,18 +27,20 @@ class ProfilePage extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthFailure) {
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute<Widget>(
-                  builder: (context) => LoginPage(),
-                ),
-                (route) => false,);
+              context,
+              MaterialPageRoute<Widget>(
+                builder: (context) => LoginPage(),
+              ),
+              (route) => false,
+            );
           } else if (state is AuthInitial) {
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute<Widget>(
-                  builder: (context) => const HomePage(),
-                ),
-                (route) => false,);
+              context,
+              MaterialPageRoute<Widget>(
+                builder: (context) => const HomePage(),
+              ),
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {

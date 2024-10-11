@@ -30,14 +30,16 @@ Widget narrowInstructionText(String boldText, {String? text}) {
         TextSpan(
           text: boldText,
           style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,), // Ensure text color is set
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ), // Ensure text color is set
         ),
         if (text != null) ...[
           TextSpan(
             text: ' $text', // Added space for separation
             style: const TextStyle(
-                color: Colors.black,), // Ensure text color is set
+              color: Colors.black,
+            ), // Ensure text color is set
           ),
         ],
       ],
@@ -59,14 +61,16 @@ Widget widenInstructionText(String boldText, {String? text}) {
         TextSpan(
           text: boldText,
           style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,), // Ensure text color is set
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ), // Ensure text color is set
         ),
         if (text != null) ...[
           TextSpan(
             text: ' $text', // Added space for separation
             style: const TextStyle(
-                color: Colors.black,), // Ensure text color is set
+              color: Colors.black,
+            ), // Ensure text color is set
           ),
         ],
       ],

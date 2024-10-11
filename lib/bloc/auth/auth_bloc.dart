@@ -9,7 +9,6 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-
   AuthBloc({required AuthRepository authRepository})
       : _authRepository = authRepository,
         super(const AuthInitial()) {
@@ -46,7 +45,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     try {
       final user = await _authRepository.signInWithEmailAndPassword(
-          event.email, event.password,);
+        event.email,
+        event.password,
+      );
       emit(AuthSuccess(uid: user!.uid));
     } catch (error) {
       emit(AuthFailure(error.toString()));
@@ -80,7 +81,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     try {
       final user = await _authRepository.registerWithEmailAndPassword(
-          event.email, event.password,);
+        event.email,
+        event.password,
+      );
       emit(AuthSuccess(uid: user!.uid));
     } catch (error) {
       emit(AuthFailure(error.toString()));
@@ -88,7 +91,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onAnnonymousUserBlocked(
-      AnnonymousUserBlocked event, Emitter<AuthState> emit,) async {
+    AnnonymousUserBlocked event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       final currentUser = await _authRepository.getCurrentUser();
       emit(AuthSuccess(uid: currentUser.uid));

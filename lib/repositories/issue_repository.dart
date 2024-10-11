@@ -141,8 +141,7 @@ class IssueRepository {
       if (currentIssue == null) {
         throw Exception('Issue is null');
       }
-      final rootHypothesis =
-          await getHypothesisById(issueId, rootHypothesisId);
+      final rootHypothesis = await getHypothesisById(issueId, rootHypothesisId);
       final updatedRoot = rootHypothesis!.desc;
       final updatedIssue = currentIssue.copyWith(
         root: updatedRoot,
@@ -236,8 +235,7 @@ SUBCOLLECTION FUNCTIONS
           _issuesCollection.doc(issueId).collection('hypotheses');
 
       // Add the hypothesis document
-      final docRef =
-          await hypothesesRef.add(newHypothesis.toJson());
+      final docRef = await hypothesesRef.add(newHypothesis.toJson());
 
       // Update the hypothesisId field with the generated document ID
       await docRef.update({'hypothesisId': docRef.id});

@@ -1,6 +1,7 @@
 // ignore_for_file: always_put_required_named_parameters_first
 
-class Hypothesis { // A map to store user votes (userId -> voteValue)
+class Hypothesis {
+  // A map to store user votes (userId -> voteValue)
 
   Hypothesis({
     this.hypothesisId,
@@ -16,19 +17,21 @@ class Hypothesis { // A map to store user votes (userId -> voteValue)
   });
 
   // Create a Hypothesis from a Map
-factory Hypothesis.fromJson(Map<String, dynamic> json) => Hypothesis(
-  hypothesisId: json['hypothesisId'] as String?,
-  ownerId: json['ownerId'] as String,
-  desc: json['desc'] as String,
-  isRoot: json['isRoot'] as bool? ?? false,
-  isSpinoffIssue: json['isSpinoffIssue'] as bool? ?? false,
-  spinoffIssueId: json['spinoffIssueId'] as String?,
-  rank: json['rank'] as int? ?? 0,
-  createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
-  lastUpdatedTimestamp: DateTime.parse(json['lastUpdatedTimestamp'] as String),
-  votes: Map<String, String>.from(json['votes'] as Map<String, dynamic>? ?? {}),
-);
-
+  factory Hypothesis.fromJson(Map<String, dynamic> json) => Hypothesis(
+        hypothesisId: json['hypothesisId'] as String?,
+        ownerId: json['ownerId'] as String,
+        desc: json['desc'] as String,
+        isRoot: json['isRoot'] as bool? ?? false,
+        isSpinoffIssue: json['isSpinoffIssue'] as bool? ?? false,
+        spinoffIssueId: json['spinoffIssueId'] as String?,
+        rank: json['rank'] as int? ?? 0,
+        createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
+        lastUpdatedTimestamp:
+            DateTime.parse(json['lastUpdatedTimestamp'] as String),
+        votes: Map<String, String>.from(
+          json['votes'] as Map<String, dynamic>? ?? {},
+        ),
+      );
 
   String? hypothesisId;
   final String ownerId; // ID of the user who owns the hypothesis

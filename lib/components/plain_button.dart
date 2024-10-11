@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PlainButton extends StatelessWidget { // Optional color parameter
+class PlainButton extends StatelessWidget {
+  // Optional color parameter
 
   const PlainButton({
-    required this.onPressed, required this.text, super.key,
+    required this.onPressed,
+    required this.text,
+    super.key,
     this.color, // Add color to the constructor
   });
 

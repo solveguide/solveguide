@@ -140,7 +140,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute<Widget>(
-                      builder: (context) => const HomePage(),),
+                    builder: (context) => const HomePage(),
+                  ),
                   (route) => false,
                 );
               }

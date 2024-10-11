@@ -170,8 +170,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     Emitter<IssueState> emit,
   ) async {
     // Get the current issue ID
-    final issueId =
-        _currentIssueId;
+    final issueId = _currentIssueId;
 
     if (issueId == null) {
       emit(const IssuesListFailure('No Issue Selected'));

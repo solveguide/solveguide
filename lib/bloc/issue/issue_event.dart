@@ -16,7 +16,6 @@ final class IssuesFetched extends IssueEvent {
 }
 
 final class NewIssueCreated extends IssueEvent {
-
   const NewIssueCreated({
     required this.seedStatement,
   });
@@ -27,7 +26,6 @@ final class NewIssueCreated extends IssueEvent {
 }
 
 final class IssueDeletionRequested extends IssueEvent {
-
   const IssueDeletionRequested({
     required this.issueId,
   });
@@ -43,7 +41,6 @@ THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
 
 */
 final class FocusIssueSelected extends IssueEvent {
-
   const FocusIssueSelected({
     required this.issueId,
   });
@@ -54,7 +51,6 @@ final class FocusIssueSelected extends IssueEvent {
 }
 
 class FocusedIssueUpdated extends IssueEvent {
-
   const FocusedIssueUpdated(this.focusedIssue);
   final Issue focusedIssue;
 
@@ -63,7 +59,6 @@ class FocusedIssueUpdated extends IssueEvent {
 }
 
 final class NewHypothesisCreated extends IssueEvent {
-
   const NewHypothesisCreated({
     required this.newHypothesis,
   });
@@ -74,7 +69,6 @@ final class NewHypothesisCreated extends IssueEvent {
 }
 
 class HypothesisUpdated extends IssueEvent {
-
   const HypothesisUpdated({
     required this.hypothesisId,
     required this.updatedDescription,
@@ -87,7 +81,6 @@ class HypothesisUpdated extends IssueEvent {
 }
 
 class CreateSeparateIssueFromHypothesis extends IssueEvent {
-
   const CreateSeparateIssueFromHypothesis({
     required this.hypothesisId,
     required this.newIssuePrioritized,
@@ -100,7 +93,6 @@ class CreateSeparateIssueFromHypothesis extends IssueEvent {
 }
 
 final class FocusRootConfirmed extends IssueEvent {
-
   const FocusRootConfirmed({
     required this.confirmedRootHypothesisId,
   });
@@ -111,7 +103,6 @@ final class FocusRootConfirmed extends IssueEvent {
 }
 
 final class NewSolutionCreated extends IssueEvent {
-
   const NewSolutionCreated({
     required this.newSolution,
   });
@@ -122,7 +113,6 @@ final class NewSolutionCreated extends IssueEvent {
 }
 
 class SolutionUpdated extends IssueEvent {
-
   const SolutionUpdated({
     required this.solutionId,
     required this.updatedDescription,
@@ -135,7 +125,6 @@ class SolutionUpdated extends IssueEvent {
 }
 
 final class FocusSolveScopeSubmitted extends IssueEvent {
-
   const FocusSolveScopeSubmitted({
     required this.solutionId,
   });
@@ -146,7 +135,6 @@ final class FocusSolveScopeSubmitted extends IssueEvent {
 }
 
 final class FocusSolveConfirmed extends IssueEvent {
-
   const FocusSolveConfirmed({required this.solutionId});
   final String solutionId;
 
@@ -155,7 +143,6 @@ final class FocusSolveConfirmed extends IssueEvent {
 }
 
 final class NewFactCreated extends IssueEvent {
-
   const NewFactCreated({
     required this.newFact,
     required this.newFactContext,
@@ -165,8 +152,7 @@ final class NewFactCreated extends IssueEvent {
   final String newFact; // The fact description
   final String newFactContext; // Context or reasoning for the fact
   final String referenceObjectId; // The ID of the object being referenced
-  final ReferenceObjectType
-      referenceObjectType;
+  final ReferenceObjectType referenceObjectType;
 
   @override
   List<Object?> get props =>
@@ -180,7 +166,6 @@ THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS
 */
 
 final class SolveProvenByOwner extends IssueEvent {
-
   const SolveProvenByOwner({
     required this.issue,
   });
@@ -191,7 +176,6 @@ final class SolveProvenByOwner extends IssueEvent {
 }
 
 final class SolveDisprovenByOwner extends IssueEvent {
-
   const SolveDisprovenByOwner({
     required this.issue,
   });

@@ -42,11 +42,12 @@ class LoginPage extends StatelessWidget {
 
           if (state is AuthSuccess) {
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute<Widget>(
-                  builder: (context) => const DashboardPage(),
-                ),
-                (route) => false,);
+              context,
+              MaterialPageRoute<Widget>(
+                builder: (context) => const DashboardPage(),
+              ),
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {

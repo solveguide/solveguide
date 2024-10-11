@@ -5,7 +5,7 @@ class HelpTextWidget extends StatelessWidget {
     required this.helpText,
     super.key,
   });
-  
+
   final String helpText;
 
   @override
