@@ -62,12 +62,12 @@ abstract class AppColors {
   /// Red material color.
   static const MaterialColor red = Colors.red;
 
-    /// Issue Solving Blue.
+  /// Issue Solving Blue for agreed on items.
   static const Color consensus = Color.fromARGB(255, 129, 212, 250);
 
-      /// Issue Solving Blue.
+  /// Issue Solving grey for public items.
   static const Color public = Color.fromARGB(255, 224, 224, 224);
 
-      /// Issue Solving Blue.
+  /// Issue Solving white for private items.
   static const Color private = Color(0xFFFFFFFF);
 }
