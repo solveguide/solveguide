@@ -105,7 +105,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-void _onFocusIssueSelected(
+  void _onFocusIssueSelected(
     FocusIssueSelected event,
     Emitter<IssueState> emit,
   ) async {
@@ -119,10 +119,11 @@ void _onFocusIssueSelected(
         issueRepository.getFocusedIssueStream(event.issueId).listen((issue) {
       // Store the latest issue from the stream
       _focusedIssue = issue;
-      
+
       // Emit the FocusedIssueUpdated event only after _focusedIssue is set
       // ignore: prefer_const_constructors
-      add(FocusedIssueUpdated(issue)); // Removed 'const' here since we want the updated data
+      add(FocusedIssueUpdated(
+          issue)); // Removed 'const' here since we want the updated data
     }, onError: (error) {
       emit(IssuesListFailure(error.toString()));
     });

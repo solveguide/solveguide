@@ -17,45 +17,43 @@ class IssueRepository {
       FirebaseFirestore.instance.collection('issues');
 
 // Get stream of issues where currentUserId is listed in the invitedUserIds map
-Stream<List<Issue>> getIssuesStream(String currentUserId) {
-  return _issuesCollection
-      .where('invitedUserIds', arrayContains: currentUserId) 
-      .snapshots()
-      .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          return Issue.fromJson(doc.data() as Map<String, dynamic>);
-        }).toList();
-      }).handleError((error) {
-        throw error.toString();
-      });
-}
-
+  Stream<List<Issue>> getIssuesStream(String currentUserId) {
+    return _issuesCollection
+        .where('invitedUserIds', arrayContains: currentUserId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }).handleError((error) {
+      throw error.toString();
+    });
+  }
 
 //Get snapshot of list of issues owned by current user// Get snapshot of list of issues where currentUserId is listed in the invitedUserIds map
-Future<List<Issue>> getIssueList(String currentUserId) async {
-  try {
-    // Fetch the snapshot from Firestore
-    final snapshot = await _issuesCollection
-        .where('invitedUserIds', arrayContains: currentUserId) // Querying the list, not the map
-        .get();
+  Future<List<Issue>> getIssueList(String currentUserId) async {
+    try {
+      // Fetch the snapshot from Firestore
+      final snapshot = await _issuesCollection
+          .where('invitedUserIds',
+              arrayContains: currentUserId) // Querying the list, not the map
+          .get();
 
-    // Convert the snapshot into a List of Issue objects
-    List<Issue> issuesList = snapshot.docs.map((doc) {
-      return Issue.fromJson(doc.data() as Map<String, dynamic>);
-    }).toList();
+      // Convert the snapshot into a List of Issue objects
+      List<Issue> issuesList = snapshot.docs.map((doc) {
+        return Issue.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
 
-    // Sort the list by the lastUpdatedTimestamp field
-    issuesList.sort(
-        (a, b) => b.lastUpdatedTimestamp.compareTo(a.lastUpdatedTimestamp));
+      // Sort the list by the lastUpdatedTimestamp field
+      issuesList.sort(
+          (a, b) => b.lastUpdatedTimestamp.compareTo(a.lastUpdatedTimestamp));
 
-    return issuesList;
-  } catch (error) {
-    // Handle any errors that occur
-    throw error.toString();
+      return issuesList;
+    } catch (error) {
+      // Handle any errors that occur
+      throw error.toString();
+    }
   }
-}
-
-
 
   // Stream of the focused issue
   Stream<Issue> getFocusedIssueStream(String issueId) {
@@ -80,26 +78,25 @@ Future<List<Issue>> getIssueList(String currentUserId) async {
   }
 
 // Create an issue
-Future<void> addIssue(String seedStatement, String ownerId) async {
-  final newIssue = Issue(
-    label: seedStatement,
-    seedStatement: seedStatement,
-    ownerId: ownerId, // Use ownerId from AuthState
-    createdTimestamp: DateTime.now(),
-    lastUpdatedTimestamp: DateTime.now(),
-    invitedUserIds: [ownerId],
-  );
-  try {
-    // Add the issue to the Firestore collection
-    final docRef = await _issuesCollection.add(newIssue.toJson());
+  Future<void> addIssue(String seedStatement, String ownerId) async {
+    final newIssue = Issue(
+      label: seedStatement,
+      seedStatement: seedStatement,
+      ownerId: ownerId, // Use ownerId from AuthState
+      createdTimestamp: DateTime.now(),
+      lastUpdatedTimestamp: DateTime.now(),
+      invitedUserIds: [ownerId],
+    );
+    try {
+      // Add the issue to the Firestore collection
+      final docRef = await _issuesCollection.add(newIssue.toJson());
 
-    // Update the issue with the generated Firestore document ID
-    await docRef.update({'issueId': docRef.id});
-  } catch (error) {
-    throw error.toString();
+      // Update the issue with the generated Firestore document ID
+      await docRef.update({'issueId': docRef.id});
+    } catch (error) {
+      throw error.toString();
+    }
   }
-}
-
 
   // Spinoff an issue
   Future<String> addSpinoffIssue(

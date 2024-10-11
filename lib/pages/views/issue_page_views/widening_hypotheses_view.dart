@@ -60,7 +60,7 @@ class WideningHypothesesView extends StatelessWidget {
                   itemCount: hypotheses.length,
                   itemBuilder: (context, index) {
                     final hypothesis = hypotheses[index];
-                    String dropdownValue = "";
+                    String dropdownValue = "Agree";
                     return ListTile(
                       title: Text(hypothesis.desc),
                       trailing: DropdownButton(
