@@ -1,8 +1,6 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
-
 /// {@template app_theme}
 /// The Default App [ThemeData].
 /// {@endtemplate}
@@ -14,7 +12,7 @@ class AppTheme {
   Brightness get brightness => Brightness.light;
 
   /// Defines the primary color of theme.
-  Color get primary => AppColors.deepBlue;
+  Color get primary => AppColors.lightBlue;
 
   /// Defines light [ThemeData].
   ShadThemeData get theme => ShadThemeData(

@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
@@ -8,8 +9,8 @@ import 'package:guide_solve/pages/login_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
-import 'package:guide_solve/themes/light_mode.dart';
 import 'package:provider/provider.dart';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -36,9 +37,27 @@ class MyApp extends StatelessWidget {
           create: (context) => IssueBloc(issueRepository, authRepository),
         ),
       ],
-      child: MaterialApp(
+      child: ShadApp.material(
         debugShowCheckedModeBanner: false,
-        theme: lightMode,
+        title: 'Solve Guide',
+        theme: const AppTheme().theme,
+        darkTheme: const AppDarkTheme().theme,
+        materialThemeBuilder: (context, theme){
+          return theme.copyWith(
+            appBarTheme: const AppBarTheme(
+              surfaceTintColor: AppColors.transparent,
+            ),
+            textTheme: theme.brightness == Brightness.light
+              ? const AppTheme().textTheme
+              : const AppDarkTheme().textTheme,
+            snackBarTheme: const SnackBarThemeData(
+              behavior: SnackBarBehavior.floating,
+            ),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              type: BottomNavigationBarType.fixed,
+            ),
+          );
+        },
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthSuccess) {
