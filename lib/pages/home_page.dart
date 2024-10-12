@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors,
 //  prefer_const_literals_to_create_immutables
 
+import 'package:app_ui/app_ui.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final demoIssueLabel = TextEditingController();
   bool isButtonEnabled = false; // Tracks whether demo button can be clicked
+  bool demoFunctional = false;
 
   @override
   void initState() {
@@ -50,21 +52,20 @@ class _HomePageState extends State<HomePage> {
   //UI
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.orange[50],
-      appBar: AppBar(
-        backgroundColor: Colors.orange[50],
-        title: Text('Home'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: ListView(
-          children: [
-            _buildMainContainer(),
-            SizedBox(height: 10),
-            _buildCenterContainer(),
-          ],
-        ),
+    return AppScaffold(
+      // backgroundColor: Colors.orange[50],
+      // appBar: AppBar(
+      //   backgroundColor: Colors.orange[50],
+      //   title: Text('Home'),
+      // ),
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
+      body: ListView(
+        children: [
+          _buildMainContainer(),
+          SizedBox(height: 10),
+          if (demoFunctional) _buildCenterContainer(),
+        ],
       ),
     );
   }
@@ -159,7 +160,7 @@ class _HomePageState extends State<HomePage> {
     return BoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(width: 5),
+      border: Border.all(),
     );
   }
 

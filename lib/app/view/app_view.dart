@@ -11,7 +11,6 @@ import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:provider/provider.dart';
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -40,16 +39,17 @@ class MyApp extends StatelessWidget {
       child: ShadApp.material(
         debugShowCheckedModeBanner: false,
         title: 'Solve Guide',
+        themeMode: ThemeMode.light,
         theme: const AppTheme().theme,
         darkTheme: const AppDarkTheme().theme,
-        materialThemeBuilder: (context, theme){
+        materialThemeBuilder: (context, theme) {
           return theme.copyWith(
             appBarTheme: const AppBarTheme(
               surfaceTintColor: AppColors.transparent,
             ),
             textTheme: theme.brightness == Brightness.light
-              ? const AppTheme().textTheme
-              : const AppDarkTheme().textTheme,
+                ? const AppTheme().textTheme
+                : const AppDarkTheme().textTheme,
             snackBarTheme: const SnackBarThemeData(
               behavior: SnackBarBehavior.floating,
             ),

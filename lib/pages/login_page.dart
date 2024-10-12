@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
@@ -24,12 +25,13 @@ class LoginPage extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.orange[50],
+    return AppScaffold(
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: Colors.orange[50],
-        title: const Text('Login/Register'),
-      ),
+          //backgroundColor: Colors.orange[50],
+          //title: const Text('Login/Register'),
+          ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {

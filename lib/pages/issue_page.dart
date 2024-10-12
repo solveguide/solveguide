@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
@@ -13,21 +14,17 @@ class IssuePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Start listening to the focused issue when the page is built
     context.read<IssueBloc>().add(FocusIssueSelected(issueId: issueId));
-    final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
-
-    // Access the current focused issue directly from the bloc
-    final focusedIssue = issueBloc.focusedIssue;
-
-    return Scaffold(
+    return AppScaffold(
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Issue in Focus'),
-        backgroundColor: Colors.orange[50],
       ),
-      backgroundColor: Colors.orange[50],
       drawer: const MyNavigationDrawer(),
       body: BlocBuilder<IssueBloc, IssueState>(
         builder: (context, state) {
           if (state is IssueProcessState) {
+            final focusedIssue = context.read<IssueBloc>().focusedIssue;
             switch (state.stage) {
               case IssueProcessStage.wideningHypotheses:
                 return WideningHypothesesView(issueId: issueId);

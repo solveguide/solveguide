@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
@@ -117,19 +118,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.orange[50],
+    return AppScaffold(
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Dashboard'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              BlocProvider.of<AuthBloc>(context)
-                  .add(const AuthLogoutRequested());
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
       ),
       drawer: const MyNavigationDrawer(),
       body: MultiBlocListener(

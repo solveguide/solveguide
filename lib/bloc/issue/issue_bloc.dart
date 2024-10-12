@@ -44,6 +44,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   String? _currentIssueId;
 
   Issue? get focusedIssue => _focusedIssue;
+  StreamSubscription<Issue>? get focusedIssueStream => 
+    _focusedIssueSubscription;
 
   Future<void> _fetchIssues(
     IssuesFetched event,
