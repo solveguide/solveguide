@@ -5,11 +5,27 @@ import 'package:guide_solve/components/narrow_wide.dart';
 class ProcessStatusBar extends StatelessWidget {
   const ProcessStatusBar({
     required this.currentStage,
+    required this.onSegmentTapped,
+    required this.completedStages,
+    required this.conflictStages,
+    required this.disabledStages,
     super.key,
   });
 
   // currentStage is an integer from 0 to 3 representing the progress
   final int currentStage;
+
+  // Callback for when a segment is tapped
+  final void Function(int index) onSegmentTapped;
+
+  // List of stages that have conflicts, will be highlighted with conflict color
+  final List<int> conflictStages;
+
+  // List of stages that are disabled
+  final List<int> disabledStages;
+
+  // List of stages that are completed
+  final List<int> completedStages;
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +34,10 @@ class ProcessStatusBar extends StatelessWidget {
 
     // List of icons representing the process
     final processIcons = [
-      widenIcon(), // Widening Hypotheses
-      narrowIcon(), // Narrowing to Root Cause
-      widenIcon(), // Widening Solutions
-      narrowIcon(), // Narrowing to Solve
+      widenIcon(size: 16), // Widening Hypotheses
+      narrowIcon(size: 16), // Narrowing to Root Cause
+      widenIcon(size: 16), // Widening Solutions
+      narrowIcon(size: 16), // Narrowing to Solve
     ];
 
     return Column(
@@ -31,49 +47,50 @@ class ProcessStatusBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(4, (index) {
             final isActive = currentStage == index;
+            final hasConflict = conflictStages.contains(index);
+            final isDisabled = disabledStages.contains(index);
+            final isCompleted = completedStages.contains(index);
 
             return Expanded(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                //spacing between segments
-                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
-                padding:
-                    EdgeInsets.all(isActive ? AppSpacing.xs : AppSpacing.xxs),
-                decoration: BoxDecoration(
-                  color:
-                      isActive ? theme.primaryColor : theme.primaryColorLight,
-                  borderRadius: BorderRadius.horizontal(
-                    left: index == 0 ? const Radius.circular(100) : Radius.zero,
-                    right:
-                        index == 3 ? const Radius.circular(100) : Radius.zero,
+              child: GestureDetector(
+                onTap: isDisabled ? null : () => onSegmentTapped(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                  padding: const EdgeInsets.all(AppSpacing.xxs),
+                  decoration: BoxDecoration(
+                    color: isDisabled
+                        ? theme.disabledColor
+                        : isCompleted
+                            ? theme.primaryColorLight
+                            : theme.scaffoldBackgroundColor,
+                    border: Border.all(
+                      color: hasConflict
+                          ? AppColors.conflictLight
+                          : (isActive
+                              ? theme.primaryColorDark
+                              : AppColors.darkGrey),
+                      width: isActive ? 4.0 : 1.0,
+                    ),
+                    borderRadius: BorderRadius.horizontal(
+                      left:
+                          index == 0 ? const Radius.circular(100) : Radius.zero,
+                      right: index == 3
+                          ? const Radius.circular(100)
+                          : Radius.zero,
+                    ),
                   ),
-                ),
-                child: Column(
-                  children: [
-                    processIcons[index], // Custom icons
-                  ],
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      processIcons[index], // Custom icons
+                    ],
+                  ),
                 ),
               ),
             );
           }),
-        ),
-
-        const SizedBox(height: 10),
-
-        // Root/Solve labels below the segments
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              'Root',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(width: 60), // Space between Root and Solve
-            Text(
-              'Solve',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
         ),
       ],
     );

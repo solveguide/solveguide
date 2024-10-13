@@ -44,7 +44,6 @@ class IssueProcessState extends IssueState {
   List<Object?> get props => [stage, hypothesesStream, solutionsStream];
 }
 
-
 enum IssueProcessStage {
   wideningHypotheses,
   establishingFacts,

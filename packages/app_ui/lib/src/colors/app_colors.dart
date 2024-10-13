@@ -70,4 +70,10 @@ abstract class AppColors {
 
   /// Issue Solving white for private items.
   static const Color private = Color(0xFFFFFFFF);
+
+  /// Issue Solving red for consensus conflicts.
+  static const Color conflict = Colors.red;
+
+  /// Issue Solving light red for consensus conflicts.
+  static const Color conflictLight = Colors.redAccent;
 }

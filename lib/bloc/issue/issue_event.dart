@@ -142,6 +142,14 @@ final class FocusSolveConfirmed extends IssueEvent {
   List<Object?> get props => [solutionId];
 }
 
+final class FocusIssueNavigationRequested extends IssueEvent {
+  const FocusIssueNavigationRequested({required this.stage});
+  final IssueProcessStage stage;
+
+  @override
+  List<Object?> get props => [stage];
+}
+
 final class NewFactCreated extends IssueEvent {
   const NewFactCreated({
     required this.newFact,

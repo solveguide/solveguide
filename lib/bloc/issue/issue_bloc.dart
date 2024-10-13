@@ -31,6 +31,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<SolutionUpdated>(_onSolutionUpdated);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<NewFactCreated>(_onNewFactCreated);
+    on<FocusIssueNavigationRequested>(_onFocusIssueNavigationRequested);
     //on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
     //Solution Proving Events
     //on<SolveProvenByOwner>(_onSolveProvenByOwner);
@@ -193,6 +194,26 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         const IssueProcessState(stage: IssueProcessStage.solveSummaryReview),
       );
     }
+  }
+
+    FutureOr<void> _onFocusIssueNavigationRequested(
+    FocusIssueNavigationRequested event,
+    Emitter<IssueState> emit,
+  ) {
+    final stage = event.stage;
+
+    // Get the appropriate streams for the current issue
+    final hypothesesStream = issueRepository.getHypotheses(_currentIssueId!);
+    final solutionsStream = issueRepository.getSolutions(_currentIssueId!);
+
+    emit(
+        IssueProcessState(
+          stage: stage,
+          hypothesesStream: hypothesesStream,
+          solutionsStream: solutionsStream,
+    ),);
+
+
   }
 
   Future<void> _newHypothesisCreated(
@@ -594,4 +615,6 @@ void _onFocusSolveScopeSubmitted(
       emit(IssuesListFailure(error.toString()));
     }
   }
+
+
 }

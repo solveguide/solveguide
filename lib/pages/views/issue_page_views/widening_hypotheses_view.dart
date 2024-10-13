@@ -32,29 +32,75 @@ class WideningHypothesesView extends StatelessWidget {
                 return Expanded(
                   child: Column(
                     children: [
-                      const ProcessStatusBar(currentStage: 0),
+                      //Issue Status & Navigation
+                      _issueProcessNav(context),
+                      const SizedBox(height: AppSpacing.lg),
                       // Consensus IssueOwner noticed the seedStatement
-                      Text(focusedIssue.seedStatement),
-                      const SizedBox(height: AppSpacing.md),
-
-                      // Widening User Input
-                      TextField(
-                        controller: _textController,
-                        decoration: const InputDecoration(
-                          labelText: 'What is the root issue?',
-                          hintText: 'Enter theories here.',
+                      SizedBox(
+                        width: 575,
+                        child: Text(
+                          '${focusedIssue.ownerId} noticed:',
+                          style: UITextStyle.overline,
+                          textAlign: TextAlign.left,
                         ),
-                        onSubmitted: (value) {
-                          if (value.isNotEmpty) {
-                            context.read<IssueBloc>().add(
-                                  NewHypothesisCreated(newHypothesis: value),
-                                );
-                            _textController.clear();
-                          }
-                        },
+                      ),
+                      const SizedBox(height: AppSpacing.xxxs),
+                      ShadCard(
+                        width: 600,
+                        title: Text(
+                          focusedIssue.seedStatement,
+                          style: UITextStyle.headline6,
+                        ),
+                        description: const Text(
+                          'What are all the possible root issues '
+                          'contributing in part or in whole to this?',
+                        ),
+                        backgroundColor: AppColors.consensus,
                       ),
                       const SizedBox(height: AppSpacing.md),
 
+                      // Widening User Input
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 800),
+                        child: ShadInput(
+                          controller: _textController,
+                          placeholder: const Text('Enter theories here.'),
+                          keyboardType: TextInputType.text,
+                          onSubmitted: (value) => {
+                            if (value.isNotEmpty)
+                              {
+                                context.read<IssueBloc>().add(
+                                  NewHypothesisCreated(
+                                    newHypothesis: value,
+                                  ),
+                                ),
+                              },
+                            _textController.clear(),
+                          },
+                          suffix: ShadButton(
+                            width: 24,
+                            height: 24,
+                            padding: EdgeInsets.zero,
+                            backgroundColor: AppColors.public,
+                            decoration: const ShadDecoration(
+                              secondaryBorder: ShadBorder.none,
+                              secondaryFocusedBorder: ShadBorder.none,
+                            ),
+                            icon: const Icon(Icons.check),
+                            onPressed: () {
+                              if (_textController.text.isNotEmpty) {
+                                context.read<IssueBloc>().add(
+                                      NewHypothesisCreated(
+                                        newHypothesis: _textController.text,
+                                      ),
+                                    );
+                                _textController.clear();
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
                       // Widening Options so far (Hypotheses list)
                       Expanded(
                         child: BlocBuilder<IssueBloc, IssueState>(
@@ -131,6 +177,42 @@ class WideningHypothesesView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Row _issueProcessNav(BuildContext context) {
+    return Row(
+      children: [
+        const Spacer(),
+        Expanded(
+          flex: 3,
+          child: ProcessStatusBar(
+            currentStage: 0,
+            onSegmentTapped: (index) {
+              var stage = IssueProcessStage.wideningHypotheses;
+              switch (index) {
+                case 0:
+                  stage = IssueProcessStage.wideningHypotheses;
+                case 1:
+                  stage = IssueProcessStage.narrowingToRootCause;
+                case 2:
+                  stage = IssueProcessStage.wideningSolutions;
+                case 3:
+                  stage = IssueProcessStage.narrowingToSolve;
+              }
+              BlocProvider.of<IssueBloc>(context).add(
+                FocusIssueNavigationRequested(
+                  stage: stage,
+                ),
+              );
+            },
+            conflictStages: const [1],
+            disabledStages: const [3],
+            completedStages: const [0],
+          ),
+        ),
+        const Spacer(),
+      ],
     );
   }
 }
