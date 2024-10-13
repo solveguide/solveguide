@@ -30,12 +30,20 @@ final class IssuesListFailure extends IssueState {
 
 // States related to the issue-solving process
 class IssueProcessState extends IssueState {
-  const IssueProcessState(this.stage);
+  const IssueProcessState({
+    required this.stage,
+    this.hypothesesStream,
+    this.solutionsStream,
+  });
+
   final IssueProcessStage stage;
+  final Stream<List<Hypothesis>>? hypothesesStream;
+  final Stream<List<Solution>>? solutionsStream;
 
   @override
-  List<Object?> get props => [stage];
+  List<Object?> get props => [stage, hypothesesStream, solutionsStream];
 }
+
 
 enum IssueProcessStage {
   wideningHypotheses,

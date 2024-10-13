@@ -36,17 +36,16 @@ class ProcessStatusBar extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 //spacing between segments
-                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs), 
-                padding: 
-                  EdgeInsets.all(isActive ? AppSpacing.xs : AppSpacing.xxs),
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                padding:
+                    EdgeInsets.all(isActive ? AppSpacing.xs : AppSpacing.xxs),
                 decoration: BoxDecoration(
-                  color: isActive
-                      ? theme.primaryColor
-                      : theme.primaryColorLight,
+                  color:
+                      isActive ? theme.primaryColor : theme.primaryColorLight,
                   borderRadius: BorderRadius.horizontal(
                     left: index == 0 ? const Radius.circular(100) : Radius.zero,
-                    right: 
-                      index == 3 ? const Radius.circular(100) : Radius.zero,
+                    right:
+                        index == 3 ? const Radius.circular(100) : Radius.zero,
                   ),
                 ),
                 child: Column(

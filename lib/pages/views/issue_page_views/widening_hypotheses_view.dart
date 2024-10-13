@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
-import 'package:guide_solve/repositories/issue_repository.dart';
 
 class WideningHypothesesView extends StatelessWidget {
   WideningHypothesesView({
@@ -30,7 +29,7 @@ class WideningHypothesesView extends StatelessWidget {
                 if (focusedIssue == null) {
                   return const Text('No seed statement available...');
                 }
-                return Flexible(
+                return Expanded(
                   child: Column(
                     children: [
                       const ProcessStatusBar(currentStage: 0),
@@ -58,53 +57,66 @@ class WideningHypothesesView extends StatelessWidget {
 
                       // Widening Options so far (Hypotheses list)
                       Expanded(
-                        child: StreamBuilder<List<Hypothesis>>(
-                          stream: context
-                              .read<IssueRepository>()
-                              .getHypotheses(issueId),
-                          builder: (context, hypothesesSnapshot) {
-                            if (hypothesesSnapshot.hasError) {
-                              return const Center(
-                                  child: Text('Error loading hypotheses'),
-                              );
-                            }
-                            if (!hypothesesSnapshot.hasData) {
-                              return const Center(
-                                child: Text('Submit a root issue theory.'),
-                              );
-                            }
-                            final hypotheses = hypothesesSnapshot.data!;
-                            return ListView.builder(
-                              itemCount: hypotheses.length,
-                              itemBuilder: (context, index) {
-                                final hypothesis = hypotheses[index];
-                                const dropdownValue = 'Agree';
-                                return ListTile(
-                                  title: Text(hypothesis.desc),
-                                  trailing: DropdownButton(
-                                    items: const [
-                                      DropdownMenuItem(
-                                        value: 'Agree',
-                                        child: Text('Agree'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'Disagree',
-                                        child: Text('Disagree'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'Modify',
-                                        child: Text('Modify'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'Spinoff',
-                                        child: Text('Spinoff'),
-                                      ),
-                                    ],
-                                    value: dropdownValue,
-                                    onChanged: null,
-                                  ),
+                        child: BlocBuilder<IssueBloc, IssueState>(
+                          builder: (context, state) {
+                            if (state is IssueProcessState) {
+                              final hypothesesStream = state.hypothesesStream;
+
+                              if (hypothesesStream != null) {
+                                return StreamBuilder<List<Hypothesis>>(
+                                  stream: hypothesesStream,
+                                  builder: (context, hypothesesSnapshot) {
+                                    if (hypothesesSnapshot.hasError) {
+                                      return const Center(
+                                        child: Text('Error loading hypotheses'),
+                                      );
+                                    }
+                                    if (!hypothesesSnapshot.hasData) {
+                                      return const Center(
+                                        child:
+                                            Text('Submit a root issue theory.'),
+                                      );
+                                    }
+                                    final hypotheses = hypothesesSnapshot.data!;
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: hypotheses.length,
+                                      itemBuilder: (context, index) {
+                                        final hypothesis = hypotheses[index];
+                                        const dropdownValue = 'Agree';
+                                        return ListTile(
+                                          title: Text(hypothesis.desc),
+                                          trailing: DropdownButton(
+                                            items: const [
+                                              DropdownMenuItem(
+                                                value: 'Agree',
+                                                child: Text('Agree'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'Disagree',
+                                                child: Text('Disagree'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'Modify',
+                                                child: Text('Modify'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'Spinoff',
+                                                child: Text('Spinoff'),
+                                              ),
+                                            ],
+                                            value: dropdownValue,
+                                            onChanged: null,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
                                 );
-                              },
+                              }
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
                           },
                         ),

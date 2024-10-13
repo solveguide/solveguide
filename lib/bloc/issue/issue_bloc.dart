@@ -44,8 +44,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   String? _currentIssueId;
 
   Issue? get focusedIssue => _focusedIssue;
-  StreamSubscription<Issue>? get focusedIssueStream => 
-    _focusedIssueSubscription;
+  StreamSubscription<Issue>? get focusedIssueStream =>
+      _focusedIssueSubscription;
 
   Future<void> _fetchIssues(
     IssuesFetched event,
@@ -144,27 +144,55 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   ) async {
     final issue = event.focusedIssue;
 
-    final hypotheses =
-        await issueRepository.getHypotheses(issue.issueId!).first;
-    final solutions = await issueRepository.getSolutions(issue.issueId!).first;
+    // Get the appropriate streams for the current issue
+    final hypothesesStream = issueRepository.getHypotheses(issue.issueId!);
+    final solutionsStream = issueRepository.getSolutions(issue.issueId!);
 
     IssueProcessStage stage;
 
-    if (issue.root.isEmpty && hypotheses.length < 2) {
+    if (issue.root.isEmpty && (await hypothesesStream.first).length < 4) {
       stage = IssueProcessStage.wideningHypotheses;
-    } else if (issue.root.isEmpty && hypotheses.length >= 2) {
+      emit(
+        IssueProcessState(
+          stage: stage,
+          hypothesesStream: hypothesesStream,
+          solutionsStream: solutionsStream,
+        ),
+      );
+    } else if (issue.root.isEmpty) {
       stage = IssueProcessStage.narrowingToRootCause;
-    } else if (issue.solve.isEmpty && solutions.length < 2) {
+      emit(
+        IssueProcessState(
+          stage: stage,
+          hypothesesStream: hypothesesStream,
+          solutionsStream: solutionsStream,
+        ),
+      );
+    } else if (issue.solve.isEmpty &&
+        (await solutionsStream.first).length < 4) {
       stage = IssueProcessStage.wideningSolutions;
-    } else if (issue.solve.isEmpty && solutions.length >= 2) {
+      emit(
+        IssueProcessState(
+          stage: stage,
+          hypothesesStream: hypothesesStream,
+          solutionsStream: solutionsStream,
+        ),
+      );
+    } else if (issue.solve.isEmpty) {
       stage = IssueProcessStage.narrowingToSolve;
-    } else if (!issue.proven) {
-      stage = IssueProcessStage.scopingSolve;
+      emit(
+        IssueProcessState(
+          stage: stage,
+          hypothesesStream: hypothesesStream,
+          solutionsStream: solutionsStream,
+        ),
+      );
     } else {
-      stage = IssueProcessStage.solveSummaryReview;
+      // Handle other stages and emit the appropriate state
+      emit(
+        const IssueProcessState(stage: IssueProcessStage.solveSummaryReview),
+      );
     }
-
-    emit(IssueProcessState(stage));
   }
 
   Future<void> _newHypothesisCreated(
