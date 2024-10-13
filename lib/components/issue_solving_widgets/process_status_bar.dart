@@ -76,9 +76,8 @@ class ProcessStatusBar extends StatelessWidget {
                     borderRadius: BorderRadius.horizontal(
                       left:
                           index == 0 ? const Radius.circular(100) : Radius.zero,
-                      right: index == 3
-                          ? const Radius.circular(100)
-                          : Radius.zero,
+                      right:
+                          index == 3 ? const Radius.circular(100) : Radius.zero,
                     ),
                   ),
                   child: Column(

@@ -19,6 +19,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AnnonymousUserBlocked>(_onAnnonymousUserBlocked);
   }
   final AuthRepository _authRepository;
+  String? _currentUserId;
+
+  String? get currentUserId => _currentUserId;
 
   Future<void> _onAppStarted(
     AppStarted event,
@@ -26,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       final currentUser = await _authRepository.getCurrentUser();
+      _currentUserId = currentUser.uid;
       emit(AuthSuccess(uid: currentUser.uid));
     } catch (error) {
       emit(const AuthInitial());
@@ -49,6 +53,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.password,
       );
       emit(AuthSuccess(uid: user!.uid));
+      _currentUserId = user.uid;
     } catch (error) {
       emit(AuthFailure(error.toString()));
     }
@@ -85,6 +90,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.password,
       );
       emit(AuthSuccess(uid: user!.uid));
+      _currentUserId = user.uid;
     } catch (error) {
       emit(AuthFailure(error.toString()));
     }

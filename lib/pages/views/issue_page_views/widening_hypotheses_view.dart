@@ -1,9 +1,12 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
+import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypothesis.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
+import 'package:provider/provider.dart';
 
 class WideningHypothesesView extends StatelessWidget {
   WideningHypothesesView({
@@ -17,6 +20,8 @@ class WideningHypothesesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
+    final currentUserId =
+        Provider.of<AuthBloc>(context, listen: false).currentUserId!;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -70,10 +75,10 @@ class WideningHypothesesView extends StatelessWidget {
                             if (value.isNotEmpty)
                               {
                                 context.read<IssueBloc>().add(
-                                  NewHypothesisCreated(
-                                    newHypothesis: value,
-                                  ),
-                                ),
+                                      NewHypothesisCreated(
+                                        newHypothesis: value,
+                                      ),
+                                    ),
                               },
                             _textController.clear(),
                           },
@@ -124,35 +129,72 @@ class WideningHypothesesView extends StatelessWidget {
                                       );
                                     }
                                     final hypotheses = hypothesesSnapshot.data!;
+
+                                    // Calculate rank for each hypothesis using
+                                    //Perspective and update rank value
+                                    for (final hypothesis in hypotheses) {
+                                      final perspective =
+                                          hypothesis.perspective(
+                                        currentUserId,
+                                        issueBloc.focusedIssue!.invitedUserIds!,
+                                      );
+                                      hypothesis.rank = perspective
+                                          .calculateRank(state.stage);
+                                    }
+                                    // Sort hypotheses based on rank in
+                                    //descending order (higher rank first)
+                                    hypotheses.sort(
+                                      (a, b) => b.rank.compareTo(a.rank),
+                                    );
+
                                     return ListView.builder(
                                       shrinkWrap: true,
                                       itemCount: hypotheses.length,
                                       itemBuilder: (context, index) {
                                         final hypothesis = hypotheses[index];
-                                        const dropdownValue = 'Agree';
-                                        return ListTile(
-                                          title: Text(hypothesis.desc),
-                                          trailing: DropdownButton(
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 'Agree',
-                                                child: Text('Agree'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Disagree',
-                                                child: Text('Disagree'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Modify',
-                                                child: Text('Modify'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Spinoff',
-                                                child: Text('Spinoff'),
-                                              ),
-                                            ],
-                                            value: dropdownValue,
-                                            onChanged: null,
+                                        //const dropdownValue = 'Agree';
+                                        return ShadCard(
+                                          title: Text(
+                                            hypothesis.desc,
+                                            style: UITextStyle.subtitle1,
+                                          ),
+                                          trailing:
+                                    // ShadRadioGroup<String>(
+                                    //   initialValue:
+                                    //       hypothesis.votes[currentUserId],
+                                    //   onChanged: (value) {
+                                    //     context.read<IssueBloc>().add(
+                                    //           HypothesisVoteSubmitted(
+                                    //             voteValue: value!,
+                                    //             hypothesisId: hypothesis
+                                    //                 .hypothesisId!,
+                                    //           ),
+                                    //         );
+                                    //   },
+                                    //   items: const [
+                                    //     ShadRadio(
+                                    //       label: Text('Agree'),
+                                    //       value: 'agree',
+                                    //     ),
+                                    //     ShadRadio(
+                                    //       label: Text('Disagree'),
+                                    //       value: 'disagree',
+                                    //     ),
+                                    //     // ShadRadio(
+                                    //     //   label: Text('Modify'),
+                                    //     //   value: 'Modify',
+                                    //     // ),
+                                    //     // ShadRadio(
+                                    //     //   label: Text('Spinoff'),
+                                    //     //   value: 'Spinoff',
+                                    //     // ),
+                                    //   ],
+                                    // ),
+                                              WidenHypothesesPopoverPage(
+                                            hypothesis: hypothesis,
+                                            currentUserId: currentUserId,
+                                            invitedUserIds: issueBloc
+                                                .focusedIssue!.invitedUserIds!,
                                           ),
                                         );
                                       },
@@ -180,39 +222,33 @@ class WideningHypothesesView extends StatelessWidget {
     );
   }
 
-  Row _issueProcessNav(BuildContext context) {
-    return Row(
-      children: [
-        const Spacer(),
-        Expanded(
-          flex: 3,
-          child: ProcessStatusBar(
-            currentStage: 0,
-            onSegmentTapped: (index) {
-              var stage = IssueProcessStage.wideningHypotheses;
-              switch (index) {
-                case 0:
-                  stage = IssueProcessStage.wideningHypotheses;
-                case 1:
-                  stage = IssueProcessStage.narrowingToRootCause;
-                case 2:
-                  stage = IssueProcessStage.wideningSolutions;
-                case 3:
-                  stage = IssueProcessStage.narrowingToSolve;
-              }
-              BlocProvider.of<IssueBloc>(context).add(
-                FocusIssueNavigationRequested(
-                  stage: stage,
-                ),
-              );
-            },
-            conflictStages: const [1],
-            disabledStages: const [3],
-            completedStages: const [0],
-          ),
-        ),
-        const Spacer(),
-      ],
+  Widget _issueProcessNav(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 300),
+      child: ProcessStatusBar(
+        currentStage: 0,
+        onSegmentTapped: (index) {
+          var stage = IssueProcessStage.wideningHypotheses;
+          switch (index) {
+            case 0:
+              stage = IssueProcessStage.wideningHypotheses;
+            case 1:
+              stage = IssueProcessStage.narrowingToRootCause;
+            case 2:
+              stage = IssueProcessStage.wideningSolutions;
+            case 3:
+              stage = IssueProcessStage.narrowingToSolve;
+          }
+          BlocProvider.of<IssueBloc>(context).add(
+            FocusIssueNavigationRequested(
+              stage: stage,
+            ),
+          );
+        },
+        conflictStages: const [1],
+        disabledStages: const [3],
+        completedStages: const [0],
+      ),
     );
   }
 }

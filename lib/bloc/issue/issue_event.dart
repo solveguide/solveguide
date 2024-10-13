@@ -80,6 +80,18 @@ class HypothesisUpdated extends IssueEvent {
   List<Object?> get props => [hypothesisId, updatedDescription];
 }
 
+class HypothesisVoteSubmitted extends IssueEvent {
+  const HypothesisVoteSubmitted({
+    required this.hypothesisId,
+    required this.voteValue,
+  });
+  final String hypothesisId;
+  final String voteValue;
+
+  @override
+  List<Object?> get props => [hypothesisId, voteValue];
+}
+
 class CreateSeparateIssueFromHypothesis extends IssueEvent {
   const CreateSeparateIssueFromHypothesis({
     required this.hypothesisId,

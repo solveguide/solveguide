@@ -26,6 +26,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<NewHypothesisCreated>(_newHypothesisCreated);
     on<HypothesisUpdated>(_onHypothesisUpdated);
     on<CreateSeparateIssueFromHypothesis>(_onCreateSeparateIssueFromHypothesis);
+    on<HypothesisVoteSubmitted>(_onHypothesisVoteSubmitted);
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<SolutionUpdated>(_onSolutionUpdated);
@@ -196,7 +197,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-    FutureOr<void> _onFocusIssueNavigationRequested(
+  FutureOr<void> _onFocusIssueNavigationRequested(
     FocusIssueNavigationRequested event,
     Emitter<IssueState> emit,
   ) {
@@ -207,13 +208,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     final solutionsStream = issueRepository.getSolutions(_currentIssueId!);
 
     emit(
-        IssueProcessState(
-          stage: stage,
-          hypothesesStream: hypothesesStream,
-          solutionsStream: solutionsStream,
-    ),);
-
-
+      IssueProcessState(
+        stage: stage,
+        hypothesesStream: hypothesesStream,
+        solutionsStream: solutionsStream,
+      ),
+    );
   }
 
   Future<void> _newHypothesisCreated(
@@ -326,6 +326,51 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       emit(IssuesListFailure(error.toString()));
     }
   }
+
+Future<void> _onHypothesisVoteSubmitted(
+  HypothesisVoteSubmitted event,
+  Emitter<IssueState> emit,
+) async {
+  try {
+    // Retrieve the current state and make sure it's an IssueProcessState
+    if (state is! IssueProcessState) return;
+
+    // Ensure _currentIssueId is available
+    if (_currentIssueId == null) {
+      throw Exception('_currentIssueId is not set');
+    }
+
+    // Fetch the current hypotheses for the issue
+    final currentHypotheses =
+        await issueRepository.getHypotheses(_currentIssueId!).first;
+
+    // Find the hypothesis to be updated
+    final hypothesis = currentHypotheses.firstWhere(
+      (h) => h.hypothesisId == event.hypothesisId,
+      orElse: () => throw Exception('Hypothesis not found'),
+    );
+
+    // Fetch the current user's ID (Assuming it's accessible via some AuthState)
+    final currentUserId = await authRepository.getUserUid();
+
+    // Update the votes map with the current user's vote
+    final updatedVotes = Map<String, String>.from(hypothesis.votes)
+      ..[currentUserId!] = event.voteValue;
+
+    // Create a new hypothesis object with updated votes
+    final updatedHypothesis = hypothesis.copyWith(votes: updatedVotes);
+
+    // Update the hypothesis in Firestore using the repository
+    await issueRepository.updateHypothesis(
+      _currentIssueId!,
+      updatedHypothesis,
+    );
+  } catch (e) {
+    // Handle errors and update the state accordingly
+    emit(IssuesListFailure(e.toString()));
+  }
+}
+
 
   Future<void> _onFocusRootConfirmed(
     FocusRootConfirmed event,
@@ -615,6 +660,4 @@ void _onFocusSolveScopeSubmitted(
       emit(IssuesListFailure(error.toString()));
     }
   }
-
-
 }

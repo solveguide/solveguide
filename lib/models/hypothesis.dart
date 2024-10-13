@@ -1,4 +1,4 @@
-import 'package:guide_solve/bloc/issue/issue_bloc.dart'; 
+import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 
 enum Vote {
   root,
