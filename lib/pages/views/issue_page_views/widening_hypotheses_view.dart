@@ -158,39 +158,7 @@ class WideningHypothesesView extends StatelessWidget {
                                             hypothesis.desc,
                                             style: UITextStyle.subtitle1,
                                           ),
-                                          trailing:
-                                    // ShadRadioGroup<String>(
-                                    //   initialValue:
-                                    //       hypothesis.votes[currentUserId],
-                                    //   onChanged: (value) {
-                                    //     context.read<IssueBloc>().add(
-                                    //           HypothesisVoteSubmitted(
-                                    //             voteValue: value!,
-                                    //             hypothesisId: hypothesis
-                                    //                 .hypothesisId!,
-                                    //           ),
-                                    //         );
-                                    //   },
-                                    //   items: const [
-                                    //     ShadRadio(
-                                    //       label: Text('Agree'),
-                                    //       value: 'agree',
-                                    //     ),
-                                    //     ShadRadio(
-                                    //       label: Text('Disagree'),
-                                    //       value: 'disagree',
-                                    //     ),
-                                    //     // ShadRadio(
-                                    //     //   label: Text('Modify'),
-                                    //     //   value: 'Modify',
-                                    //     // ),
-                                    //     // ShadRadio(
-                                    //     //   label: Text('Spinoff'),
-                                    //     //   value: 'Spinoff',
-                                    //     // ),
-                                    //   ],
-                                    // ),
-                                              WidenHypothesesPopoverPage(
+                                          trailing: WidenHypothesesPopoverPage(
                                             hypothesis: hypothesis,
                                             currentUserId: currentUserId,
                                             invitedUserIds: issueBloc

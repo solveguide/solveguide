@@ -327,50 +327,49 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
-Future<void> _onHypothesisVoteSubmitted(
-  HypothesisVoteSubmitted event,
-  Emitter<IssueState> emit,
-) async {
-  try {
-    // Retrieve the current state and make sure it's an IssueProcessState
-    if (state is! IssueProcessState) return;
+  Future<void> _onHypothesisVoteSubmitted(
+    HypothesisVoteSubmitted event,
+    Emitter<IssueState> emit,
+  ) async {
+    try {
+      // Retrieve the current state and make sure it's an IssueProcessState
+      if (state is! IssueProcessState) return;
 
-    // Ensure _currentIssueId is available
-    if (_currentIssueId == null) {
-      throw Exception('_currentIssueId is not set');
+      // Ensure _currentIssueId is available
+      if (_currentIssueId == null) {
+        throw Exception('_currentIssueId is not set');
+      }
+
+      // Fetch the current hypotheses for the issue
+      final currentHypotheses =
+          await issueRepository.getHypotheses(_currentIssueId!).first;
+
+      // Find the hypothesis to be updated
+      final hypothesis = currentHypotheses.firstWhere(
+        (h) => h.hypothesisId == event.hypothesisId,
+        orElse: () => throw Exception('Hypothesis not found'),
+      );
+
+      // Fetch the current user's ID
+      final currentUserId = await authRepository.getUserUid();
+
+      // Update the votes map with the current user's vote
+      final updatedVotes = Map<String, String>.from(hypothesis.votes)
+        ..[currentUserId!] = event.voteValue;
+
+      // Create a new hypothesis object with updated votes
+      final updatedHypothesis = hypothesis.copyWith(votes: updatedVotes);
+
+      // Update the hypothesis in Firestore using the repository
+      await issueRepository.updateHypothesis(
+        _currentIssueId!,
+        updatedHypothesis,
+      );
+    } catch (e) {
+      // Handle errors and update the state accordingly
+      emit(IssuesListFailure(e.toString()));
     }
-
-    // Fetch the current hypotheses for the issue
-    final currentHypotheses =
-        await issueRepository.getHypotheses(_currentIssueId!).first;
-
-    // Find the hypothesis to be updated
-    final hypothesis = currentHypotheses.firstWhere(
-      (h) => h.hypothesisId == event.hypothesisId,
-      orElse: () => throw Exception('Hypothesis not found'),
-    );
-
-    // Fetch the current user's ID (Assuming it's accessible via some AuthState)
-    final currentUserId = await authRepository.getUserUid();
-
-    // Update the votes map with the current user's vote
-    final updatedVotes = Map<String, String>.from(hypothesis.votes)
-      ..[currentUserId!] = event.voteValue;
-
-    // Create a new hypothesis object with updated votes
-    final updatedHypothesis = hypothesis.copyWith(votes: updatedVotes);
-
-    // Update the hypothesis in Firestore using the repository
-    await issueRepository.updateHypothesis(
-      _currentIssueId!,
-      updatedHypothesis,
-    );
-  } catch (e) {
-    // Handle errors and update the state accordingly
-    emit(IssuesListFailure(e.toString()));
   }
-}
-
 
   Future<void> _onFocusRootConfirmed(
     FocusRootConfirmed event,

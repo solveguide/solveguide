@@ -1,5 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 
 class WidenHypothesesPopoverPage extends StatefulWidget {
@@ -34,7 +36,7 @@ class _WidenHypothesesPopoverPageState
   @override
   Widget build(BuildContext context) {
     final currentUservote =
-        widget.hypothesis.votes[widget.currentUserId] ?? 'No Vote';
+        widget.hypothesis.votes[widget.currentUserId] ?? 'Vote!';
 
     return Center(
       child: ShadPopover(
@@ -46,32 +48,79 @@ class _WidenHypothesesPopoverPageState
             mainAxisSize: MainAxisSize.min,
             children: [
               // Display the hypothesis description
+              Text(
+                'Hypothesis:',
+                style: UITextStyle.headline7,
+              ),
+              const SizedBox(height: AppSpacing.md),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Text(
                   widget.hypothesis.desc,
                   style: UITextStyle.subtitle1,
+                  textAlign: TextAlign.start,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
+              const Divider(),
+              const SizedBox(height: AppSpacing.md),
 
               // Existing dimension settings UI
-              Text(
-                'Your Vote',
-                style: UITextStyle.headline7,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ShadSwitch(
-                value: value,
-                onChanged: (v) => setState(() => value = v),
-                label: const Text('Agree'),
+              ShadRadioGroupFormField<String>(
+                label: Text(
+                  'Your Vote',
+                  style: UITextStyle.headline7,
+                ),
+                initialValue: currentUservote,
+                items: const [
+                  ShadRadio(
+                    label: Text('Agree'),
+                    value: 'agree',
+                  ),
+                  ShadRadio(
+                    label: Text('Disagree'),
+                    value: 'disagree',
+                  ),
+                  // ShadRadio(
+                  //   label: Text('Modify'),
+                  //   value: 'modify',
+                  // ),
+                  // ShadRadio(
+                  //   label: Text('Spin Off'),
+                  //   value: 'spinOff',
+                  // ),
+                ],
+                onSaved: (value) {
+                  if (value != null){
+                  context.read<IssueBloc>().add(
+                        HypothesisVoteSubmitted(
+                          voteValue: value,
+                          hypothesisId: widget.hypothesis.hypothesisId!,
+                        ),
+                      );
+                  }
+                },
+                validator: (v) {
+                  if (v == null) {
+                    return 'You need to select an option.';
+                  }
+                  return null;
+                },
               ),
             ],
           ),
         ),
         child: ShadButton.outline(
           onPressed: popoverController.toggle,
-          child: Text(currentUservote),
+          backgroundColor: currentUservote == 'agree'
+              ? AppColors.consensus
+              : currentUservote == 'disagree'
+                  ? AppColors.conflictLight
+                  : AppColors.white,
+          child: Text(
+            currentUservote,
+            style: UITextStyle.subtitle1.copyWith(color: AppColors.black),
+          ),
         ),
       ),
     );
