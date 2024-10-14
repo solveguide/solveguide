@@ -30,6 +30,12 @@ class ActionItem {
   }
 }
 
+enum SolutionVote {
+  solve,
+  agree,
+  disagree,
+}
+
 class Solution {
   // A map to store user votes (userId -> voteValue)
 
@@ -146,5 +152,128 @@ class Solution {
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
       votes: votes ?? this.votes,
     );
+  }
+
+    // Perspective utility functions encapsulated within Hypothesis
+  SolutionPerspective perspective(String currentUserId, List<String> invitedUserIds) {
+    return SolutionPerspective(this, currentUserId, invitedUserIds);
+  }
+}
+
+class SolutionPerspective {
+  SolutionPerspective(this.solution, this.currentUserId, this.invitedUserIds);
+
+  final Solution solution;
+  final String currentUserId;
+  final List<String> invitedUserIds;
+
+  /// Get the current user's vote.
+  SolutionVote? getCurrentUserVote() {
+    final voteString = solution.votes[currentUserId];
+    return voteString != null ? SolutionVote.values.byName(voteString) : null;
+  }
+
+  /// Determine if all stakeholders have voted.
+  bool allStakeholdersVoted() {
+    final votes = solution.votes.keys.toSet();
+    final invitedSet = invitedUserIds.toSet();
+    return invitedSet.difference(votes).isEmpty;
+  }
+
+  /// Determine if all other stakeholders voted agree or solve.
+  bool allOtherStakeholdersAgreeOrSolve() {
+    for (final entry in solution.votes.entries) {
+      if (entry.key == currentUserId) continue;
+      final vote = SolutionVote.values.byName(entry.value);
+      if (vote != SolutionVote.agree && vote != SolutionVote.solve) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Calculate voter turnout percentage.
+  double voterTurnoutPercentage() {
+    if (invitedUserIds.isEmpty) return 0;
+    final voteCount = solution.votes.length;
+    return (voteCount / invitedUserIds.length) * 100;
+  }
+
+  /// Check if the current user's vote is in conflict with any other user's vote.
+  bool isCurrentUserInConflict() {
+    final currentUserVote = solution.votes[currentUserId];
+    if (currentUserVote == null) return false;
+
+    for (final entry in solution.votes.entries) {
+      if (entry.key == currentUserId) continue;
+
+      final otherUserVote = SolutionVote.values.byName(entry.value);
+      final vote = SolutionVote.values.byName(currentUserVote);
+      if (_isConflict(vote, otherUserVote)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Determine if two votes are in conflict.
+  bool _isConflict(SolutionVote vote1, SolutionVote vote2) {
+    if ((vote1 == SolutionVote.solve && vote2 == SolutionVote.agree) ||
+        (vote1 == SolutionVote.agree && vote2 == SolutionVote.solve)) {
+      return false;
+    }
+    return vote1 != vote2;
+  }
+
+  /// Calculate the rank of the solution based on consensus.
+  int calculateConsensusRank() {
+    final consensusVotes = solution.votes.values;
+
+    // Determine the number of stakeholders for assigning solve vote value
+    final numberOfStakeholders = invitedUserIds.length;
+
+    // Assign points to each type of vote
+    final solvePoints = consensusVotes
+            .where((vote) => vote == SolutionVote.solve.name)
+            .length *
+        numberOfStakeholders;
+    final agreePoints =
+        consensusVotes.where((vote) => vote == SolutionVote.agree.name).length *
+            2;
+    final disagreePoints =
+        consensusVotes.where((vote) => vote == SolutionVote.disagree.name).length *
+            -1;
+
+    // Total points to determine the rank
+    final totalPoints = solvePoints + agreePoints + disagreePoints;
+
+    return totalPoints;
+  }
+
+  /// Calculate the rank of the solution during the narrowing stage.
+  int calculateNarrowingRank() {
+    final currentUserVote = getCurrentUserVote();
+    final consensusVotes = solution.votes.values;
+    final solveCount =
+        consensusVotes.where((vote) => vote == SolutionVote.solve.name).length;
+
+    // Assign the primary rank value
+    int primaryRank;
+
+    if (solveCount == invitedUserIds.length) {
+      primaryRank = 1000; // All users voted solve, give the highest rank
+    } else if (isCurrentUserInConflict()) {
+      primaryRank = 500; // Current user is in conflict, second highest rank
+    } else if (currentUserVote == null) {
+      primaryRank = 200; // Current user has not voted yet, third highest rank
+    } else {
+      primaryRank = 0; // General consensus as the lowest rank
+    }
+
+    // Assign a secondary rank for sorting solutions with the same primary rank
+    final consensusRank = calculateConsensusRank();
+
+    // Combine the primary and secondary rank, using order of magnitude
+    return primaryRank + consensusRank;
   }
 }

@@ -48,64 +48,60 @@ class _WidenHypothesesPopoverPageState
             mainAxisSize: MainAxisSize.min,
             children: [
               // Display the hypothesis description
-              Text(
-                'Hypothesis:',
-                style: UITextStyle.headline7,
-              ),
+              // Text(
+              //   'Hypothesis:',
+              //   style: UITextStyle.headline7,
+              // ),
               const SizedBox(height: AppSpacing.md),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Text(
-                  widget.hypothesis.desc,
-                  style: UITextStyle.subtitle1,
+                  'This COULD (at least in part) be causing the initial issue.',
+                  style: UITextStyle.caption,
                   textAlign: TextAlign.start,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
               const Divider(),
               const SizedBox(height: AppSpacing.md),
-
-              // Existing dimension settings UI
-              ShadRadioGroupFormField<String>(
-                label: Text(
-                  'Your Vote',
-                  style: UITextStyle.headline7,
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: ShadRadioGroupFormField<String>(
+                  label: Text(
+                    'Your Vote',
+                    style: UITextStyle.headline7,
+                  ),
+                  initialValue: currentUservote,
+                  items: const [
+                    ShadRadio(
+                      label: Text('Agree'),
+                      value: 'agree',
+                    ),
+                    ShadRadio(
+                      label: Text('Disagree'),
+                      value: 'disagree',
+                    ),
+                    // ShadRadio(
+                    //   label: Text('Modify'),
+                    //   value: 'modify',
+                    // ),
+                    // ShadRadio(
+                    //   label: Text('Spin Off'),
+                    //   value: 'spinOff',
+                    // ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      context.read<IssueBloc>().add(
+                            HypothesisVoteSubmitted(
+                              voteValue: value,
+                              hypothesisId: widget.hypothesis.hypothesisId!,
+                            ),
+                          );
+                    }
+                    popoverController.hide();
+                  },
                 ),
-                initialValue: currentUservote,
-                items: const [
-                  ShadRadio(
-                    label: Text('Agree'),
-                    value: 'agree',
-                  ),
-                  ShadRadio(
-                    label: Text('Disagree'),
-                    value: 'disagree',
-                  ),
-                  // ShadRadio(
-                  //   label: Text('Modify'),
-                  //   value: 'modify',
-                  // ),
-                  // ShadRadio(
-                  //   label: Text('Spin Off'),
-                  //   value: 'spinOff',
-                  // ),
-                ],
-                onSaved: (value) {
-                  if (value != null){
-                  context.read<IssueBloc>().add(
-                        HypothesisVoteSubmitted(
-                          voteValue: value,
-                          hypothesisId: widget.hypothesis.hypothesisId!,
-                        ),
-                      );
-                  }
-                },
-                validator: (v) {
-                  if (v == null) {
-                    return 'You need to select an option.';
-                  }
-                  return null;
-                },
               ),
             ],
           ),

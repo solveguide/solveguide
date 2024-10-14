@@ -75,5 +75,5 @@ abstract class AppColors {
   static const Color conflict = Colors.red;
 
   /// Issue Solving light red for consensus conflicts.
-  static const Color conflictLight = Colors.redAccent;
+  static const Color conflictLight = Color.fromARGB(255, 221, 161, 161);
 }

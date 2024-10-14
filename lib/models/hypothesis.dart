@@ -1,6 +1,6 @@
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 
-enum Vote {
+enum HypothesisVote {
   root,
   agree,
   disagree,
@@ -93,13 +93,13 @@ class Hypothesis {
   }
 
   // Perspective utility functions encapsulated within Hypothesis
-  Perspective perspective(String currentUserId, List<String> invitedUserIds) {
-    return Perspective(this, currentUserId, invitedUserIds);
+  HypothesisPerspective perspective(String currentUserId, List<String> invitedUserIds) {
+    return HypothesisPerspective(this, currentUserId, invitedUserIds);
   }
 }
 
-class Perspective {
-  Perspective(
+class HypothesisPerspective {
+  HypothesisPerspective(
     this.hypothesis,
     this.currentUserId,
     this.invitedUserIds,
@@ -110,9 +110,9 @@ class Perspective {
   final List<String> invitedUserIds;
 
   /// Get the current user's vote.
-  Vote? getCurrentUserVote() {
+  HypothesisVote? getCurrentUserVote() {
     final voteString = hypothesis.votes[currentUserId];
-    return voteString != null ? Vote.values.byName(voteString) : null;
+    return voteString != null ? HypothesisVote.values.byName(voteString) : null;
   }
 
   /// Determine if all stakeholders have voted.
@@ -121,6 +121,38 @@ class Perspective {
     final invitedSet = invitedUserIds.toSet();
     return invitedSet.difference(votes).isEmpty;
   }
+
+/// Determine if all other stakeholders have voted 'agree' or 'root'.
+bool allOtherStakeholdersAgree() {
+
+  // If there are no other stakeholders, return true.
+  if (invitedUserIds.length <= 1) {
+    if (getCurrentUserVote() == HypothesisVote.agree || getCurrentUserVote() == HypothesisVote.root) {
+    return true;
+    }
+    return false;
+  }
+  // Check if all stakeholders have voted
+  if (!allStakeholdersVoted()) {
+    return false;
+  }
+
+  for (final entry in hypothesis.votes.entries) {
+    // Skip the current user's vote
+    if (entry.key == currentUserId) {
+      continue;
+    }
+
+    // Check if the vote is neither 'agree' nor 'root'
+    final vote = HypothesisVote.values.byName(entry.value);
+    if (vote != HypothesisVote.agree && vote != HypothesisVote.root) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 
   /// Calculate voter turnout percentage.
   double voterTurnoutPercentage() {
@@ -137,7 +169,7 @@ class Perspective {
     for (final entry in hypothesis.votes.entries) {
       if (entry.key == currentUserId) continue; // Skip current user's vote
 
-      final otherUserVote = Vote.values.byName(entry.value);
+      final otherUserVote = HypothesisVote.values.byName(entry.value);
       if (_isConflict(currentUserVote, otherUserVote)) {
         return true;
       }
@@ -146,13 +178,13 @@ class Perspective {
   }
 
   /// Determine if two votes are in conflict.
-  bool _isConflict(Vote vote1, Vote vote2) {
-    if ((vote1 == Vote.root && vote2 == Vote.agree) ||
-        (vote1 == Vote.agree && vote2 == Vote.root)) {
+  bool _isConflict(HypothesisVote vote1, HypothesisVote vote2) {
+    if ((vote1 == HypothesisVote.root && vote2 == HypothesisVote.agree) ||
+        (vote1 == HypothesisVote.agree && vote2 == HypothesisVote.root)) {
       return false;
     }
-    if ((vote1 == Vote.disagree && vote2 == Vote.spinoff) ||
-        (vote1 == Vote.spinoff && vote2 == Vote.disagree)) {
+    if ((vote1 == HypothesisVote.disagree && vote2 == HypothesisVote.spinoff) ||
+        (vote1 == HypothesisVote.spinoff && vote2 == HypothesisVote.disagree)) {
       return false;
     }
     return vote1 != vote2;
@@ -193,14 +225,14 @@ class Perspective {
 
     // Assign points to each type of vote
     final rootPoints =
-        consensusVotes.where((vote) => vote == Vote.root.name).length *
+        consensusVotes.where((vote) => vote == HypothesisVote.root.name).length *
             numberOfStakeholders;
     final agreePoints =
-        consensusVotes.where((vote) => vote == Vote.agree.name).length * 2;
+        consensusVotes.where((vote) => vote == HypothesisVote.agree.name).length * 2;
     final disagreePoints =
-        consensusVotes.where((vote) => vote == Vote.disagree.name).length * -1;
+        consensusVotes.where((vote) => vote == HypothesisVote.disagree.name).length * -1;
     final spinoffPoints =
-        consensusVotes.where((vote) => vote == Vote.spinoff.name).length * -10;
+        consensusVotes.where((vote) => vote == HypothesisVote.spinoff.name).length * -10;
 
     // Total points to determine the rank
     final totalPoints =
@@ -209,10 +241,10 @@ class Perspective {
     return totalPoints;
   }
 
-  int _rankForNarrowing(Vote? currentUserVote) {
+  int _rankForNarrowing(HypothesisVote? currentUserVote) {
     final consensusVotes = hypothesis.votes.values;
     final rootCount =
-        consensusVotes.where((vote) => vote == Vote.root.name).length;
+        consensusVotes.where((vote) => vote == HypothesisVote.root.name).length;
 
     // Assign the primary rank value
     int primaryRank;
