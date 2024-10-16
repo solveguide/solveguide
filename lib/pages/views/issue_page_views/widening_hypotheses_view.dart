@@ -224,11 +224,12 @@ class HypothesisList extends StatelessWidget {
                               hypothesis.desc,
                               style: UITextStyle.subtitle1,
                             ),
-                            backgroundColor: currentUserVote == HypothesisVote.spinoff
-                                ? AppColors.conflictLight
-                                : everyoneElseAgrees
-                                    ? AppColors.consensus
-                                    : AppColors.public,
+                            backgroundColor:
+                                currentUserVote == HypothesisVote.spinoff
+                                    ? AppColors.conflictLight
+                                    : everyoneElseAgrees
+                                        ? AppColors.consensus
+                                        : AppColors.public,
                             trailing: WidenHypothesesPopoverPage(
                               hypothesis: hypothesis,
                               currentUserId: currentUserId,

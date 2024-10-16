@@ -154,8 +154,9 @@ class Solution {
     );
   }
 
-    // Perspective utility functions encapsulated within Hypothesis
-  SolutionPerspective perspective(String currentUserId, List<String> invitedUserIds) {
+  // Perspective utility functions encapsulated within Hypothesis
+  SolutionPerspective perspective(
+      String currentUserId, List<String> invitedUserIds) {
     return SolutionPerspective(this, currentUserId, invitedUserIds);
   }
 }
@@ -233,16 +234,16 @@ class SolutionPerspective {
     final numberOfStakeholders = invitedUserIds.length;
 
     // Assign points to each type of vote
-    final solvePoints = consensusVotes
-            .where((vote) => vote == SolutionVote.solve.name)
-            .length *
-        numberOfStakeholders;
+    final solvePoints =
+        consensusVotes.where((vote) => vote == SolutionVote.solve.name).length *
+            numberOfStakeholders;
     final agreePoints =
         consensusVotes.where((vote) => vote == SolutionVote.agree.name).length *
             2;
-    final disagreePoints =
-        consensusVotes.where((vote) => vote == SolutionVote.disagree.name).length *
-            -1;
+    final disagreePoints = consensusVotes
+            .where((vote) => vote == SolutionVote.disagree.name)
+            .length *
+        -1;
 
     // Total points to determine the rank
     final totalPoints = solvePoints + agreePoints + disagreePoints;

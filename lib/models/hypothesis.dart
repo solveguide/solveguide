@@ -93,7 +93,8 @@ class Hypothesis {
   }
 
   // Perspective utility functions encapsulated within Hypothesis
-  HypothesisPerspective perspective(String currentUserId, List<String> invitedUserIds) {
+  HypothesisPerspective perspective(
+      String currentUserId, List<String> invitedUserIds) {
     return HypothesisPerspective(this, currentUserId, invitedUserIds);
   }
 }
@@ -122,37 +123,36 @@ class HypothesisPerspective {
     return invitedSet.difference(votes).isEmpty;
   }
 
-/// Determine if all other stakeholders have voted 'agree' or 'root'.
-bool allOtherStakeholdersAgree() {
-
-  // If there are no other stakeholders, return true.
-  if (invitedUserIds.length <= 1) {
-    if (getCurrentUserVote() == HypothesisVote.agree || getCurrentUserVote() == HypothesisVote.root) {
-    return true;
-    }
-    return false;
-  }
-  // Check if all stakeholders have voted
-  if (!allStakeholdersVoted()) {
-    return false;
-  }
-
-  for (final entry in hypothesis.votes.entries) {
-    // Skip the current user's vote
-    if (entry.key == currentUserId) {
-      continue;
-    }
-
-    // Check if the vote is neither 'agree' nor 'root'
-    final vote = HypothesisVote.values.byName(entry.value);
-    if (vote != HypothesisVote.agree && vote != HypothesisVote.root) {
+  /// Determine if all other stakeholders have voted 'agree' or 'root'.
+  bool allOtherStakeholdersAgree() {
+    // If there are no other stakeholders, return true.
+    if (invitedUserIds.length <= 1) {
+      if (getCurrentUserVote() == HypothesisVote.agree ||
+          getCurrentUserVote() == HypothesisVote.root) {
+        return true;
+      }
       return false;
     }
+    // Check if all stakeholders have voted
+    if (!allStakeholdersVoted()) {
+      return false;
+    }
+
+    for (final entry in hypothesis.votes.entries) {
+      // Skip the current user's vote
+      if (entry.key == currentUserId) {
+        continue;
+      }
+
+      // Check if the vote is neither 'agree' nor 'root'
+      final vote = HypothesisVote.values.byName(entry.value);
+      if (vote != HypothesisVote.agree && vote != HypothesisVote.root) {
+        return false;
+      }
+    }
+
+    return true;
   }
-
-  return true;
-}
-
 
   /// Calculate voter turnout percentage.
   double voterTurnoutPercentage() {
@@ -224,15 +224,22 @@ bool allOtherStakeholdersAgree() {
     final numberOfStakeholders = invitedUserIds.length;
 
     // Assign points to each type of vote
-    final rootPoints =
-        consensusVotes.where((vote) => vote == HypothesisVote.root.name).length *
-            numberOfStakeholders;
-    final agreePoints =
-        consensusVotes.where((vote) => vote == HypothesisVote.agree.name).length * 2;
-    final disagreePoints =
-        consensusVotes.where((vote) => vote == HypothesisVote.disagree.name).length * -1;
-    final spinoffPoints =
-        consensusVotes.where((vote) => vote == HypothesisVote.spinoff.name).length * -10;
+    final rootPoints = consensusVotes
+            .where((vote) => vote == HypothesisVote.root.name)
+            .length *
+        numberOfStakeholders;
+    final agreePoints = consensusVotes
+            .where((vote) => vote == HypothesisVote.agree.name)
+            .length *
+        2;
+    final disagreePoints = consensusVotes
+            .where((vote) => vote == HypothesisVote.disagree.name)
+            .length *
+        -1;
+    final spinoffPoints = consensusVotes
+            .where((vote) => vote == HypothesisVote.spinoff.name)
+            .length *
+        -10;
 
     // Total points to determine the rank
     final totalPoints =
