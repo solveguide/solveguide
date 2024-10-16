@@ -61,7 +61,7 @@ class ProcessStatusBar extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.xxs),
                   decoration: BoxDecoration(
                     color: isDisabled
-                        ? theme.disabledColor
+                        ? AppColors.grey
                         : isCompleted
                             ? theme.primaryColorLight
                             : theme.scaffoldBackgroundColor,
@@ -70,7 +70,7 @@ class ProcessStatusBar extends StatelessWidget {
                           ? AppColors.conflictLight
                           : (isActive
                               ? theme.primaryColorDark
-                              : AppColors.darkGrey),
+                              : AppColors.grey),
                       width: isActive ? 4.0 : 1.0,
                     ),
                     borderRadius: BorderRadius.horizontal(

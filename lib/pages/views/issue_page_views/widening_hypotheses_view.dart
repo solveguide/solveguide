@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypothesis.dart';
+import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypotheses.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:provider/provider.dart';
@@ -56,10 +56,6 @@ class WideningHypothesesView extends StatelessWidget {
                           focusedIssue.seedStatement,
                           style: UITextStyle.headline6,
                         ),
-                        description: const Text(
-                          'What are all the possible root issues '
-                          'contributing in part or in whole to this?',
-                        ),
                         backgroundColor: AppColors.consensus,
                       ),
                       const SizedBox(height: AppSpacing.md),
@@ -107,9 +103,10 @@ class WideningHypothesesView extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       // Widening Options so far (Hypotheses list)
-                      HypothesisList(
-                        currentUserId: currentUserId,
-                        issueBloc: issueBloc,
+                      _hypothesisList(
+                        context,
+                        currentUserId,
+                        issueBloc,
                       ),
                     ],
                   ),
@@ -147,26 +144,15 @@ class WideningHypothesesView extends StatelessWidget {
             ),
           );
         },
-        conflictStages: const [1],
-        disabledStages: const [3],
-        completedStages: const [0],
+        conflictStages: const [],
+        disabledStages: const [],
+        completedStages: const [],
       ),
     );
   }
 }
 
-class HypothesisList extends StatelessWidget {
-  const HypothesisList({
-    required this.currentUserId,
-    required this.issueBloc,
-    super.key,
-  });
-
-  final String currentUserId;
-  final IssueBloc issueBloc;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _hypothesisList(BuildContext context, String currentUserId, IssueBloc issueBloc) {
     return Expanded(
       child: BlocBuilder<IssueBloc, IssueState>(
         builder: (context, state) {
@@ -190,7 +176,7 @@ class HypothesisList extends StatelessWidget {
                   final hypotheses = hypothesesSnapshot.data!;
 
                   // Calculate rank for each hypothesis using
-                  //Perspective and update rank value
+                  // Perspective and update rank value
                   for (final hypothesis in hypotheses) {
                     final perspective = hypothesis.perspective(
                       currentUserId,
@@ -199,7 +185,7 @@ class HypothesisList extends StatelessWidget {
                     hypothesis.rank = perspective.calculateRank(state.stage);
                   }
                   // Sort hypotheses based on rank in
-                  //descending order (higher rank first)
+                  // descending order (higher rank first)
                   hypotheses.sort(
                     (a, b) => b.rank.compareTo(a.rank),
                   );
@@ -252,4 +238,3 @@ class HypothesisList extends StatelessWidget {
       ),
     );
   }
-}
