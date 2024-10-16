@@ -152,89 +152,90 @@ class WideningHypothesesView extends StatelessWidget {
   }
 }
 
-  Widget _hypothesisList(BuildContext context, String currentUserId, IssueBloc issueBloc) {
-    return Expanded(
-      child: BlocBuilder<IssueBloc, IssueState>(
-        builder: (context, state) {
-          if (state is IssueProcessState) {
-            final hypothesesStream = state.hypothesesStream;
+Widget _hypothesisList(
+    BuildContext context, String currentUserId, IssueBloc issueBloc) {
+  return Expanded(
+    child: BlocBuilder<IssueBloc, IssueState>(
+      builder: (context, state) {
+        if (state is IssueProcessState) {
+          final hypothesesStream = state.hypothesesStream;
 
-            if (hypothesesStream != null) {
-              return StreamBuilder<List<Hypothesis>>(
-                stream: hypothesesStream,
-                builder: (context, hypothesesSnapshot) {
-                  if (hypothesesSnapshot.hasError) {
-                    return const Center(
-                      child: Text('Error loading hypotheses'),
-                    );
-                  }
-                  if (!hypothesesSnapshot.hasData) {
-                    return const Center(
-                      child: Text('Submit a root issue theory.'),
-                    );
-                  }
-                  final hypotheses = hypothesesSnapshot.data!;
-
-                  // Calculate rank for each hypothesis using
-                  // Perspective and update rank value
-                  for (final hypothesis in hypotheses) {
-                    final perspective = hypothesis.perspective(
-                      currentUserId,
-                      issueBloc.focusedIssue!.invitedUserIds!,
-                    );
-                    hypothesis.rank = perspective.calculateRank(state.stage);
-                  }
-                  // Sort hypotheses based on rank in
-                  // descending order (higher rank first)
-                  hypotheses.sort(
-                    (a, b) => b.rank.compareTo(a.rank),
+          if (hypothesesStream != null) {
+            return StreamBuilder<List<Hypothesis>>(
+              stream: hypothesesStream,
+              builder: (context, hypothesesSnapshot) {
+                if (hypothesesSnapshot.hasError) {
+                  return const Center(
+                    child: Text('Error loading hypotheses'),
                   );
+                }
+                if (!hypothesesSnapshot.hasData) {
+                  return const Center(
+                    child: Text('Submit a root issue theory.'),
+                  );
+                }
+                final hypotheses = hypothesesSnapshot.data!;
 
-                  return Align(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1000),
-                      child: ListView.builder(
-                        itemCount: hypotheses.length,
-                        itemBuilder: (context, index) {
-                          final hypothesis = hypotheses[index];
-                          final currentUserVote = hypothesis
-                              .perspective(currentUserId,
-                                  issueBloc.focusedIssue!.invitedUserIds!)
-                              .getCurrentUserVote();
-                          final everyoneElseAgrees = hypothesis
-                              .perspective(currentUserId,
-                                  issueBloc.focusedIssue!.invitedUserIds!)
-                              .allOtherStakeholdersAgree();
-                          return ShadCard(
-                            title: Text(
-                              hypothesis.desc,
-                              style: UITextStyle.subtitle1,
-                            ),
-                            backgroundColor:
-                                currentUserVote == HypothesisVote.spinoff
-                                    ? AppColors.conflictLight
-                                    : everyoneElseAgrees
-                                        ? AppColors.consensus
-                                        : AppColors.public,
-                            trailing: WidenHypothesesPopoverPage(
-                              hypothesis: hypothesis,
-                              currentUserId: currentUserId,
-                              invitedUserIds:
-                                  issueBloc.focusedIssue!.invitedUserIds!,
-                            ),
-                          );
-                        },
-                      ),
+                // Calculate rank for each hypothesis using
+                // Perspective and update rank value
+                for (final hypothesis in hypotheses) {
+                  final perspective = hypothesis.perspective(
+                    currentUserId,
+                    issueBloc.focusedIssue!.invitedUserIds!,
+                  );
+                  hypothesis.rank = perspective.calculateRank(state.stage);
+                }
+                // Sort hypotheses based on rank in
+                // descending order (higher rank first)
+                hypotheses.sort(
+                  (a, b) => b.rank.compareTo(a.rank),
+                );
+
+                return Align(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1000),
+                    child: ListView.builder(
+                      itemCount: hypotheses.length,
+                      itemBuilder: (context, index) {
+                        final hypothesis = hypotheses[index];
+                        final currentUserVote = hypothesis
+                            .perspective(currentUserId,
+                                issueBloc.focusedIssue!.invitedUserIds!)
+                            .getCurrentUserVote();
+                        final everyoneElseAgrees = hypothesis
+                            .perspective(currentUserId,
+                                issueBloc.focusedIssue!.invitedUserIds!)
+                            .allOtherStakeholdersAgree();
+                        return ShadCard(
+                          title: Text(
+                            hypothesis.desc,
+                            style: UITextStyle.subtitle1,
+                          ),
+                          backgroundColor:
+                              currentUserVote == HypothesisVote.spinoff
+                                  ? AppColors.conflictLight
+                                  : everyoneElseAgrees
+                                      ? AppColors.consensus
+                                      : AppColors.public,
+                          trailing: WidenHypothesesPopoverPage(
+                            hypothesis: hypothesis,
+                            currentUserId: currentUserId,
+                            invitedUserIds:
+                                issueBloc.focusedIssue!.invitedUserIds!,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              );
-            }
+                  ),
+                );
+              },
+            );
           }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      ),
-    );
-  }
+        }
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    ),
+  );
+}

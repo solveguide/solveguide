@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypothesis.dart';
+import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypotheses.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:provider/provider.dart';
@@ -111,105 +111,104 @@ class NarrowingToRootCauseView extends StatelessWidget {
   }
 }
 
- Widget _hypothesisList(BuildContext context, String currentUserId, IssueBloc issueBloc) {
-    return Expanded(
-      child: BlocBuilder<IssueBloc, IssueState>(
-        builder: (context, state) {
-          if (state is IssueProcessState) {
-            final hypothesesStream = state.hypothesesStream;
+Widget _hypothesisList(
+    BuildContext context, String currentUserId, IssueBloc issueBloc) {
+  return Expanded(
+    child: BlocBuilder<IssueBloc, IssueState>(
+      builder: (context, state) {
+        if (state is IssueProcessState) {
+          final hypothesesStream = state.hypothesesStream;
 
-            if (hypothesesStream != null) {
-              return StreamBuilder<List<Hypothesis>>(
-                stream: hypothesesStream,
-                builder: (context, hypothesesSnapshot) {
-                  if (hypothesesSnapshot.hasError) {
-                    return const Center(
-                      child: Text('Error loading hypotheses'),
-                    );
-                  }
-                  if (!hypothesesSnapshot.hasData) {
-                    return const Center(
-                      child: Text('Submit a root issue theory.'),
-                    );
-                  }
-                  final hypotheses = hypothesesSnapshot.data!;
-
-                  // Calculate rank for each hypothesis using
-                  // Perspective and update rank value
-                  for (final hypothesis in hypotheses) {
-                    final perspective = hypothesis.perspective(
-                      currentUserId,
-                      issueBloc.focusedIssue!.invitedUserIds!,
-                    );
-                    hypothesis.rank = perspective.calculateRank(state.stage);
-                  }
-                  // Sort hypotheses based on rank in
-                  // descending order (higher rank first)
-                  hypotheses.sort(
-                    (a, b) => b.rank.compareTo(a.rank),
+          if (hypothesesStream != null) {
+            return StreamBuilder<List<Hypothesis>>(
+              stream: hypothesesStream,
+              builder: (context, hypothesesSnapshot) {
+                if (hypothesesSnapshot.hasError) {
+                  return const Center(
+                    child: Text('Error loading hypotheses'),
                   );
+                }
+                if (!hypothesesSnapshot.hasData) {
+                  return const Center(
+                    child: Text('Submit a root issue theory.'),
+                  );
+                }
+                final hypotheses = hypothesesSnapshot.data!;
 
-                  return Align(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1000),
-                      child: ListView.builder(
-                        itemCount: hypotheses.length,
-                        itemBuilder: (context, index) {
-                          final hypothesis = hypotheses[index];
-                          final currentUserVote = hypothesis
-                              .perspective(currentUserId,
-                                  issueBloc.focusedIssue!.invitedUserIds!)
-                              .getCurrentUserVote();
-                          final everyoneElseAgrees = hypothesis
-                              .perspective(currentUserId,
-                                  issueBloc.focusedIssue!.invitedUserIds!)
-                              .allOtherStakeholdersAgree();
-                          final conflict = hypothesis
-                              .perspective(currentUserId,
-                                  issueBloc.focusedIssue!.invitedUserIds!)
-                              .isCurrentUserInConflict();
-                          return ShadCard(
-                            title: Text(
-                              hypothesis.desc,
-                              style: UITextStyle.subtitle1,
+                // Calculate rank for each hypothesis using
+                // Perspective and update rank value
+                for (final hypothesis in hypotheses) {
+                  final perspective = hypothesis.perspective(
+                    currentUserId,
+                    issueBloc.focusedIssue!.invitedUserIds!,
+                  );
+                  hypothesis.rank = perspective.calculateRank(state.stage);
+                }
+                // Sort hypotheses based on rank in
+                // descending order (higher rank first)
+                hypotheses.sort(
+                  (a, b) => b.rank.compareTo(a.rank),
+                );
+
+                return Align(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1000),
+                    child: ListView.builder(
+                      itemCount: hypotheses.length,
+                      itemBuilder: (context, index) {
+                        final hypothesis = hypotheses[index];
+                        final currentUserVote = hypothesis
+                            .perspective(currentUserId,
+                                issueBloc.focusedIssue!.invitedUserIds!)
+                            .getCurrentUserVote();
+                        final everyoneElseAgrees = hypothesis
+                            .perspective(currentUserId,
+                                issueBloc.focusedIssue!.invitedUserIds!)
+                            .allOtherStakeholdersAgree();
+                        final conflict = hypothesis
+                            .perspective(currentUserId,
+                                issueBloc.focusedIssue!.invitedUserIds!)
+                            .isCurrentUserInConflict();
+                        return ShadCard(
+                          title: Text(
+                            hypothesis.desc,
+                            style: UITextStyle.subtitle1,
+                          ),
+                          backgroundColor:
+                              currentUserVote == HypothesisVote.spinoff
+                                  ? AppColors.conflictLight
+                                  : everyoneElseAgrees
+                                      ? AppColors.consensus
+                                      : AppColors.public,
+                          trailing: Stack(clipBehavior: Clip.none, children: [
+                            WidenHypothesesPopoverPage(
+                              hypothesis: hypothesis,
+                              currentUserId: currentUserId,
+                              invitedUserIds:
+                                  issueBloc.focusedIssue!.invitedUserIds!,
                             ),
-                            backgroundColor:
-                                currentUserVote == HypothesisVote.spinoff
-                                    ? AppColors.conflictLight
-                                    : everyoneElseAgrees
-                                        ? AppColors.consensus
-                                        : AppColors.public,
-                            trailing: Stack(
-                              clipBehavior: Clip.none,
-                              children: [WidenHypothesesPopoverPage(
-                                hypothesis: hypothesis,
-                                currentUserId: currentUserId,
-                                invitedUserIds:
-                                    issueBloc.focusedIssue!.invitedUserIds!,
+                            if (conflict)
+                              Positioned(
+                                top: -8,
+                                right: -8,
+                                child: ShadBadge.destructive(
+                                  child: const Text(''),
+                                ),
                               ),
-                              if (conflict)
-                                  Positioned(
-                                    top: -8,
-                                    right: -8,
-                                    child: ShadBadge.destructive(
-                                      child: const Text(''),
-                                    ),
-                                  ),
-                              ]
-                            ),
-                          );
-                        },
-                      ),
+                          ]),
+                        );
+                      },
                     ),
-                  );
-                },
-              );
-            }
+                  ),
+                );
+              },
+            );
           }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      ),
-    );
-  }
+        }
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    ),
+  );
+}
