@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:guide_solve/models/appUser.dart';
 
 class AuthRepository {
   AuthRepository({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   final FirebaseAuth _firebaseAuth;
+  final CollectionReference _userCollection =
+      FirebaseFirestore.instance.collection('users');
 // validate email
   bool isValidEmail(String email) {
     final emailRegExp = RegExp(
@@ -26,16 +30,38 @@ class AuthRepository {
   }
 
 // register
-  Future<User?> registerWithEmailAndPassword(
+Future<User?> registerWithEmailAndPassword(
     String email,
     String password,
   ) async {
     try {
+      // Create User
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user;
+
+      // Create new user in Firestore 'users' collection
+      final user = userCredential.user;
+      if (user != null) {
+        final privateAreaId = 'p${user.uid}';
+        final privateArea = IssueArea(label: 'Private', userIds: [user.uid], issueAreaId: privateAreaId);
+
+        await _userCollection.doc(user.uid).set(
+          {
+            'userId': user.uid,
+            'email': email,
+            'username': email,
+            'createdTimestamp': DateTime.now(),
+            'lastLoginTimestamp': DateTime.now(),
+            'contacts': <String>[], // Explicitly typed as List<String>
+            'issueAreas': [privateArea.toJson()], // Add initial private area
+            'invitedContacts': <String>[], // Explicitly typed as List<String>
+          },
+        );
+      }
+
+      return user;
     } on FirebaseAuthException catch (e) {
       // Handle specific error codes if needed
       throw Exception(e.message);

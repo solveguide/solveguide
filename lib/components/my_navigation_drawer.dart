@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_solve/components/logo.dart';
+import 'package:guide_solve/pages/contact_page.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/pages/proven_solved_issues_page.dart';
@@ -71,7 +72,16 @@ class MyNavigationDrawer extends StatelessWidget {
                 child: ListTile(
                   title: const Text('C O N T A C T S'),
                   leading: const Icon(Icons.person),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute<Widget>(
+                        builder: (context) => const ContactPage(),
+                      ),
+                      (route) => false,
+                    );
+                  },
                 ),
               ),
             ],

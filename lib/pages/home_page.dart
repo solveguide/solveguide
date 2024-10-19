@@ -62,8 +62,11 @@ class _HomePageState extends State<HomePage> {
       resizeToAvoidBottomInset: true,
       body: ListView(
         children: [
-          _buildMainContainer(),
-          SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: _buildMainContainer(),
+          ),
+          SizedBox(height: AppSpacing.md),
           if (demoFunctional) _buildCenterContainer(),
         ],
       ),
@@ -74,10 +77,10 @@ class _HomePageState extends State<HomePage> {
     return Align(
       child: Container(
         width: double.infinity,
-        constraints: BoxConstraints(maxWidth: 1000),
+        //constraints: BoxConstraints(maxWidth: 1000),
         decoration:
-            _containerDecoration(Colors.lightBlue[200] ?? Colors.orange),
-        padding: EdgeInsets.all(25),
+            _containerDecoration(AppColors.consensus),
+        padding: EdgeInsets.all(AppSpacing.xlg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -88,7 +91,7 @@ class _HomePageState extends State<HomePage> {
               child: _buildDetailedText(),
             ),
             Padding(
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: MaterialButton(
                 onPressed: goToLoginPage,
                 color: Colors.red,
@@ -109,14 +112,14 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         width: 500,
         decoration: _containerDecoration(Colors.white),
-        padding: EdgeInsets.all(25),
+        padding: EdgeInsets.all(AppSpacing.xlg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildHeaderText('Try Solve Guide'),
-            SizedBox(height: 10),
+            SizedBox(height: AppSpacing.md),
             narrowInstructionText('Narrow in on a single issue.'),
-            SizedBox(height: 6),
+            SizedBox(height: AppSpacing.sm),
             Text(
               'Try using a recent example of a personal experience '
               "you'd like to avoid in the future.",
@@ -124,7 +127,7 @@ class _HomePageState extends State<HomePage> {
               softWrap: true,
               style: TextStyle(fontSize: 12),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: AppSpacing.md),
             TextField(
               controller: demoIssueLabel,
               onSubmitted: (String value) {},
@@ -139,7 +142,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: MaterialButton(
                 onPressed: isButtonEnabled ? () => {} : null,
                 color: Colors.red,
@@ -159,8 +162,8 @@ class _HomePageState extends State<HomePage> {
   BoxDecoration _containerDecoration(Color color) {
     return BoxDecoration(
       color: color,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(),
+      // borderRadius: BorderRadius.circular(20),
+      // border: Border.all(),
     );
   }
 

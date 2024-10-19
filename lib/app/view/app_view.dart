@@ -7,6 +7,7 @@ import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/login_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';
+import 'package:guide_solve/repositories/appUser_repository.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,9 @@ class MyApp extends StatelessWidget {
         ),
         Provider<IssueRepository>.value(
           value: issueRepository,
+        ),
+        Provider<AppUserRepository>(
+          create: (_) => AppUserRepository(),
         ),
         BlocProvider<AuthBloc>(
           create: (context) =>
