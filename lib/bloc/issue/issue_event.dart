@@ -179,6 +179,17 @@ final class NewFactCreated extends IssueEvent {
       [newFact, newFactContext, referenceObjectId, referenceObjectType];
 }
 
+class AddUserToIssueEvent extends IssueEvent {
+  final String issueId;
+  final String userId;
+
+  const AddUserToIssueEvent({required this.issueId, required this.userId});
+
+  @override
+  List<Object?> get props => [issueId, userId];
+}
+
+
 /*
 
 THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS

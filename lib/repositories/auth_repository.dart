@@ -30,7 +30,7 @@ class AuthRepository {
   }
 
 // register
-Future<User?> registerWithEmailAndPassword(
+  Future<User?> registerWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -45,7 +45,8 @@ Future<User?> registerWithEmailAndPassword(
       final user = userCredential.user;
       if (user != null) {
         final privateAreaId = 'p${user.uid}';
-        final privateArea = IssueArea(label: 'Private', userIds: [user.uid], issueAreaId: privateAreaId);
+        final privateArea = IssueArea(
+            label: 'Private', userIds: [user.uid], issueAreaId: privateAreaId);
 
         await _userCollection.doc(user.uid).set(
           {

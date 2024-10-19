@@ -4,6 +4,7 @@ Any issue that is not currently in focus will be displayed using this issue tile
 
 */
 
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
@@ -81,14 +82,30 @@ class _IssueTileState extends State<IssueTile> {
             children: [
               // Actions --
               // Start solving Issue
-              PlainButton(
-                onPressed: solved
-                    ? () => _showReveiwDialog(widget.issue)
-                    : () => widget.firstButton(),
-                text: solved ? 'Review' : 'Solve',
-                color: solved
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.tertiaryContainer,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  if (widget.issue.invitedUserIds!.length > 1) 
+                    Row(
+                      children: [
+                        Text((widget.issue.invitedUserIds!.length - 1).toString(), style: UITextStyle.headline7,),
+                        SizedBox(width: AppSpacing.xs),
+                        Icon(Icons.person_add),
+                        SizedBox(width: AppSpacing.md),
+                      ],
+                    )
+                    
+                  ,
+                  PlainButton(
+                    onPressed: solved
+                        ? () => _showReveiwDialog(widget.issue)
+                        : () => widget.firstButton(),
+                    text: solved ? 'Review' : 'Solve',
+                    color: solved
+                        ? Theme.of(context).colorScheme.primaryContainer
+                        : Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                ],
               ),
               // Delete Issue
               if (widget.secondButton != null)

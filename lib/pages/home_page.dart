@@ -78,8 +78,7 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         width: double.infinity,
         //constraints: BoxConstraints(maxWidth: 1000),
-        decoration:
-            _containerDecoration(AppColors.consensus),
+        decoration: _containerDecoration(AppColors.consensus),
         padding: EdgeInsets.all(AppSpacing.xlg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

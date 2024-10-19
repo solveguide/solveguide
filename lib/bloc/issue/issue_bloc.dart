@@ -33,6 +33,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<NewFactCreated>(_onNewFactCreated);
     on<FocusIssueNavigationRequested>(_onFocusIssueNavigationRequested);
+    on<AddUserToIssueEvent>(_onAddUserToIssueEvent);
     //on<FocusSolveScopeSubmitted>(_onFocusSolveScopeSubmitted);
     //Solution Proving Events
     //on<SolveProvenByOwner>(_onSolveProvenByOwner);
@@ -657,6 +658,28 @@ void _onFocusSolveScopeSubmitted(
       // No need to emit a new state; the UI will update via the stream
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
+    }
+  }
+
+    Future<void> _onAddUserToIssueEvent(
+    AddUserToIssueEvent event,
+    Emitter<IssueState> emit,
+  ) async {
+    try {
+      // Fetch the issue
+      final issue = await issueRepository.getIssueById(event.issueId);
+      if (issue == null) {
+        emit(IssuesListFailure('Issue not found.'));
+        return;
+      }
+
+      // Add the user to the invitedUserIds
+      issue.invitedUserIds?.add(event.userId);
+
+      // Update the issue in the repository
+      await issueRepository.updateIssue(issue.issueId!, issue);
+    } catch (e) {
+      emit(IssuesListFailure(e.toString()));
     }
   }
 }

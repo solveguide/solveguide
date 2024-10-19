@@ -20,15 +20,17 @@ class AppUser {
   final DateTime createdTimestamp;
   final DateTime lastLoginTimestamp;
   List<String> contacts; // List of userIds that are contacts
-  List<String> invitedContacts; // List of emails for users invited but not registered
+  List<String>
+      invitedContacts; // List of emails for users invited but not registered
   List<IssueArea> issueAreas; // List of issue areas this user belongs to
 
-    // Simple Getters for the mandatory fields
+  // Simple Getters for the mandatory fields
   String get getUserId => userId;
   String get getEmail => email;
   String get getUsername => username;
   DateTime get getCreatedTimestamp => createdTimestamp;
   DateTime get getLastLoginTimestamp => lastLoginTimestamp;
+  List<String> get getContacts => contacts;
 
   // Getters for convenient access
 
@@ -48,13 +50,15 @@ class AppUser {
   bool isInvited(String email) => invitedContacts.contains(email);
 
   // Get the list of issue area labels
-  List<String> get issueAreaLabels => issueAreas.map((area) => area.label).toList();
+  List<String> get issueAreaLabels =>
+      issueAreas.map((area) => area.label).toList();
 
   // Check if a user belongs to an issue area
   bool isUserInIssueArea(String issueAreaId, String userId) {
     final issueArea = issueAreas.firstWhere(
       (area) => area.issueAreaId == issueAreaId,
-      orElse: () => IssueArea(issueAreaId: issueAreaId, label: 'Unknown', userIds: []),
+      orElse: () =>
+          IssueArea(issueAreaId: issueAreaId, label: 'Unknown', userIds: []),
     );
     return issueArea.userIds.contains(userId);
   }
@@ -77,7 +81,8 @@ class AppUser {
   void addUserToIssueArea(String issueAreaId, String userId) {
     final issueArea = issueAreas.firstWhere(
       (area) => area.issueAreaId == issueAreaId,
-      orElse: () => IssueArea(issueAreaId: issueAreaId, label: 'Unknown', userIds: []),
+      orElse: () =>
+          IssueArea(issueAreaId: issueAreaId, label: 'Unknown', userIds: []),
     );
     if (!issueArea.userIds.contains(userId)) {
       issueArea.userIds.add(userId);
@@ -104,7 +109,8 @@ class AppUser {
         createdTimestamp: (json['createdTimestamp'] as Timestamp).toDate(),
         lastLoginTimestamp: (json['lastLoginTimestamp'] as Timestamp).toDate(),
         contacts: (json['contacts'] as List<dynamic>).cast<String>(),
-        invitedContacts: (json['invitedContacts'] as List<dynamic>).cast<String>(),
+        invitedContacts:
+            (json['invitedContacts'] as List<dynamic>).cast<String>(),
         issueAreas: (json['issueAreas'] as List<dynamic>)
             .map((e) => IssueArea.fromJson(e as Map<String, dynamic>))
             .toList(),
