@@ -158,7 +158,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     final hypotheses = await hypothesesStream.first;
     final solutions = await solutionsStream.first;
 
-    final perspective = issue.perspective(_currentUserId!, hypotheses, solutions);
+    final perspective =
+        issue.perspective(_currentUserId!, hypotheses, solutions);
 
     IssueProcessStage stage;
 
@@ -224,7 +225,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     final hypotheses = await hypothesesStream.first;
     final solutions = await solutionsStream.first;
 
-    final perspective = _focusedIssue!.perspective(_currentUserId!, hypotheses, solutions);
+    final perspective =
+        _focusedIssue!.perspective(_currentUserId!, hypotheses, solutions);
 
     emit(
       IssueProcessState(
@@ -356,7 +358,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       if (state is! IssueProcessState) return;
 
       // Cast state to IssueProcessState
-    final currentState = state as IssueProcessState;
+      final currentState = state as IssueProcessState;
 
       // Ensure _currentIssueId is available
       if (_currentIssueId == null) {
@@ -385,10 +387,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         _currentIssueId!,
         updatedHypothesis,
       );
-      
+
       final stage = currentState.stage;
 
-    add(FocusIssueNavigationRequested(stage: stage));
+      add(FocusIssueNavigationRequested(stage: stage));
     } catch (e) {
       // Handle errors and update the state accordingly
       emit(IssuesListFailure(e.toString()));

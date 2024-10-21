@@ -104,13 +104,15 @@ class Issue {
   }
 
   // Perspective for the issue
-  IssuePerspective perspective(String currentUserId, List<Hypothesis> hypotheses, List<Solution> solutions) {
+  IssuePerspective perspective(String currentUserId,
+      List<Hypothesis> hypotheses, List<Solution> solutions) {
     return IssuePerspective(this, currentUserId, hypotheses, solutions);
   }
 }
 
 class IssuePerspective {
-  IssuePerspective(this.issue, this.currentUserId, this.hypotheses, this.solutions);
+  IssuePerspective(
+      this.issue, this.currentUserId, this.hypotheses, this.solutions);
 
   final Issue issue;
   final String currentUserId;
@@ -132,7 +134,7 @@ class IssuePerspective {
     });
   }
 
-    /// Get the number of hypotheses
+  /// Get the number of hypotheses
   int numberOfHypotheses() {
     return hypotheses.length;
   }

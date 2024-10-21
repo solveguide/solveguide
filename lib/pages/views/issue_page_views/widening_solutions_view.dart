@@ -37,7 +37,9 @@ class WideningSolutionsView extends StatelessWidget {
                   child: Column(
                     children: [
                       //Issue Status & Navigation
-                      ProcessStatusBar(perspective: perspective!,),
+                      ProcessStatusBar(
+                        perspective: perspective!,
+                      ),
                       const SizedBox(height: AppSpacing.lg),
                       // Consensus IssueOwner noticed the seedStatement
                       SizedBox(
@@ -51,7 +53,8 @@ class WideningSolutionsView extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xxxs),
                       ShadCard(
                         width: 600,
-                        title: Text(focusedIssue.root.isEmpty? 'TBD' : focusedIssue.root,
+                        title: Text(
+                          focusedIssue.root.isEmpty ? 'TBD' : focusedIssue.root,
                           style: UITextStyle.headline6,
                         ),
                         backgroundColor: AppColors.consensus,
@@ -63,7 +66,8 @@ class WideningSolutionsView extends StatelessWidget {
                         constraints: const BoxConstraints(maxWidth: 800),
                         child: ShadInput(
                           controller: _textController,
-                          placeholder: const Text('Enter possible solutions here.'),
+                          placeholder:
+                              const Text('Enter possible solutions here.'),
                           keyboardType: TextInputType.text,
                           onSubmitted: (value) => {
                             if (value.isNotEmpty)
@@ -99,7 +103,7 @@ class WideningSolutionsView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),                      
+                      const SizedBox(height: AppSpacing.md),
                       // Widening Options so far (Hypotheses list)
                       _solutionList(
                         context,

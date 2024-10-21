@@ -36,7 +36,9 @@ class WideningHypothesesView extends StatelessWidget {
                   child: Column(
                     children: [
                       //Issue Status & Navigation
-                      ProcessStatusBar(perspective: perspective!,),
+                      ProcessStatusBar(
+                        perspective: perspective!,
+                      ),
                       const SizedBox(height: AppSpacing.lg),
                       // Consensus IssueOwner noticed the seedStatement
                       SizedBox(
@@ -99,7 +101,7 @@ class WideningHypothesesView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),                      
+                      const SizedBox(height: AppSpacing.md),
                       // Widening Options so far (Hypotheses list)
                       _hypothesisList(
                         context,

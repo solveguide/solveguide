@@ -31,8 +31,6 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
   Widget build(BuildContext context) {
     // Custom theme color (update with your AppColors)
     final theme = Theme.of(context);
-    
-
 
     // List of icons representing the process
     final processIcons = [
@@ -79,9 +77,12 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
                           // Determine the values of hasConflict, isDisabled, and isCompleted using a switch
                           switch (stage) {
                             case IssueProcessStage.wideningHypotheses:
-                              hasConflict = !widget.perspective.hasCurrentUserVotedOnAllHypotheses();
+                              hasConflict = !widget.perspective
+                                  .hasCurrentUserVotedOnAllHypotheses();
                               isDisabled = false;
-                              isCompleted = (widget.perspective.hasCurrentUserVotedOnAllHypotheses() && widget.perspective.numberOfHypotheses() > 1);
+                              isCompleted = (widget.perspective
+                                      .hasCurrentUserVotedOnAllHypotheses() &&
+                                  widget.perspective.numberOfHypotheses() > 1);
                               break;
 
                             case IssueProcessStage.establishingFacts:
@@ -91,21 +92,31 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
                               break;
 
                             case IssueProcessStage.narrowingToRootCause:
-                              hasConflict = widget.perspective.numberOfHypothesesInConflict() > 0;
+                              hasConflict = widget.perspective
+                                      .numberOfHypothesesInConflict() >
+                                  0;
                               isDisabled = false;
-                              isCompleted = widget.perspective.hasConsensusRoot();
+                              isCompleted =
+                                  widget.perspective.hasConsensusRoot();
                               break;
 
                             case IssueProcessStage.wideningSolutions:
-                              hasConflict = !widget.perspective.hasCurrentUserVotedOnAllSolutions();
+                              hasConflict = !widget.perspective
+                                  .hasCurrentUserVotedOnAllSolutions();
                               isDisabled = false;
-                              isCompleted = (widget.perspective.hasCurrentUserVotedOnAllSolutions() && widget.perspective.numberOfSolutions() > 1);
+                              isCompleted = (widget.perspective
+                                      .hasCurrentUserVotedOnAllSolutions() &&
+                                  widget.perspective.numberOfSolutions() > 1);
                               break;
 
                             case IssueProcessStage.narrowingToSolve:
-                              hasConflict = widget.perspective.numberOfSolutionsInConflict() > 0;
-                              isDisabled = !widget.perspective.hasConsensusRoot(); // Example logic for disabling
-                              isCompleted = widget.perspective.hasConsensusSolve(); // Example logic for completion
+                              hasConflict = widget.perspective
+                                      .numberOfSolutionsInConflict() >
+                                  0;
+                              isDisabled = !widget.perspective
+                                  .hasConsensusRoot(); // Example logic for disabling
+                              isCompleted = widget.perspective
+                                  .hasConsensusSolve(); // Example logic for completion
                               break;
 
                             case IssueProcessStage.scopingSolve:

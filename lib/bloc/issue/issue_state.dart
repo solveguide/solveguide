@@ -43,7 +43,8 @@ class IssueProcessState extends IssueState {
   final IssuePerspective? perspective;
 
   @override
-  List<Object?> get props => [stage, hypothesesStream, solutionsStream, perspective];
+  List<Object?> get props =>
+      [stage, hypothesesStream, solutionsStream, perspective];
 }
 
 enum IssueProcessStage {

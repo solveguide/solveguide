@@ -21,8 +21,7 @@ class WidenSolutionPopoverPage extends StatefulWidget {
       _WidenSolutionPopoverPageState();
 }
 
-class _WidenSolutionPopoverPageState
-    extends State<WidenSolutionPopoverPage> {
+class _WidenSolutionPopoverPageState extends State<WidenSolutionPopoverPage> {
   final popoverController = ShadPopoverController();
   Set<String> selected = {};
   bool value = false;
