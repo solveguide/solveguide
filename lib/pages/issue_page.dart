@@ -13,7 +13,7 @@ class IssuePage extends StatelessWidget {
 
   final String issueId;
 
-  void _showInviteDialog(BuildContext context) {
+  void _showInviteDialog(BuildContext context, String issueId) {
     showDialog<void>(
       context: context,
       builder: (context) {
@@ -36,7 +36,7 @@ class IssuePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.person_add),
             onPressed: () {
-              _showInviteDialog(context);
+              _showInviteDialog(context, issueId);
             },
           ),
         ],

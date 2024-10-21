@@ -136,6 +136,18 @@ class SolutionUpdated extends IssueEvent {
   List<Object?> get props => [solutionId, updatedDescription];
 }
 
+class SolutionVoteSubmitted extends IssueEvent {
+  const SolutionVoteSubmitted({
+    required this.solutionId,
+    required this.voteValue,
+  });
+  final String solutionId;
+  final String voteValue;
+
+  @override
+  List<Object?> get props => [solutionId, voteValue];
+}
+
 final class FocusSolveScopeSubmitted extends IssueEvent {
   const FocusSolveScopeSubmitted({
     required this.solutionId,
@@ -188,7 +200,6 @@ class AddUserToIssueEvent extends IssueEvent {
   @override
   List<Object?> get props => [issueId, userId];
 }
-
 
 /*
 

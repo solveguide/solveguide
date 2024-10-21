@@ -182,7 +182,7 @@ class SolutionPerspective {
   }
 
   /// Determine if all other stakeholders voted agree or solve.
-  bool allOtherStakeholdersAgreeOrSolve() {
+  bool allOtherStakeholdersAgree() {
     for (final entry in solution.votes.entries) {
       if (entry.key == currentUserId) continue;
       final vote = SolutionVote.values.byName(entry.value);

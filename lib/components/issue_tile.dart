@@ -85,17 +85,18 @@ class _IssueTileState extends State<IssueTile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  if (widget.issue.invitedUserIds!.length > 1) 
+                  if (widget.issue.invitedUserIds!.length > 1)
                     Row(
                       children: [
-                        Text((widget.issue.invitedUserIds!.length - 1).toString(), style: UITextStyle.headline7,),
+                        Text(
+                          (widget.issue.invitedUserIds!.length - 1).toString(),
+                          style: UITextStyle.headline7,
+                        ),
                         SizedBox(width: AppSpacing.xs),
                         Icon(Icons.person_add),
                         SizedBox(width: AppSpacing.md),
                       ],
-                    )
-                    
-                  ,
+                    ),
                   PlainButton(
                     onPressed: solved
                         ? () => _showReveiwDialog(widget.issue)

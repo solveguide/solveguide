@@ -34,14 +34,16 @@ class IssueProcessState extends IssueState {
     required this.stage,
     this.hypothesesStream,
     this.solutionsStream,
+    this.perspective,
   });
 
   final IssueProcessStage stage;
   final Stream<List<Hypothesis>>? hypothesesStream;
   final Stream<List<Solution>>? solutionsStream;
+  final IssuePerspective? perspective;
 
   @override
-  List<Object?> get props => [stage, hypothesesStream, solutionsStream];
+  List<Object?> get props => [stage, hypothesesStream, solutionsStream, perspective];
 }
 
 enum IssueProcessStage {

@@ -45,7 +45,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   StreamSubscription<Issue>? _focusedIssueSubscription;
   Issue? _focusedIssue;
   String? _currentIssueId;
+  String? _currentUserId;
 
+  String? get currentUserId => _currentUserId;
+  String? get currentIssueId => _currentIssueId;
   Issue? get focusedIssue => _focusedIssue;
   StreamSubscription<Issue>? get focusedIssueStream =>
       _focusedIssueSubscription;
@@ -62,6 +65,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         emit(const IssuesListFailure('User not authenticated'));
         return;
       }
+      _currentUserId = userId;
       // Use getIssuesList for a one-time fetch
       final issuesList = await issueRepository.getIssueList(userId);
       emit(IssuesListSuccess(issueList: issuesList));
@@ -151,6 +155,11 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     final hypothesesStream = issueRepository.getHypotheses(issue.issueId!);
     final solutionsStream = issueRepository.getSolutions(issue.issueId!);
 
+    final hypotheses = await hypothesesStream.first;
+    final solutions = await solutionsStream.first;
+
+    final perspective = issue.perspective(_currentUserId!, hypotheses, solutions);
+
     IssueProcessStage stage;
 
     if (issue.root.isEmpty && (await hypothesesStream.first).length < 4) {
@@ -160,6 +169,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           stage: stage,
           hypothesesStream: hypothesesStream,
           solutionsStream: solutionsStream,
+          perspective: perspective,
         ),
       );
     } else if (issue.root.isEmpty) {
@@ -169,6 +179,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           stage: stage,
           hypothesesStream: hypothesesStream,
           solutionsStream: solutionsStream,
+          perspective: perspective,
         ),
       );
     } else if (issue.solve.isEmpty &&
@@ -179,6 +190,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           stage: stage,
           hypothesesStream: hypothesesStream,
           solutionsStream: solutionsStream,
+          perspective: perspective,
         ),
       );
     } else if (issue.solve.isEmpty) {
@@ -188,6 +200,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           stage: stage,
           hypothesesStream: hypothesesStream,
           solutionsStream: solutionsStream,
+          perspective: perspective,
         ),
       );
     } else {
@@ -201,18 +214,24 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   FutureOr<void> _onFocusIssueNavigationRequested(
     FocusIssueNavigationRequested event,
     Emitter<IssueState> emit,
-  ) {
+  ) async {
     final stage = event.stage;
 
     // Get the appropriate streams for the current issue
     final hypothesesStream = issueRepository.getHypotheses(_currentIssueId!);
     final solutionsStream = issueRepository.getSolutions(_currentIssueId!);
 
+    final hypotheses = await hypothesesStream.first;
+    final solutions = await solutionsStream.first;
+
+    final perspective = _focusedIssue!.perspective(_currentUserId!, hypotheses, solutions);
+
     emit(
       IssueProcessState(
         stage: stage,
         hypothesesStream: hypothesesStream,
         solutionsStream: solutionsStream,
+        perspective: perspective,
       ),
     );
   }
@@ -336,6 +355,9 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       // Retrieve the current state and make sure it's an IssueProcessState
       if (state is! IssueProcessState) return;
 
+      // Cast state to IssueProcessState
+    final currentState = state as IssueProcessState;
+
       // Ensure _currentIssueId is available
       if (_currentIssueId == null) {
         throw Exception('_currentIssueId is not set');
@@ -351,12 +373,9 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         orElse: () => throw Exception('Hypothesis not found'),
       );
 
-      // Fetch the current user's ID
-      final currentUserId = await authRepository.getUserUid();
-
       // Update the votes map with the current user's vote
       final updatedVotes = Map<String, String>.from(hypothesis.votes)
-        ..[currentUserId!] = event.voteValue;
+        ..[_currentUserId!] = event.voteValue;
 
       // Create a new hypothesis object with updated votes
       final updatedHypothesis = hypothesis.copyWith(votes: updatedVotes);
@@ -366,6 +385,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         _currentIssueId!,
         updatedHypothesis,
       );
+      
+      final stage = currentState.stage;
+
+    add(FocusIssueNavigationRequested(stage: stage));
     } catch (e) {
       // Handle errors and update the state accordingly
       emit(IssuesListFailure(e.toString()));
@@ -661,7 +684,7 @@ void _onFocusSolveScopeSubmitted(
     }
   }
 
-    Future<void> _onAddUserToIssueEvent(
+  Future<void> _onAddUserToIssueEvent(
     AddUserToIssueEvent event,
     Emitter<IssueState> emit,
   ) async {

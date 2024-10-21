@@ -1,12 +1,10 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypotheses.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
-import 'package:provider/provider.dart';
 
 class WideningHypothesesView extends StatelessWidget {
   WideningHypothesesView({
@@ -20,8 +18,7 @@ class WideningHypothesesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
-    final currentUserId =
-        Provider.of<AuthBloc>(context, listen: false).currentUserId!;
+    final currentUserId = issueBloc.currentUserId!;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -34,11 +31,12 @@ class WideningHypothesesView extends StatelessWidget {
                 if (focusedIssue == null) {
                   return const Text('No seed statement available...');
                 }
+                final perspective = state.perspective;
                 return Expanded(
                   child: Column(
                     children: [
                       //Issue Status & Navigation
-                      _issueProcessNav(context),
+                      ProcessStatusBar(perspective: perspective!,),
                       const SizedBox(height: AppSpacing.lg),
                       // Consensus IssueOwner noticed the seedStatement
                       SizedBox(
@@ -101,7 +99,7 @@ class WideningHypothesesView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      const SizedBox(height: AppSpacing.md),                      
                       // Widening Options so far (Hypotheses list)
                       _hypothesisList(
                         context,
@@ -117,36 +115,6 @@ class WideningHypothesesView extends StatelessWidget {
             },
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _issueProcessNav(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 300),
-      child: ProcessStatusBar(
-        currentStage: 0,
-        onSegmentTapped: (index) {
-          var stage = IssueProcessStage.wideningHypotheses;
-          switch (index) {
-            case 0:
-              stage = IssueProcessStage.wideningHypotheses;
-            case 1:
-              stage = IssueProcessStage.narrowingToRootCause;
-            case 2:
-              stage = IssueProcessStage.wideningSolutions;
-            case 3:
-              stage = IssueProcessStage.narrowingToSolve;
-          }
-          BlocProvider.of<IssueBloc>(context).add(
-            FocusIssueNavigationRequested(
-              stage: stage,
-            ),
-          );
-        },
-        conflictStages: const [],
-        disabledStages: const [],
-        completedStages: const [],
       ),
     );
   }

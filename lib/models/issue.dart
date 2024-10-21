@@ -104,25 +104,27 @@ class Issue {
   }
 
   // Perspective for the issue
-  IssuePerspective perspective(String currentUserId) {
-    return IssuePerspective(this, currentUserId);
+  IssuePerspective perspective(String currentUserId, List<Hypothesis> hypotheses, List<Solution> solutions) {
+    return IssuePerspective(this, currentUserId, hypotheses, solutions);
   }
 }
 
 class IssuePerspective {
-  IssuePerspective(this.issue, this.currentUserId);
+  IssuePerspective(this.issue, this.currentUserId, this.hypotheses, this.solutions);
 
   final Issue issue;
   final String currentUserId;
+  final List<Hypothesis> hypotheses;
+  final List<Solution> solutions;
 
   /// Check if the current user has voted on all hypotheses.
-  bool hasCurrentUserVotedOnAllHypotheses(List<Hypothesis> hypotheses) {
+  bool hasCurrentUserVotedOnAllHypotheses() {
     return hypotheses
         .every((hypothesis) => hypothesis.votes.containsKey(currentUserId));
   }
 
   /// Check if all stakeholders have voted on all hypotheses.
-  bool haveAllStakeholdersVotedOnAllHypotheses(List<Hypothesis> hypotheses) {
+  bool haveAllStakeholdersVotedOnAllHypotheses() {
     final invitedUserIds = issue.invitedUserIds;
     return hypotheses.every((hypothesis) {
       return invitedUserIds!
@@ -130,8 +132,13 @@ class IssuePerspective {
     });
   }
 
+    /// Get the number of hypotheses
+  int numberOfHypotheses() {
+    return hypotheses.length;
+  }
+
   /// Get the number of hypotheses where the current user is in conflict.
-  int numberOfHypothesesInConflict(List<Hypothesis> hypotheses) {
+  int numberOfHypothesesInConflict() {
     return hypotheses.where((hypothesis) {
       final perspective =
           hypothesis.perspective(currentUserId, issue.invitedUserIds!);
@@ -140,13 +147,13 @@ class IssuePerspective {
   }
 
   /// Check if the current user has voted "root" on any hypothesis.
-  bool hasCurrentUserVotedRoot(List<Hypothesis> hypotheses) {
+  bool hasCurrentUserVotedRoot() {
     return hypotheses.any((hypothesis) =>
         hypothesis.votes[currentUserId] == HypothesisVote.root.name);
   }
 
   /// Check if the issue has a consensus root.
-  bool hasConsensusRoot(List<Hypothesis> hypotheses) {
+  bool hasConsensusRoot() {
     return hypotheses.any((hypothesis) {
       final invitedUserIds = issue.invitedUserIds;
       return invitedUserIds!.every(
@@ -155,13 +162,13 @@ class IssuePerspective {
   }
 
   /// Check if the current user has voted on all solutions.
-  bool hasCurrentUserVotedOnAllSolutions(List<Solution> solutions) {
+  bool hasCurrentUserVotedOnAllSolutions() {
     return solutions
         .every((solution) => solution.votes.containsKey(currentUserId));
   }
 
   /// Check if all stakeholders have voted on all solutions.
-  bool haveAllStakeholdersVotedOnAllSolutions(List<Solution> solutions) {
+  bool haveAllStakeholdersVotedOnAllSolutions() {
     final invitedUserIds = issue.invitedUserIds;
     return solutions.every((solution) {
       return invitedUserIds!
@@ -169,8 +176,13 @@ class IssuePerspective {
     });
   }
 
+  /// Get the number of solutions
+  int numberOfSolutions() {
+    return solutions.length;
+  }
+
   /// Get the number of solutions where the current user is in conflict.
-  int numberOfSolutionsInConflict(List<Solution> solutions) {
+  int numberOfSolutionsInConflict() {
     return solutions.where((solution) {
       final perspective =
           SolutionPerspective(solution, currentUserId, issue.invitedUserIds!);
@@ -179,13 +191,13 @@ class IssuePerspective {
   }
 
   /// Check if the current user has voted "solve" on any solution.
-  bool hasCurrentUserVotedSolve(List<Solution> solutions) {
+  bool hasCurrentUserVotedSolve() {
     return solutions.any(
         (solution) => solution.votes[currentUserId] == SolutionVote.solve.name);
   }
 
   /// Check if the issue has a consensus solve.
-  bool hasConsensusSolve(List<Solution> solutions) {
+  bool hasConsensusSolve() {
     return solutions.any((solution) {
       final invitedUserIds = issue.invitedUserIds;
       return invitedUserIds!
