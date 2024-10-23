@@ -69,18 +69,17 @@ class _WidenHypothesesSegmentButtonState
                     label: const Text('Disagree'),
                     tooltip: 'Disagree with this hypothesis.'),
                 if (currentUserVote != 'root') ...[
-                ButtonSegment<String>(
-                    value: 'agree',
-                    label: const Text('Agree'),
-                    tooltip:
-                        'Agree that this hypothesis could be part of the issue.'),
+                  ButtonSegment<String>(
+                      value: 'agree',
+                      label: const Text('Agree'),
+                      tooltip:
+                          'Agree that this hypothesis could be part of the issue.'),
                 ],
                 if (currentUserVote == 'root') ...[
                   ButtonSegment<String>(
-                    value: 'root',
-                    label: const Text('Root'),
-                    tooltip:
-                        'Select as Root Issue.'),
+                      value: 'root',
+                      label: const Text('Root'),
+                      tooltip: 'Select as Root Issue.'),
                 ]
               ],
               selected: {currentUserVote},
@@ -90,7 +89,7 @@ class _WidenHypothesesSegmentButtonState
                   _handleVote('agree');
                 } else if (newSelection.contains('disagree')) {
                   _handleVote('disagree');
-                }else if (newSelection.contains('root')) {
+                } else if (newSelection.contains('root')) {
                   _handleVote('root');
                 }
               },
@@ -111,7 +110,8 @@ class _WidenHypothesesSegmentButtonState
                       return currentUserVote == 'agree'
                           ? AppColors.consensus
                           : currentUserVote == 'root'
-                          ? AppColors.consensus : AppColors.conflictLight;
+                              ? AppColors.consensus
+                              : AppColors.conflictLight;
                     }
                     return AppColors.public;
                   },

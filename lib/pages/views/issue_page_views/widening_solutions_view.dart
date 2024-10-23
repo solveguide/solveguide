@@ -186,7 +186,8 @@ Widget _solutionList(
                                 issueBloc.focusedIssue!.invitedUserIds!)
                             .allOtherStakeholdersAgree();
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical:AppSpacing.xxs),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.xxs),
                           child: ShadCard(
                             title: Text(
                               solution.desc,

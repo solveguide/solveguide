@@ -138,7 +138,8 @@ Widget _hypothesisList(
                                 issueBloc.focusedIssue!.invitedUserIds!)
                             .isCurrentUserInConflict();
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical:AppSpacing.xxs),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.xxs),
                           child: ShadCard(
                             title: Text(
                               hypothesis.desc,

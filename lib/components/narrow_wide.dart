@@ -24,7 +24,6 @@ Widget widenIcon({double size = 24.0, Color? color}) {
   );
 }
 
-
 // Function for displaying narrow instruction with text
 Widget narrowInstructionText(String boldText, {String? text}) {
   return RichText(

@@ -38,7 +38,7 @@ class _WidenHypothesesPopoverPageState
   Widget build(BuildContext context) {
     final currentUservote =
         widget.hypothesis.votes[widget.currentUserId] ?? 'Vote!';
-        _textController = TextEditingController(text: widget.hypothesis.desc);
+    _textController = TextEditingController(text: widget.hypothesis.desc);
 
     return Center(
       child: ShadPopover(
@@ -110,60 +110,61 @@ class _WidenHypothesesPopoverPageState
                 const Divider(),
                 const SizedBox(height: AppSpacing.md),
                 Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Text(
-                'What is the smallest change you can make that would change your vote to agree?',
-                style: UITextStyle.bodyText2,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 800),
-                        child: ShadInput(
-                          controller: _textController,
-                          keyboardType: TextInputType.text,
-                          //expands: true,
-                          autofocus: true,
-                          maxLines: 3,
-                          onSubmitted: (value) => {
-                            if (value.isNotEmpty)
-                              {
-                                context.read<IssueBloc>().add(
-                                      NewHypothesisCreated(
-                                        newHypothesis: value,
-                                      ),
-                                    ),
-                                    popoverController.hide(),
-                              },
-                            _textController.clear(),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Text(
+                    'What is the smallest change you can make that would change your vote to agree?',
+                    style: UITextStyle.bodyText2,
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: ShadInput(
+                      controller: _textController,
+                      keyboardType: TextInputType.text,
+                      //expands: true,
+                      autofocus: true,
+                      maxLines: 3,
+                      onSubmitted: (value) => {
+                        if (value.isNotEmpty)
+                          {
+                            context.read<IssueBloc>().add(
+                                  NewHypothesisCreated(
+                                    newHypothesis: value,
+                                  ),
+                                ),
+                            popoverController.hide(),
                           },
-                          suffix: ShadButton(
-                            width: 24,
-                            height: 24,
-                            padding: EdgeInsets.zero,
-                            backgroundColor: AppColors.public,
-                            decoration: const ShadDecoration(
-                              secondaryBorder: ShadBorder.none,
-                              secondaryFocusedBorder: ShadBorder.none,
-                            ),
-                            icon: const Icon(Icons.check),
-                            onPressed: () {
-                              if (_textController.text.isNotEmpty) {
-                                context.read<IssueBloc>().add(
-                                      NewHypothesisCreated(
-                                        newHypothesis: _textController.text,
-                                      ),
-                                    );
-                                _textController.clear();
-                                popoverController.hide();
-                              }
-                            },
-                          ),
+                        _textController.clear(),
+                      },
+                      suffix: ShadButton(
+                        width: 24,
+                        height: 24,
+                        padding: EdgeInsets.zero,
+                        backgroundColor: AppColors.public,
+                        decoration: const ShadDecoration(
+                          secondaryBorder: ShadBorder.none,
+                          secondaryFocusedBorder: ShadBorder.none,
                         ),
+                        icon: const Icon(Icons.check),
+                        onPressed: () {
+                          if (_textController.text.isNotEmpty) {
+                            context.read<IssueBloc>().add(
+                                  NewHypothesisCreated(
+                                    newHypothesis: _textController.text,
+                                  ),
+                                );
+                            _textController.clear();
+                            popoverController.hide();
+                          }
+                        },
                       ),
-            ),
-            const SizedBox(height: AppSpacing.md),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
               ],
             ],
           ),

@@ -201,7 +201,8 @@ Widget _hypothesisList(
                             trailing: WidenHypothesesSegmentButton(
                               hypothesis: hypothesis,
                               currentUserId: currentUserId,
-                              invitedUserIds: issueBloc.focusedIssue!.invitedUserIds!,
+                              invitedUserIds:
+                                  issueBloc.focusedIssue!.invitedUserIds!,
                               textController: textController,
                               focusNode: focusNode,
                             ),

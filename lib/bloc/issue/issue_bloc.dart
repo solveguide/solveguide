@@ -409,7 +409,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       );
 
       if (event.voteValue == 'root') {
-        add(FocusIssueNavigationRequested(stage: IssueProcessStage.narrowingToRootCause));
+        add(FocusIssueNavigationRequested(
+            stage: IssueProcessStage.narrowingToRootCause));
       } else {
         final stage = currentState.stage;
         add(FocusIssueNavigationRequested(stage: stage));

@@ -258,8 +258,8 @@ class InstructionBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (currentStage) {
-      case IssueProcessStage.wideningHypotheses : 
-      if (perspecitve.hasCurrentUserVotedOnAllHypotheses()) {
+      case IssueProcessStage.wideningHypotheses:
+        if (perspecitve.hasCurrentUserVotedOnAllHypotheses()) {
           return Center(
             child: Text(
               '''You've already voted on all hypotheses. Your job here is to ensure all possible underlying causes have been explored.''',
@@ -272,38 +272,38 @@ class InstructionBody extends StatelessWidget {
             ),
           );
         }
-      case IssueProcessStage.narrowingToRootCause : 
+      case IssueProcessStage.narrowingToRootCause:
         return Center(
           child: Text(
             '''Your job here is to select a single root issue that, if solved, will have a large impact on the original issue, but is also within your power to solve.''',
           ),
         );
-      case IssueProcessStage.wideningSolutions : 
+      case IssueProcessStage.wideningSolutions:
         return Center(
           child: Text(
             '''Your job here capture all the various ways you could address the agreed root to solve it. ''',
           ),
         );
-      case IssueProcessStage.narrowingToSolve : 
+      case IssueProcessStage.narrowingToSolve:
         return Center(
           child: Text(
             '''Your job here is to select the solution that has the best chance of resolving the agreet root issue, and is within your power to achieve.''',
           ),
         );
-        case IssueProcessStage.establishingFacts : 
+      case IssueProcessStage.establishingFacts:
         return Center(
           child: Text(
             '''establishingFacts''',
           ),
         );
-      case IssueProcessStage.scopingSolve : 
-      return Center(
+      case IssueProcessStage.scopingSolve:
+        return Center(
           child: Text(
             '''scopingSolve''',
           ),
         );
-      case IssueProcessStage.solveSummaryReview : 
-      return Center(
+      case IssueProcessStage.solveSummaryReview:
+        return Center(
           child: Text(
             '''solveSummaryReview''',
           ),
