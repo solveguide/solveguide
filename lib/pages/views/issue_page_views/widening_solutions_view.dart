@@ -15,6 +15,7 @@ class WideningSolutionsView extends StatelessWidget {
 
   final String issueId;
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +67,13 @@ class WideningSolutionsView extends StatelessWidget {
                         constraints: const BoxConstraints(maxWidth: 800),
                         child: ShadInput(
                           controller: _textController,
+                          focusNode: _focusNode,
                           placeholder:
                               const Text('Enter possible solutions here.'),
                           keyboardType: TextInputType.text,
+                          autofocus: true,
+                          minLines: 1,
+                          maxLines: 3,
                           onSubmitted: (value) => {
                             if (value.isNotEmpty)
                               {
@@ -79,6 +84,7 @@ class WideningSolutionsView extends StatelessWidget {
                                     ),
                               },
                             _textController.clear(),
+                            _focusNode.requestFocus(),
                           },
                           suffix: ShadButton(
                             width: 24,
@@ -98,6 +104,7 @@ class WideningSolutionsView extends StatelessWidget {
                                       ),
                                     );
                                 _textController.clear();
+                                _focusNode.requestFocus();
                               }
                             },
                           ),
@@ -178,22 +185,25 @@ Widget _solutionList(
                             .perspective(currentUserId,
                                 issueBloc.focusedIssue!.invitedUserIds!)
                             .allOtherStakeholdersAgree();
-                        return ShadCard(
-                          title: Text(
-                            solution.desc,
-                            style: UITextStyle.subtitle1,
-                          ),
-                          backgroundColor:
-                              currentUserVote == HypothesisVote.spinoff
-                                  ? AppColors.conflictLight
-                                  : everyoneElseAgrees
-                                      ? AppColors.consensus
-                                      : AppColors.public,
-                          trailing: WidenSolutionPopoverPage(
-                            solution: solution,
-                            currentUserId: currentUserId,
-                            invitedUserIds:
-                                issueBloc.focusedIssue!.invitedUserIds!,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical:AppSpacing.xxs),
+                          child: ShadCard(
+                            title: Text(
+                              solution.desc,
+                              style: UITextStyle.subtitle1,
+                            ),
+                            backgroundColor:
+                                currentUserVote == HypothesisVote.spinoff
+                                    ? AppColors.conflictLight
+                                    : everyoneElseAgrees
+                                        ? AppColors.consensus
+                                        : AppColors.public,
+                            trailing: WidenSolutionPopoverPage(
+                              solution: solution,
+                              currentUserId: currentUserId,
+                              invitedUserIds:
+                                  issueBloc.focusedIssue!.invitedUserIds!,
+                            ),
                           ),
                         );
                       },

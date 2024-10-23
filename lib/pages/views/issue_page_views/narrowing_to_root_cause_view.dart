@@ -2,7 +2,7 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypotheses.dart';
+import 'package:guide_solve/components/issue_solving_widgets/popover_narrowing_hypotheses.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 
@@ -137,33 +137,36 @@ Widget _hypothesisList(
                             .perspective(currentUserId,
                                 issueBloc.focusedIssue!.invitedUserIds!)
                             .isCurrentUserInConflict();
-                        return ShadCard(
-                          title: Text(
-                            hypothesis.desc,
-                            style: UITextStyle.subtitle1,
-                          ),
-                          backgroundColor:
-                              currentUserVote == HypothesisVote.spinoff
-                                  ? AppColors.conflictLight
-                                  : everyoneElseAgrees
-                                      ? AppColors.consensus
-                                      : AppColors.public,
-                          trailing: Stack(clipBehavior: Clip.none, children: [
-                            WidenHypothesesPopoverPage(
-                              hypothesis: hypothesis,
-                              currentUserId: currentUserId,
-                              invitedUserIds:
-                                  issueBloc.focusedIssue!.invitedUserIds!,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical:AppSpacing.xxs),
+                          child: ShadCard(
+                            title: Text(
+                              hypothesis.desc,
+                              style: UITextStyle.subtitle1,
                             ),
-                            if (conflict)
-                              Positioned(
-                                top: -8,
-                                right: -8,
-                                child: ShadBadge.destructive(
-                                  child: const Text(''),
-                                ),
+                            backgroundColor:
+                                currentUserVote == HypothesisVote.spinoff
+                                    ? AppColors.conflictLight
+                                    : everyoneElseAgrees
+                                        ? AppColors.consensus
+                                        : AppColors.public,
+                            trailing: Stack(clipBehavior: Clip.none, children: [
+                              NarrowingHypothesesPopoverPage(
+                                hypothesis: hypothesis,
+                                currentUserId: currentUserId,
+                                invitedUserIds:
+                                    issueBloc.focusedIssue!.invitedUserIds!,
                               ),
-                          ]),
+                              if (conflict)
+                                Positioned(
+                                  top: -8,
+                                  right: -8,
+                                  child: ShadBadge.destructive(
+                                    child: const Text(''),
+                                  ),
+                                ),
+                            ]),
+                          ),
                         );
                       },
                     ),

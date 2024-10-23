@@ -375,6 +375,26 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         orElse: () => throw Exception('Hypothesis not found'),
       );
 
+      //get IssuePerspective
+      final hypotheses = await currentState.hypothesesStream!.first;
+      final solutions = await currentState.solutionsStream!.first;
+
+      final perspective =
+          _focusedIssue!.perspective(_currentUserId!, hypotheses, solutions);
+
+      //Remove old root if user is voting on a new root
+      if (event.voteValue == 'root' && perspective.hasCurrentUserVotedRoot()) {
+        final unVoteRoot = Map<String, String>.from(hypothesis.votes)
+          ..[_currentUserId!] = 'agree';
+        final oldRoot = perspective
+            .getUsersCurrentRootHypothesis()!
+            .copyWith(votes: unVoteRoot);
+        await issueRepository.updateHypothesis(
+          _currentIssueId!,
+          oldRoot,
+        );
+      }
+
       // Update the votes map with the current user's vote
       final updatedVotes = Map<String, String>.from(hypothesis.votes)
         ..[_currentUserId!] = event.voteValue;
@@ -388,9 +408,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         updatedHypothesis,
       );
 
-      final stage = currentState.stage;
-
-      add(FocusIssueNavigationRequested(stage: stage));
+      if (event.voteValue == 'root') {
+        add(FocusIssueNavigationRequested(stage: IssueProcessStage.narrowingToRootCause));
+      } else {
+        final stage = currentState.stage;
+        add(FocusIssueNavigationRequested(stage: stage));
+      }
     } catch (e) {
       // Handle errors and update the state accordingly
       emit(IssuesListFailure(e.toString()));

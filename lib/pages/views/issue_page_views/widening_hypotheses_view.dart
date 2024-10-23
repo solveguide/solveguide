@@ -2,8 +2,8 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/popover_widening_hypotheses.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
+import 'package:guide_solve/components/issue_solving_widgets/vote_button_hypotheses_widen.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 
 class WideningHypothesesView extends StatelessWidget {
@@ -14,6 +14,7 @@ class WideningHypothesesView extends StatelessWidget {
 
   final String issueId;
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +66,12 @@ class WideningHypothesesView extends StatelessWidget {
                         constraints: const BoxConstraints(maxWidth: 800),
                         child: ShadInput(
                           controller: _textController,
+                          focusNode: _focusNode,
                           placeholder: const Text('Enter theories here.'),
                           keyboardType: TextInputType.text,
+                          autofocus: true,
+                          minLines: 1,
+                          maxLines: 3,
                           onSubmitted: (value) => {
                             if (value.isNotEmpty)
                               {
@@ -77,6 +82,7 @@ class WideningHypothesesView extends StatelessWidget {
                                     ),
                               },
                             _textController.clear(),
+                            _focusNode.requestFocus(),
                           },
                           suffix: ShadButton(
                             width: 24,
@@ -96,6 +102,7 @@ class WideningHypothesesView extends StatelessWidget {
                                       ),
                                     );
                                 _textController.clear();
+                                _focusNode.requestFocus();
                               }
                             },
                           ),
@@ -103,11 +110,8 @@ class WideningHypothesesView extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       // Widening Options so far (Hypotheses list)
-                      _hypothesisList(
-                        context,
-                        currentUserId,
-                        issueBloc,
-                      ),
+                      _hypothesisList(context, currentUserId, issueBloc,
+                          _textController, _focusNode),
                     ],
                   ),
                 );
@@ -123,7 +127,11 @@ class WideningHypothesesView extends StatelessWidget {
 }
 
 Widget _hypothesisList(
-    BuildContext context, String currentUserId, IssueBloc issueBloc) {
+    BuildContext context,
+    String currentUserId,
+    IssueBloc issueBloc,
+    TextEditingController textController,
+    FocusNode focusNode) {
   return Expanded(
     child: BlocBuilder<IssueBloc, IssueState>(
       builder: (context, state) {
@@ -176,22 +184,27 @@ Widget _hypothesisList(
                             .perspective(currentUserId,
                                 issueBloc.focusedIssue!.invitedUserIds!)
                             .allOtherStakeholdersAgree();
-                        return ShadCard(
-                          title: Text(
-                            hypothesis.desc,
-                            style: UITextStyle.subtitle1,
-                          ),
-                          backgroundColor:
-                              currentUserVote == HypothesisVote.spinoff
-                                  ? AppColors.conflictLight
-                                  : everyoneElseAgrees
-                                      ? AppColors.consensus
-                                      : AppColors.public,
-                          trailing: WidenHypothesesPopoverPage(
-                            hypothesis: hypothesis,
-                            currentUserId: currentUserId,
-                            invitedUserIds:
-                                issueBloc.focusedIssue!.invitedUserIds!,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.xxs),
+                          child: ShadCard(
+                            title: Text(
+                              hypothesis.desc,
+                              style: UITextStyle.subtitle1,
+                            ),
+                            backgroundColor:
+                                currentUserVote == HypothesisVote.spinoff
+                                    ? AppColors.conflictLight
+                                    : everyoneElseAgrees
+                                        ? AppColors.consensus
+                                        : AppColors.public,
+                            trailing: WidenHypothesesSegmentButton(
+                              hypothesis: hypothesis,
+                              currentUserId: currentUserId,
+                              invitedUserIds: issueBloc.focusedIssue!.invitedUserIds!,
+                              textController: textController,
+                              focusNode: focusNode,
+                            ),
                           ),
                         );
                       },

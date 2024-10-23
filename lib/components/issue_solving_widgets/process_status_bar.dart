@@ -223,7 +223,10 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
                           width: 450,
                           child: Padding(
                             padding: const EdgeInsets.all(AppSpacing.xlg),
-                            child: InstructionBody(),
+                            child: InstructionBody(
+                              currentStage: currentStage,
+                              perspecitve: widget.perspective,
+                            ),
                           ),
                         ),
                       ),
@@ -245,10 +248,72 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
 class InstructionBody extends StatelessWidget {
   const InstructionBody({
     super.key,
+    required this.currentStage,
+    required this.perspecitve,
   });
+
+  final IssueProcessStage currentStage;
+  final IssuePerspective perspecitve;
 
   @override
   Widget build(BuildContext context) {
-    return Text("data");
+    switch (currentStage) {
+      case IssueProcessStage.wideningHypotheses : 
+      if (perspecitve.hasCurrentUserVotedOnAllHypotheses()) {
+          return Center(
+            child: Text(
+              '''You've already voted on all hypotheses. Your job here is to ensure all possible underlying causes have been explored.''',
+            ),
+          );
+        } else {
+          return Center(
+            child: Text(
+              '''Your job here is to capture all the possible underlying causes and addressable root issues that contribute to the noticed issue below.''',
+            ),
+          );
+        }
+      case IssueProcessStage.narrowingToRootCause : 
+        return Center(
+          child: Text(
+            '''Your job here is to select a single root issue that, if solved, will have a large impact on the original issue, but is also within your power to solve.''',
+          ),
+        );
+      case IssueProcessStage.wideningSolutions : 
+        return Center(
+          child: Text(
+            '''Your job here capture all the various ways you could address the agreed root to solve it. ''',
+          ),
+        );
+      case IssueProcessStage.narrowingToSolve : 
+        return Center(
+          child: Text(
+            '''Your job here is to select the solution that has the best chance of resolving the agreet root issue, and is within your power to achieve.''',
+          ),
+        );
+        case IssueProcessStage.establishingFacts : 
+        return Center(
+          child: Text(
+            '''establishingFacts''',
+          ),
+        );
+      case IssueProcessStage.scopingSolve : 
+      return Center(
+          child: Text(
+            '''scopingSolve''',
+          ),
+        );
+      case IssueProcessStage.solveSummaryReview : 
+      return Center(
+          child: Text(
+            '''solveSummaryReview''',
+          ),
+        );
+      default:
+        return Center(
+          child: Text(
+            '''No instructional content available for this stage.''',
+          ),
+        );
+    }
   }
 }
