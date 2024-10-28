@@ -86,7 +86,7 @@ class HypothesisVoteSubmitted extends IssueEvent {
     required this.voteValue,
   });
   final String hypothesisId;
-  final String voteValue;
+  final HypothesisVote voteValue;
 
   @override
   List<Object?> get props => [hypothesisId, voteValue];

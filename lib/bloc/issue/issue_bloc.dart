@@ -349,6 +349,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     }
   }
 
+//TODO: this function doesn't treat the root votes correctly.
   Future<void> _onHypothesisVoteSubmitted(
     HypothesisVoteSubmitted event,
     Emitter<IssueState> emit,
@@ -366,14 +367,8 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       }
 
       // Fetch the current hypotheses for the issue
-      final currentHypotheses =
-          await issueRepository.getHypotheses(_currentIssueId!).first;
-
-      // Find the hypothesis to be updated
-      final hypothesis = currentHypotheses.firstWhere(
-        (h) => h.hypothesisId == event.hypothesisId,
-        orElse: () => throw Exception('Hypothesis not found'),
-      );
+      final currentHypothesis = await issueRepository.getHypothesisById(
+          _currentIssueId!, event.hypothesisId);
 
       //get IssuePerspective
       final hypotheses = await currentState.hypothesesStream!.first;
@@ -383,9 +378,11 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
           _focusedIssue!.perspective(_currentUserId!, hypotheses, solutions);
 
       //Remove old root if user is voting on a new root
-      if (event.voteValue == 'root' && perspective.hasCurrentUserVotedRoot()) {
-        final unVoteRoot = Map<String, String>.from(hypothesis.votes)
-          ..[_currentUserId!] = 'agree';
+      if (event.voteValue == HypothesisVote.root &&
+          perspective.hasCurrentUserVotedRoot()) {
+        final unVoteRoot =
+            Map<String, HypothesisVote>.from(currentHypothesis!.votes)
+              ..[_currentUserId!] = HypothesisVote.agree;
         final oldRoot = perspective
             .getUsersCurrentRootHypothesis()!
             .copyWith(votes: unVoteRoot);
@@ -396,11 +393,12 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       }
 
       // Update the votes map with the current user's vote
-      final updatedVotes = Map<String, String>.from(hypothesis.votes)
-        ..[_currentUserId!] = event.voteValue;
+      final updatedVotes =
+          Map<String, HypothesisVote>.from(currentHypothesis!.votes)
+            ..[_currentUserId!] = event.voteValue;
 
       // Create a new hypothesis object with updated votes
-      final updatedHypothesis = hypothesis.copyWith(votes: updatedVotes);
+      final updatedHypothesis = currentHypothesis.copyWith(votes: updatedVotes);
 
       // Update the hypothesis in Firestore using the repository
       await issueRepository.updateHypothesis(
@@ -408,7 +406,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
         updatedHypothesis,
       );
 
-      if (event.voteValue == 'root') {
+      if (event.voteValue == HypothesisVote.root) {
         add(FocusIssueNavigationRequested(
             stage: IssueProcessStage.narrowingToRootCause));
       } else {

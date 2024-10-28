@@ -4,29 +4,28 @@ import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:app_ui/app_ui.dart';
 
-class WidenHypothesesSegmentButton extends StatefulWidget {
-  const WidenHypothesesSegmentButton({
+class NarrowToRootSegmentButton extends StatefulWidget {
+  const NarrowToRootSegmentButton({
     required this.hypothesis,
     required this.currentUserId,
     required this.invitedUserIds,
-    required this.textController,
-    required this.focusNode,
+    //required this.textController,
+    //required this.focusNode,
     super.key,
   });
 
   final Hypothesis hypothesis;
   final String currentUserId;
   final List<String> invitedUserIds;
-  final TextEditingController textController;
-  final FocusNode focusNode;
+  //final TextEditingController textController;
+  //final FocusNode focusNode;
 
   @override
-  State<WidenHypothesesSegmentButton> createState() =>
-      _WidenHypothesesSegmentButtonState();
+  State<NarrowToRootSegmentButton> createState() =>
+      _NarrowToRootSegmentButtonState();
 }
 
-class _WidenHypothesesSegmentButtonState
-    extends State<WidenHypothesesSegmentButton> {
+class _NarrowToRootSegmentButtonState extends State<NarrowToRootSegmentButton> {
   HypothesisVote? currentUserVote;
 
   @override
@@ -48,10 +47,10 @@ class _WidenHypothesesSegmentButtonState
         );
   }
 
-  void _modifyHypothesis() {
-    widget.textController.text = widget.hypothesis.desc;
-    widget.focusNode.requestFocus();
-  }
+  // void _modifyHypothesis() {
+  //   widget.textController.text = widget.hypothesis.desc;
+  //   widget.focusNode.requestFocus();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -122,23 +121,23 @@ class _WidenHypothesesSegmentButtonState
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (currentUserVote == 'disagree')
-              Tooltip(
-                message: 'Modify this hypothesis.',
-                child: ShadButton(
-                  width: 24,
-                  height: 24,
-                  padding: EdgeInsets.zero,
-                  backgroundColor: AppColors.public,
-                  foregroundColor: AppColors.black,
-                  decoration: const ShadDecoration(
-                    secondaryBorder: ShadBorder.none,
-                    secondaryFocusedBorder: ShadBorder.none,
-                  ),
-                  icon: const Icon(Icons.arrow_upward),
-                  onPressed: _modifyHypothesis,
-                ),
-              ),
+            // if (currentUserVote == 'disagree')
+            //   Tooltip(
+            //     message: 'Modify this hypothesis.',
+            //     child: ShadButton(
+            //       width: 24,
+            //       height: 24,
+            //       padding: EdgeInsets.zero,
+            //       backgroundColor: AppColors.public,
+            //       foregroundColor: AppColors.black,
+            //       decoration: const ShadDecoration(
+            //         secondaryBorder: ShadBorder.none,
+            //         secondaryFocusedBorder: ShadBorder.none,
+            //       ),
+            //       icon: const Icon(Icons.arrow_upward),
+            //       onPressed: _modifyHypothesis,
+            //     ),
+            //   ),
           ],
         ),
       ],

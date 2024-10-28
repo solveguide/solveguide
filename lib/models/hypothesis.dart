@@ -35,8 +35,9 @@ class Hypothesis {
         createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
         lastUpdatedTimestamp:
             DateTime.parse(json['lastUpdatedTimestamp'] as String),
-        votes: Map<String, String>.from(
-          json['votes'] as Map<String, dynamic>? ?? {},
+        votes: (json['votes'] as Map<String, dynamic>? ?? {}).map(
+          (key, value) =>
+              MapEntry(key, HypothesisVote.values.byName(value as String)),
         ),
       );
 
@@ -49,7 +50,7 @@ class Hypothesis {
   int rank;
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
-  Map<String, String> votes; // Vote Map: userId -> vote
+  Map<String, HypothesisVote> votes; // Vote Map: userId -> vote
 
   // Convert a Hypothesis to a Map
   Map<String, dynamic> toJson() => {
@@ -62,7 +63,7 @@ class Hypothesis {
         'rank': rank,
         'createdTimestamp': createdTimestamp.toIso8601String(),
         'lastUpdatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
-        'votes': votes, // Store the votes map
+        'votes': votes.map((key, value) => MapEntry(key, value.name)),
       };
 
   // Add the copyWith method
@@ -76,7 +77,7 @@ class Hypothesis {
     int? rank,
     DateTime? createdTimestamp,
     DateTime? lastUpdatedTimestamp,
-    Map<String, String>? votes,
+    Map<String, HypothesisVote>? votes,
   }) {
     return Hypothesis(
       hypothesisId: hypothesisId ?? this.hypothesisId,
@@ -88,7 +89,7 @@ class Hypothesis {
       rank: rank ?? this.rank,
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
-      votes: votes ?? this.votes,
+      votes: votes ?? Map<String, HypothesisVote>.from(this.votes),
     );
   }
 
@@ -112,8 +113,8 @@ class HypothesisPerspective {
 
   /// Get the current user's vote.
   HypothesisVote? getCurrentUserVote() {
-    final voteString = hypothesis.votes[currentUserId];
-    return voteString != null ? HypothesisVote.values.byName(voteString) : null;
+    final voteEnum = hypothesis.votes[currentUserId];
+    return voteEnum != null ? voteEnum : null;
   }
 
   /// Determine if all stakeholders have voted.
@@ -127,30 +128,19 @@ class HypothesisPerspective {
   bool allOtherStakeholdersAgree() {
     // If there are no other stakeholders, return true.
     if (invitedUserIds.length <= 1) {
-      if (getCurrentUserVote() == HypothesisVote.agree ||
-          getCurrentUserVote() == HypothesisVote.root) {
-        return true;
-      }
-      return false;
+      final vote = getCurrentUserVote();
+      return vote == HypothesisVote.agree || vote == HypothesisVote.root;
     }
     // Check if all stakeholders have voted
-    if (!allStakeholdersVoted()) {
-      return false;
-    }
+    if (!allStakeholdersVoted()) return false;
 
     for (final entry in hypothesis.votes.entries) {
-      // Skip the current user's vote
-      if (entry.key == currentUserId) {
-        continue;
-      }
-
-      // Check if the vote is neither 'agree' nor 'root'
-      final vote = HypothesisVote.values.byName(entry.value);
+      if (entry.key == currentUserId) continue;
+      final vote = entry.value;
       if (vote != HypothesisVote.agree && vote != HypothesisVote.root) {
         return false;
       }
     }
-
     return true;
   }
 
@@ -169,7 +159,7 @@ class HypothesisPerspective {
     for (final entry in hypothesis.votes.entries) {
       if (entry.key == currentUserId) continue; // Skip current user's vote
 
-      final otherUserVote = HypothesisVote.values.byName(entry.value);
+      final otherUserVote = entry.value;
       if (_isConflict(currentUserVote, otherUserVote)) {
         return true;
       }
@@ -224,22 +214,17 @@ class HypothesisPerspective {
     final numberOfStakeholders = invitedUserIds.length;
 
     // Assign points to each type of vote
-    final rootPoints = consensusVotes
-            .where((vote) => vote == HypothesisVote.root.name)
-            .length *
-        numberOfStakeholders;
-    final agreePoints = consensusVotes
-            .where((vote) => vote == HypothesisVote.agree.name)
-            .length *
-        2;
-    final disagreePoints = consensusVotes
-            .where((vote) => vote == HypothesisVote.disagree.name)
-            .length *
-        -1;
-    final spinoffPoints = consensusVotes
-            .where((vote) => vote == HypothesisVote.spinoff.name)
-            .length *
-        -10;
+    final rootPoints =
+        consensusVotes.where((vote) => vote == HypothesisVote.root).length *
+            numberOfStakeholders;
+    final agreePoints =
+        consensusVotes.where((vote) => vote == HypothesisVote.agree).length * 2;
+    final disagreePoints =
+        consensusVotes.where((vote) => vote == HypothesisVote.disagree).length *
+            -1;
+    final spinoffPoints =
+        consensusVotes.where((vote) => vote == HypothesisVote.spinoff).length *
+            -10;
 
     // Total points to determine the rank
     final totalPoints =
@@ -251,7 +236,7 @@ class HypothesisPerspective {
   int _rankForNarrowing(HypothesisVote? currentUserVote) {
     final consensusVotes = hypothesis.votes.values;
     final rootCount =
-        consensusVotes.where((vote) => vote == HypothesisVote.root.name).length;
+        consensusVotes.where((vote) => vote == HypothesisVote.root).length;
 
     // Assign the primary rank value
     int primaryRank;

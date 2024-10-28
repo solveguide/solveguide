@@ -2,7 +2,6 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/popover_widening_solutions.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/solution.dart';
@@ -199,12 +198,6 @@ Widget _solutionList(
                                     : everyoneElseAgrees
                                         ? AppColors.consensus
                                         : AppColors.public,
-                            trailing: WidenSolutionPopoverPage(
-                              solution: solution,
-                              currentUserId: currentUserId,
-                              invitedUserIds:
-                                  issueBloc.focusedIssue!.invitedUserIds!,
-                            ),
                           ),
                         );
                       },

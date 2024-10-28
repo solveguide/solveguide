@@ -258,20 +258,20 @@ class InstructionBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (currentStage) {
-      case IssueProcessStage.wideningHypotheses:
-        if (perspecitve.hasCurrentUserVotedOnAllHypotheses()) {
-          return Center(
-            child: Text(
-              '''You've already voted on all hypotheses. Your job here is to ensure all possible underlying causes have been explored.''',
-            ),
-          );
-        } else {
-          return Center(
-            child: Text(
-              '''Your job here is to capture all the possible underlying causes and addressable root issues that contribute to the noticed issue below.''',
-            ),
-          );
-        }
+      case IssueProcessStage.wideningHypotheses
+          when perspecitve.hasCurrentUserVotedOnAllHypotheses():
+        return Center(
+          child: Text(
+            '''You've already voted on all hypotheses. Your job here is to ensure all possible underlying causes have been explored.''',
+          ),
+        );
+      case IssueProcessStage.wideningHypotheses
+          when !perspecitve.hasCurrentUserVotedOnAllHypotheses():
+        return Center(
+          child: Text(
+            '''Your job here is to capture all the possible underlying causes and addressable root issues that contribute to the noticed issue below.''',
+          ),
+        );
       case IssueProcessStage.narrowingToRootCause:
         return Center(
           child: Text(

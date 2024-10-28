@@ -2,8 +2,8 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/popover_narrowing_hypotheses.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
+import 'package:guide_solve/components/issue_solving_widgets/vote_button_hypothesis_narrow.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 
 class NarrowingToRootCauseView extends StatelessWidget {
@@ -152,7 +152,7 @@ Widget _hypothesisList(
                                         ? AppColors.consensus
                                         : AppColors.public,
                             trailing: Stack(clipBehavior: Clip.none, children: [
-                              NarrowingHypothesesPopoverPage(
+                              NarrowToRootSegmentButton(
                                 hypothesis: hypothesis,
                                 currentUserId: currentUserId,
                                 invitedUserIds:

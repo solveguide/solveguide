@@ -150,14 +150,14 @@ class IssuePerspective {
 
   /// Check if the current user has voted "root" on any hypothesis.
   bool hasCurrentUserVotedRoot() {
-    return hypotheses.any((hypothesis) =>
-        hypothesis.votes[currentUserId] == HypothesisVote.root.name);
+    return hypotheses.any(
+        (hypothesis) => hypothesis.votes[currentUserId] == HypothesisVote.root);
   }
 
   /// Return the Hypothesis where the current user has voted "root", or null if none.
   Hypothesis? getUsersCurrentRootHypothesis() {
     for (final hypothesis in hypotheses) {
-      if (hypothesis.votes[currentUserId] == HypothesisVote.root.name) {
+      if (hypothesis.votes[currentUserId] == HypothesisVote.root) {
         return hypothesis;
       }
     }
@@ -168,8 +168,8 @@ class IssuePerspective {
   bool hasConsensusRoot() {
     return hypotheses.any((hypothesis) {
       final invitedUserIds = issue.invitedUserIds;
-      return invitedUserIds!.every(
-          (userId) => hypothesis.votes[userId] == HypothesisVote.root.name);
+      return invitedUserIds!
+          .every((userId) => hypothesis.votes[userId] == HypothesisVote.root);
     });
   }
 
