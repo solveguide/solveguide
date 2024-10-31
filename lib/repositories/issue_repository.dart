@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:guide_solve/models/fact.dart';
 import 'package:guide_solve/models/hypothesis.dart';
@@ -346,6 +348,25 @@ SUBCOLLECTION FUNCTIONS
     }
   }
 
+  //Fetch a Specific Fact by ID
+  Future<Fact?> getFactById(String issueId, String factId) async {
+    try {
+      final DocumentSnapshot doc = await _issuesCollection
+          .doc(issueId)
+          .collection('facts')
+          .doc(factId)
+          .get();
+
+      if (doc.exists) {
+        return Fact.fromJson(doc.data()! as Map<String, dynamic>);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw Exception('Failed to fetch fact: $error');
+    }
+  }
+
 //Update an Existing Hypothesis
   Future<void> updateHypothesis(String issueId, Hypothesis hypothesis) async {
     final updatedHypothesis = hypothesis.copyWith(
@@ -378,6 +399,22 @@ SUBCOLLECTION FUNCTIONS
     }
   }
 
+  //Update an Existing Fact
+  Future<void> updateFact(String issueId, Fact fact) async {
+    final updatedFact = fact.copyWith(
+      lastUpdatedTimestamp: DateTime.now(),
+    );
+    try {
+      await _issuesCollection
+          .doc(issueId)
+          .collection('facts')
+          .doc(fact.factId)
+          .update(updatedFact.toJson());
+    } catch (error) {
+      throw Exception('Failed to update fact: $error');
+    }
+  }
+
 //Delete a Hypothesis from an Issue
   Future<void> deleteHypothesis(String issueId, String hypothesisId) async {
     try {
@@ -402,5 +439,38 @@ SUBCOLLECTION FUNCTIONS
     } catch (error) {
       throw Exception('Failed to delete solution: $error');
     }
+  }
+
+  //Delete a Fact from an Issue
+  Future<void> deleteFact(String issueId, String factId) async {
+    try {
+      await _issuesCollection
+          .doc(issueId)
+          .collection('facts')
+          .doc(factId)
+          .delete();
+    } catch (error) {
+      throw Exception('Failed to delete fact: $error');
+    }
+  }
+
+  Future<T> getLatestValue<T>(Stream<T> stream) async {
+    late StreamSubscription<T> subscription;
+    final completer = Completer<T>();
+
+    subscription = stream.listen(
+      (data) {
+        completer.complete(data); // Complete with the first data event
+        subscription.cancel(); // Cancel the subscription right away
+      },
+      onError: (Object error) {
+        // Explicitly specify error type as Object
+        completer.completeError(error); // Complete the completer with the error
+        subscription.cancel(); // Cancel on error as well
+      },
+    );
+
+    return completer
+        .future; // Returns the Future that completes with data or error
   }
 }

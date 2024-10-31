@@ -37,9 +37,6 @@ class _WidenHypothesesSegmentButtonState
   }
 
   void _handleVote(HypothesisVote value) {
-    setState(() {
-      currentUserVote = value;
-    });
     context.read<IssueBloc>().add(
           HypothesisVoteSubmitted(
             voteValue: value,
@@ -55,6 +52,10 @@ class _WidenHypothesesSegmentButtonState
 
   @override
   Widget build(BuildContext context) {
+    final hypothesis = widget.hypothesis;
+
+    // Use the latest vote from the hypothesis instead of local state
+    final currentUserVote = hypothesis.votes[widget.currentUserId];
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -81,7 +82,7 @@ class _WidenHypothesesSegmentButtonState
                       tooltip: 'Select as Root Issue.'),
                 ]
               ],
-              selected: currentUserVote != null ? {currentUserVote!} : {},
+              selected: currentUserVote != null ? {currentUserVote} : {},
               multiSelectionEnabled: false,
               showSelectedIcon: false,
               onSelectionChanged: (Set<HypothesisVote> newSelection) {

@@ -45,7 +45,8 @@ class IssuePage extends StatelessWidget {
       body: BlocBuilder<IssueBloc, IssueState>(
         builder: (context, state) {
           if (state is IssueProcessState) {
-            final focusedIssue = context.read<IssueBloc>().focusedIssue;
+            final bloc = context.read<IssueBloc>();
+            final focusedIssue = bloc.focusedIssue;
             switch (state.stage) {
               case IssueProcessStage.wideningHypotheses:
                 return WideningHypothesesView(issueId: issueId);

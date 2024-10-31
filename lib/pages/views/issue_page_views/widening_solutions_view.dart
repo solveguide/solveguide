@@ -32,14 +32,11 @@ class WideningSolutionsView extends StatelessWidget {
                 if (focusedIssue == null) {
                   return const Text('No root issue available...');
                 }
-                final perspective = state.perspective;
                 return Expanded(
                   child: Column(
                     children: [
                       //Issue Status & Navigation
-                      ProcessStatusBar(
-                        perspective: perspective!,
-                      ),
+                      ProcessStatusBar(),
                       const SizedBox(height: AppSpacing.lg),
                       // Consensus IssueOwner noticed the seedStatement
                       SizedBox(

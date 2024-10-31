@@ -31,12 +31,11 @@ class NarrowingToRootCauseView extends StatelessWidget {
                 if (focusedIssue == null) {
                   return const Text('No seed statement available...');
                 }
-                final perspective = state.perspective;
                 return Expanded(
                   child: Column(
                     children: [
                       //Issue Status & Navigation
-                      ProcessStatusBar(perspective: perspective!),
+                      ProcessStatusBar(),
                       const SizedBox(height: AppSpacing.lg),
                       // Consensus IssueOwner noticed the seedStatement
                       SizedBox(
