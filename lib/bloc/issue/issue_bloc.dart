@@ -218,11 +218,19 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   ) async {
     final stage = event.stage;
 
+    _focusedIssueStream =
+        await issueRepository.getFocusedIssueStream(focusedIssue!.issueId!);
+    _hypothesesStream =
+        await issueRepository.getHypotheses(focusedIssue!.issueId!);
+    _solutionsStream =
+        await issueRepository.getSolutions(focusedIssue!.issueId!);
+    _factsStream = await issueRepository.getFacts(focusedIssue!.issueId!);
+
+    focusedIssue = await issueRepository.getLatestValue(_focusedIssueStream!);
+
     emit(
       IssueProcessState(
         stage: stage,
-        hypothesesStream: _hypothesesStream,
-        solutionsStream: _solutionsStream,
       ),
     );
   }

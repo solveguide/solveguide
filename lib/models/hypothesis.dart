@@ -1,5 +1,3 @@
-import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-
 enum HypothesisVote {
   root,
   agree,
@@ -180,34 +178,7 @@ class HypothesisPerspective {
     return vote1 != vote2;
   }
 
-  /// Calculate the rank of the hypothesis.
-  int calculateRank(IssueProcessStage stage) {
-    var rank = 0;
-    final currentUserVote = getCurrentUserVote();
-
-    // Assign rank based on consensus and user vote
-    switch (stage) {
-      case IssueProcessStage.wideningHypotheses:
-        rank += _rankForWidening();
-
-      case IssueProcessStage.narrowingToRootCause:
-        rank += _rankForNarrowing(currentUserVote);
-
-      case IssueProcessStage.wideningSolutions:
-        break;
-      case IssueProcessStage.narrowingToSolve:
-        break;
-      case IssueProcessStage.establishingFacts:
-        break;
-      case IssueProcessStage.scopingSolve:
-        break;
-      case IssueProcessStage.solveSummaryReview:
-        break;
-    }
-    return rank;
-  }
-
-  int _rankForWidening() {
+  int calculateConsensusRank() {
     final consensusVotes = hypothesis.votes.values;
 
     // Determine the number of stakeholders for assigning root vote value
@@ -233,7 +204,8 @@ class HypothesisPerspective {
     return totalPoints;
   }
 
-  int _rankForNarrowing(HypothesisVote? currentUserVote) {
+  int calculateNarrowingRank() {
+    final currentUserVote = getCurrentUserVote();
     final consensusVotes = hypothesis.votes.values;
     final rootCount =
         consensusVotes.where((vote) => vote == HypothesisVote.root).length;
@@ -253,7 +225,7 @@ class HypothesisPerspective {
     }
 
     // Assign a secondary rank for sorting hypotheses with the same primary rank
-    final consensusRank = _rankForWidening();
+    final consensusRank = calculateConsensusRank();
 
     // Combine the primary and secondary rank, using order of magnitude
     return primaryRank + consensusRank;
