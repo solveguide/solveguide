@@ -234,6 +234,7 @@ SUBCOLLECTION FUNCTIONS
 
       // Update the hypothesisId field with the generated document ID
       await docRef.update({'hypothesisId': docRef.id});
+      newHypothesis.hypothesisId = docRef.id;
     } catch (error) {
       throw Exception('Failed to add hypothesis: $error');
     }
@@ -267,7 +268,7 @@ SUBCOLLECTION FUNCTIONS
   }
 
 //Add a new Fact to an Issue
-  Future<void> addFact(
+  Future<String?> addFact(
     String issueId,
     ReferenceObjectType refObjectType,
     String refObjectId,
@@ -298,6 +299,7 @@ SUBCOLLECTION FUNCTIONS
 
       // Update the factId field with the generated document ID
       await docRef.update({'factId': docRef.id});
+      return docRef.id;
     } catch (error) {
       throw Exception('Failed to add fact: $error');
     }

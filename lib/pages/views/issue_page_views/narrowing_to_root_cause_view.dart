@@ -236,94 +236,13 @@ Widget _hypothesisList(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
                   child: Tappable(
                     onTap: () {
-                      showShadDialog<bool>(
-                        context: context,
-                        builder: (context) => ShadDialog(
-                          title: const Text('Resolving Conflicts'),
-                          description: const Text(
-                              "Add reasoning to your votes to help get to the root."),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Divider(),
-                              SizedBox(height: AppSpacing.xxlg),
-                              // When it comes to addressing [seedStatement]
-                              Text.rich(
-                                TextSpan(
-                                  text: 'Given that ',
-                                  style: UITextStyle.subtitle2,
-                                  children: [
-                                    TextSpan(
-                                      text:
-                                          ' ${issueBloc.focusedIssue!.seedStatement} ',
-                                      style: UITextStyle.subtitle2.copyWith(
-                                          backgroundColor: AppColors.consensus,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: AppSpacing.lg),
-                              // [Current Hypothesis] [[IS/IS NOT]] a possible root of the issue because
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: ' ${hypothesis.desc} ',
-                                      style: UITextStyle.subtitle2.copyWith(
-                                          backgroundColor: AppColors.public,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    TextSpan(
-                                      text: currentUserVote ==
-                                              HypothesisVote.agree
-                                          ? ' IS '
-                                          : ' IS NOT ',
-                                      style: UITextStyle.subtitle2.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          fontStyle: FontStyle.italic),
-                                    ),
-                                    TextSpan(
-                                      text: 'a possible root issue because: ',
-                                      style: UITextStyle.subtitle2,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: AppSpacing.md),
-                              // [New Fact]
-                              ShadInput(
-                                controller: _textController,
-                                placeholder: const Text(
-                                    "Enter new fact or reasoning here..."),
-                                onChanged: (value) {
-                                  // handle new fact input if needed
-                                },
-                              ),
-                            ],
-                          ),
-                          actions: [
-                            ShadButton(
-                              child: Text('Share Reasoning'),
-                              onPressed: () {
-                                context.read<IssueBloc>().add(
-                                      NewFactCreated(
-                                          newFact: _textController.text,
-                                          newFactContext: currentUserVote ==
-                                                  HypothesisVote.agree
-                                              ? ' IS '
-                                              : ' IS NOT ' +
-                                                  'a possible root issue',
-                                          referenceObjectId:
-                                              hypothesis.hypothesisId!,
-                                          referenceObjectType:
-                                              ReferenceObjectType.hypothesis),
-                                    );
-                              },
-                            )
-                          ],
-                        ),
-                      );
+                      if (hypothesis.factIds[currentUserId] == null) {
+                        showCreateFactDialog(context, issueBloc, hypothesis,
+                            currentUserVote, _textController);
+                      } else {
+                        showVoteFactDialog(context, issueBloc, hypothesis,
+                            currentUserVote, _textController);
+                      }
                     },
                     child: ShadCard(
                       title: Text(
@@ -359,6 +278,181 @@ Widget _hypothesisList(
           ),
         );
       },
+    ),
+  );
+}
+
+Future<bool?> showCreateFactDialog(
+  BuildContext context,
+  IssueBloc issueBloc,
+  Hypothesis hypothesis,
+  HypothesisVote? currentUserVote,
+  TextEditingController _textController,
+) {
+  //Fact Submitting Dialog
+  return showShadDialog<bool>(
+    context: context,
+    builder: (context) => ShadDialog(
+      title: const Text('Resolving Conflicts'),
+      description:
+          const Text("Add reasoning to your votes to help get to the root."),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(),
+          SizedBox(height: AppSpacing.xxlg),
+          // When it comes to addressing [seedStatement]
+          Text.rich(
+            TextSpan(
+              text: 'With respect to ',
+              style: UITextStyle.subtitle2,
+              children: [
+                TextSpan(
+                  text: ' ${issueBloc.focusedIssue!.seedStatement} ',
+                  style: UITextStyle.subtitle2.copyWith(
+                      backgroundColor: AppColors.consensus,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: AppSpacing.lg),
+          // [Current Hypothesis] [[IS/IS NOT]] a possible root of the issue because
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: ' ${hypothesis.desc} ',
+                  style: UITextStyle.subtitle2.copyWith(
+                      backgroundColor: AppColors.public,
+                      fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: currentUserVote == HypothesisVote.agree
+                      ? ' IS  '
+                      : ' IS NOT  ',
+                  style: UITextStyle.subtitle2.copyWith(
+                      fontWeight: FontWeight.w600, fontStyle: FontStyle.italic),
+                ),
+                TextSpan(
+                  text: 'a possible root issue because: ',
+                  style: UITextStyle.subtitle2,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: AppSpacing.md),
+          // [New Fact]
+          ShadInput(
+            controller: _textController,
+            placeholder: const Text("Enter reasoning here..."),
+            onSubmitted: (value) {
+              context.read<IssueBloc>().add(
+                    NewFactCreated(
+                        newFact: _textController.text,
+                        newFactContext: currentUserVote == HypothesisVote.agree
+                            ? ' IS '
+                            : ' IS NOT ' + 'a possible root issue',
+                        referenceObjectId: hypothesis.hypothesisId!,
+                        referenceObjectType: ReferenceObjectType.hypothesis),
+                  );
+              Navigator.of(context).pop(); // Close the dialog
+              _textController.clear();
+            },
+          ),
+        ],
+      ),
+      actions: [
+        ShadButton(
+          child: Text('Share Reasoning'),
+          onPressed: () {
+            context.read<IssueBloc>().add(
+                  NewFactCreated(
+                      newFact: _textController.text,
+                      newFactContext: (currentUserVote == HypothesisVote.agree
+                              ? ' IS '
+                              : ' IS NOT ') +
+                          'a possible root issue',
+                      referenceObjectId: hypothesis.hypothesisId!,
+                      referenceObjectType: ReferenceObjectType.hypothesis),
+                );
+            Navigator.of(context).pop(); // Close the dialog
+            _textController.clear();
+          },
+        )
+      ],
+    ),
+  );
+}
+
+Future<bool?> showVoteFactDialog(
+  BuildContext context,
+  IssueBloc issueBloc,
+  Hypothesis hypothesis,
+  HypothesisVote? currentUserVote,
+  TextEditingController _textController,
+) {
+  //Fact voting Dialog
+  return showShadDialog<bool>(
+    context: context,
+    builder: (context) => ShadDialog(
+      title: const Text('Resolving Conflicts'),
+      description:
+          const Text("Opine on the reasoning of others to move forward."),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(),
+          SizedBox(height: AppSpacing.xxlg),
+          StreamBuilder<List<Fact>>(
+            stream: issueBloc.factsStream,
+            builder: (context, factsSnapshot) {
+              if (factsSnapshot.hasError) {
+                return const Center(
+                  child: Text('Error loading facts'),
+                );
+              }
+              if (!factsSnapshot.hasData) {
+                return const Center(
+                  child: Text('No facts available.'),
+                );
+              }
+              final facts = factsSnapshot.data!
+                  .where((fact) => fact
+                      .referenceObjects[ReferenceObjectType.hypothesis]!
+                      .contains(hypothesis.hypothesisId))
+                  .toList();
+              if (facts.length > 0) {
+                return ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  child: ListView.builder(
+                    itemCount: facts.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.xxs),
+                        child: ShadCard(
+                          padding: EdgeInsets.all(AppSpacing.xxs),
+                          title: Text(
+                            facts[index].desc,
+                            style: UITextStyle.subtitle1,
+                          ),
+                          backgroundColor: AppColors.public,
+                          trailing: Icon(Icons.how_to_vote),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('No facts available.'),
+                );
+              }
+            },
+          )
+        ],
+      ),
     ),
   );
 }
@@ -440,6 +534,7 @@ class _NarrowToRootSegmentButtonState extends State<NarrowToRootSegmentButton> {
               selected: currentUserVote != null ? {currentUserVote!} : {},
               multiSelectionEnabled: false,
               showSelectedIcon: false,
+              emptySelectionAllowed: true,
               onSelectionChanged: (Set<HypothesisVote> newSelection) {
                 if (newSelection.isNotEmpty) {
                   final selectedVote = newSelection.first;

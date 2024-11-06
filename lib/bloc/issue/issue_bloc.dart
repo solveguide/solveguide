@@ -660,7 +660,7 @@ void _onFocusSolveScopeSubmitted(
     }
 
     // Get userId from AuthRepository
-    final userId = await authRepository.getUserUid();
+    final userId = _currentUserId;
     if (userId == null) {
       emit(const IssuesListFailure('User not authenticated'));
       return;
@@ -668,7 +668,7 @@ void _onFocusSolveScopeSubmitted(
 
     try {
       // Call the addFact method
-      await issueRepository.addFact(
+      var factId = await issueRepository.addFact(
         issueId,
         event.referenceObjectType, // Pass the reference object type
         event.referenceObjectId, // Pass the reference object ID
@@ -676,6 +676,22 @@ void _onFocusSolveScopeSubmitted(
         event.newFact, // Pass the fact description
         userId, // Pass the userId
       );
+
+      if (factId != null &&
+          event.referenceObjectType == ReferenceObjectType.hypothesis) {
+        // Update the hypothesis with the new fact
+        final currentHypothesis = await issueRepository.getHypothesisById(
+            issueId, event.referenceObjectId);
+        // Create a new map based on the current factIds
+        if (currentHypothesis != null) {
+          final updatedFactIds =
+              Map<String, String>.from(currentHypothesis.factIds)
+                ..[userId] = factId;
+          final updatedHypothesis =
+              currentHypothesis.copyWith(factIds: updatedFactIds);
+          await issueRepository.updateHypothesis(issueId, updatedHypothesis);
+        }
+      }
 
       // No need to emit a new state; the UI will update via the stream
     } catch (error) {

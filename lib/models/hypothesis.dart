@@ -38,8 +38,8 @@ class Hypothesis {
           (key, value) =>
               MapEntry(key, HypothesisVote.values.byName(value as String)),
         ),
-        factIds: (json['factIds'] as Map<String, String>? ?? {}).map(
-          (key, value) => MapEntry(key, value),
+        factIds: (json['factIds'] as Map<dynamic, dynamic>? ?? {}).map(
+          (key, value) => MapEntry(key.toString(), value.toString()),
         ),
       );
 

@@ -52,7 +52,8 @@ class Solution {
     this.assignedStakeholderUserId,
     this.actionItems,
     this.dueDate,
-    this.votes = const {}, // Initialize with an empty map
+    this.votes = const {},
+    this.factIds = const {}, // Initialize with an empty map
   }) {
     provenIssueIds = provenIssueIds ?? [];
     disprovenIssueIds = disprovenIssueIds ?? [];
@@ -87,6 +88,9 @@ class Solution {
         votes: Map<String, String>.from(
           json['votes'] as Map<String, dynamic>? ?? {},
         ),
+        factIds: (json['factIds'] as Map<String, String>? ?? {}).map(
+          (key, value) => MapEntry(key, value),
+        ),
       );
 
   String? solutionId;
@@ -102,6 +106,8 @@ class Solution {
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
   Map<String, String> votes;
+  Map<String, String>
+      factIds; // Map of the newest authorId to factId associated with this hypothesis
 
   // Convert a Solution to a Map
   Map<String, dynamic> toJson() => {
@@ -118,6 +124,7 @@ class Solution {
         'createdTimestamp': createdTimestamp.toIso8601String(),
         'lastUpdatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
         'votes': votes, // Store the votes map
+        'factIds': factIds.map((key, value) => MapEntry(key, value)),
       };
 
   // CopyWith function
@@ -135,6 +142,7 @@ class Solution {
     DateTime? createdTimestamp,
     DateTime? lastUpdatedTimestamp,
     Map<String, String>? votes,
+    Map<String, String>? factIds,
   }) {
     return Solution(
       solutionId: solutionId ?? this.solutionId,
@@ -151,6 +159,7 @@ class Solution {
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
       votes: votes ?? this.votes,
+      factIds: factIds ?? Map<String, String>.from(this.factIds),
     );
   }
 
@@ -172,6 +181,13 @@ class SolutionPerspective {
   SolutionVote? getCurrentUserVote() {
     final voteString = solution.votes[currentUserId];
     return voteString != null ? SolutionVote.values.byName(voteString) : null;
+  }
+
+  /// Get the current user's factId.
+  String? getCurrentUserFactId() {
+    // Assuming factIds is a map of newest authorId to factId
+    final factId = solution.factIds[currentUserId];
+    return factId; // Return null if no factId is found
   }
 
   /// Determine if all stakeholders have voted.

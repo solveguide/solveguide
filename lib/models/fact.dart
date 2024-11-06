@@ -1,6 +1,7 @@
 enum FactVote {
-  agree,
-  disagree,
+  agree, //user agrees the fact is true and the contextual conclusion sound
+  unsound, // user agrees the fact is true, but the contextual conclusion is unsound
+  disagree, // user disagrees the fact is true, context is irrelevant
 }
 
 enum ReferenceObjectType {
@@ -33,17 +34,34 @@ class Fact {
         createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
         lastUpdatedTimestamp:
             DateTime.parse(json['updatedTimestamp'] as String),
-        referenceObjects:
-            (json['referenceObjects'] as Map<String, dynamic>?)?.map(
-                  (key, value) => MapEntry(key as ReferenceObjectType,
-                      List<String>.from(value as List<dynamic>)),
-                ) ??
-                {},
+        referenceObjects: (json['referenceObjects'] as Map<String, dynamic>?)
+                ?.entries
+                .where((entry) {
+                  // Ensure the key is valid as a ReferenceObjectType enum
+                  try {
+                    ReferenceObjectType.values.byName(entry.key);
+                    return true;
+                  } catch (e) {
+                    return false;
+                  }
+                })
+                .map((entry) {
+                  // Parse the key as a ReferenceObjectType safely
+                  final refType = ReferenceObjectType.values.byName(entry.key);
+                  return MapEntry(
+                      refType, List<String>.from(entry.value as List));
+                })
+                .toList()
+                .asMap()
+                .map((index, entry) => MapEntry(entry.key, entry.value)) ??
+            {},
         parentIssueId: json['parentIssueId'] as String?,
         supportingContext: json['supportingContext'] as String?,
         votes: (json['votes'] as Map<String, dynamic>? ?? {}).map(
-          (key, value) =>
-              MapEntry(key, FactVote.values.byName(value as String)),
+          (key, value) => MapEntry(
+            key,
+            FactVote.values.byName(value as String),
+          ),
         ),
       );
 

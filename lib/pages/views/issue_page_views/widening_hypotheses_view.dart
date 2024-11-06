@@ -60,7 +60,6 @@ class WideningHypothesesView extends StatelessWidget {
                         ),
                         backgroundColor: AppColors.consensus,
                       ),
-                      //TODO: Add a footer here that is a list of "rootable" hypothesis
                       const SizedBox(height: AppSpacing.md),
 
                       // Widening User Input
