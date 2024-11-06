@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
+import 'package:guide_solve/models/fact.dart';
 import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 
@@ -13,7 +14,6 @@ class NarrowingToRootCauseView extends StatelessWidget {
   });
 
   final String issueId;
-  //final TextEditingController _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +60,11 @@ class NarrowingToRootCauseView extends StatelessWidget {
                           style: UITextStyle.headline6,
                         ),
                         backgroundColor: AppColors.consensus,
+                        child: _possibleRootsList(
+                          context,
+                          currentUserId,
+                          issueBloc,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.md),
 
@@ -80,8 +85,103 @@ class NarrowingToRootCauseView extends StatelessWidget {
   }
 }
 
+Widget _possibleRootsList(
+    BuildContext context, String currentUserId, IssueBloc issueBloc) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: ShadCard(
+        padding: EdgeInsets.all(AppSpacing.xs),
+        description: Text("is a symptom of the root issue. . ."),
+        backgroundColor: AppColors.public,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 80),
+            child: StreamBuilder<List<Hypothesis>>(
+              stream: issueBloc.hypothesesStream,
+              builder: (context, hypothesesSnapshot) {
+                if (hypothesesSnapshot.hasError) {
+                  return const Center(
+                    child: Text('Error loading root theories'),
+                  );
+                }
+                if (!hypothesesSnapshot.hasData) {
+                  return const Center(
+                    child: Text('No Root Issue candidates available'),
+                  );
+                }
+                final hypotheses = hypothesesSnapshot.data!
+                    .where((hypothesis) => hypothesis
+                        .perspective(currentUserId,
+                            issueBloc.focusedIssue!.invitedUserIds!)
+                        .allOtherStakeholdersAgree())
+                    .toList();
+
+                // Calculate rank for each hypothesis using
+                // Perspective and update rank value
+                for (final hypothesis in hypotheses) {
+                  final perspective = hypothesis.perspective(
+                    currentUserId,
+                    issueBloc.focusedIssue!.invitedUserIds!,
+                  );
+                  hypothesis.rank = perspective.calculateConsensusRank();
+                }
+                // Sort hypotheses based on rank in
+                // descending order (higher rank first)
+                hypotheses.sort(
+                  (a, b) => b.rank.compareTo(a.rank),
+                );
+
+                return ListView.builder(
+                  itemCount: hypotheses.length,
+                  itemBuilder: (context, index) {
+                    final hypothesis = hypotheses[index];
+                    final currentUserVote = hypothesis
+                        .perspective(currentUserId,
+                            issueBloc.focusedIssue!.invitedUserIds!)
+                        .getCurrentUserVote();
+                    final descLength = hypothesis.desc.length;
+                    return Padding(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+                      child: ShadCard(
+                        padding: EdgeInsets.all(AppSpacing.xxs),
+                        title: Text(
+                          hypothesis.desc
+                              .substring(0, descLength < 50 ? descLength : 49),
+                          style: UITextStyle.subtitle1,
+                        ),
+                        backgroundColor: AppColors.consensus,
+                        trailing: ShadCheckbox(
+                          value: currentUserVote == HypothesisVote.root
+                              ? true
+                              : false,
+                          onChanged: (v) => context.read<IssueBloc>().add(
+                                HypothesisVoteSubmitted(
+                                  voteValue: v == true
+                                      ? HypothesisVote.root
+                                      : HypothesisVote.agree,
+                                  hypothesisId: hypothesis.hypothesisId!,
+                                ),
+                              ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 Widget _hypothesisList(
     BuildContext context, String currentUserId, IssueBloc issueBloc) {
+  final TextEditingController _textController = TextEditingController();
   return Expanded(
     child: StreamBuilder<List<Hypothesis>>(
       stream: issueBloc.hypothesesStream,
@@ -134,31 +234,124 @@ Widget _hypothesisList(
                     .isCurrentUserInConflict();
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
-                  child: ShadCard(
-                    title: Text(
-                      hypothesis.desc,
-                      style: UITextStyle.subtitle1,
-                    ),
-                    backgroundColor: currentUserVote == HypothesisVote.spinoff
-                        ? AppColors.conflictLight
-                        : everyoneElseAgrees
-                            ? AppColors.consensus
-                            : AppColors.public,
-                    trailing: Stack(clipBehavior: Clip.none, children: [
-                      NarrowToRootSegmentButton(
+                  child: Tappable(
+                    onTap: () {
+                      showShadDialog<bool>(
+                        context: context,
+                        builder: (context) => ShadDialog(
+                          title: const Text('Resolving Conflicts'),
+                          description: const Text(
+                              "Add reasoning to your votes to help get to the root."),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Divider(),
+                              SizedBox(height: AppSpacing.xxlg),
+                              // When it comes to addressing [seedStatement]
+                              Text.rich(
+                                TextSpan(
+                                  text: 'Given that ',
+                                  style: UITextStyle.subtitle2,
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          ' ${issueBloc.focusedIssue!.seedStatement} ',
+                                      style: UITextStyle.subtitle2.copyWith(
+                                          backgroundColor: AppColors.consensus,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: AppSpacing.lg),
+                              // [Current Hypothesis] [[IS/IS NOT]] a possible root of the issue because
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: ' ${hypothesis.desc} ',
+                                      style: UITextStyle.subtitle2.copyWith(
+                                          backgroundColor: AppColors.public,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text: currentUserVote ==
+                                              HypothesisVote.agree
+                                          ? ' IS '
+                                          : ' IS NOT ',
+                                      style: UITextStyle.subtitle2.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                    TextSpan(
+                                      text: 'a possible root issue because: ',
+                                      style: UITextStyle.subtitle2,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              // [New Fact]
+                              ShadInput(
+                                controller: _textController,
+                                placeholder: const Text(
+                                    "Enter new fact or reasoning here..."),
+                                onChanged: (value) {
+                                  // handle new fact input if needed
+                                },
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            ShadButton(
+                              child: Text('Share Reasoning'),
+                              onPressed: () {
+                                context.read<IssueBloc>().add(
+                                      NewFactCreated(
+                                          newFact: _textController.text,
+                                          newFactContext: currentUserVote ==
+                                                  HypothesisVote.agree
+                                              ? ' IS '
+                                              : ' IS NOT ' +
+                                                  'a possible root issue',
+                                          referenceObjectId:
+                                              hypothesis.hypothesisId!,
+                                          referenceObjectType:
+                                              ReferenceObjectType.hypothesis),
+                                    );
+                              },
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    child: ShadCard(
+                      title: Text(
+                        hypothesis.desc,
+                        style: UITextStyle.subtitle1,
+                      ),
+                      backgroundColor: currentUserVote == HypothesisVote.spinoff
+                          ? AppColors.conflictLight
+                          : everyoneElseAgrees
+                              ? AppColors.consensus
+                              : AppColors.public,
+                      border: conflict
+                          ? Border(
+                              top: BorderSide(
+                                color: AppColors.conflict,
+                                width: 3,
+                              ),
+                              right: BorderSide(
+                                color: AppColors.conflict,
+                                width: 3,
+                              ))
+                          : null,
+                      trailing: NarrowToRootSegmentButton(
                         hypothesis: hypothesis,
                         currentUserId: currentUserId,
                         invitedUserIds: issueBloc.focusedIssue!.invitedUserIds!,
                       ),
-                      if (conflict)
-                        Positioned(
-                          top: -8,
-                          right: -8,
-                          child: ShadBadge.destructive(
-                            child: const Text(''),
-                          ),
-                        ),
-                    ]),
+                    ),
                   ),
                 );
               },

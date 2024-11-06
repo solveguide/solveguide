@@ -1,3 +1,15 @@
+enum FactVote {
+  agree,
+  disagree,
+}
+
+enum ReferenceObjectType {
+  issue,
+  hypothesis,
+  solution,
+  fact,
+}
+
 class Fact {
   // A map to store user votes (userId -> voteValue)
 
@@ -23,14 +35,15 @@ class Fact {
             DateTime.parse(json['updatedTimestamp'] as String),
         referenceObjects:
             (json['referenceObjects'] as Map<String, dynamic>?)?.map(
-                  (key, value) =>
-                      MapEntry(key, List<String>.from(value as List<dynamic>)),
+                  (key, value) => MapEntry(key as ReferenceObjectType,
+                      List<String>.from(value as List<dynamic>)),
                 ) ??
                 {},
         parentIssueId: json['parentIssueId'] as String?,
         supportingContext: json['supportingContext'] as String?,
-        votes: Map<String, String>.from(
-          json['votes'] as Map<String, dynamic>? ?? {},
+        votes: (json['votes'] as Map<String, dynamic>? ?? {}).map(
+          (key, value) =>
+              MapEntry(key, FactVote.values.byName(value as String)),
         ),
       );
 
@@ -39,11 +52,11 @@ class Fact {
   final String desc; // The actual fact description
   final DateTime createdTimestamp; // Timestamp when the fact was created
   final DateTime lastUpdatedTimestamp; // Timestamp for the last update
-  final Map<String, List<String>>
+  final Map<ReferenceObjectType, List<String>>
       referenceObjects; // Map of reference types to their IDs
   final String? parentIssueId; // ID of the parent issue, optional
   final String? supportingContext; // Additional context for the fact
-  Map<String, String> votes;
+  Map<String, FactVote> votes;
 
   // Convert a Fact object to JSON (for Firestore or other storage)
   Map<String, dynamic> toJson() => {
@@ -52,14 +65,15 @@ class Fact {
         'desc': desc,
         'createdTimestamp': createdTimestamp.toIso8601String(),
         'updatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
-        'referenceObjects': referenceObjects,
+        'referenceObjects':
+            referenceObjects.map((key, value) => MapEntry(key.name, value)),
         'parentIssueId': parentIssueId,
         'supportingContext': supportingContext,
-        'votes': votes, // Store the votes map
+        'votes': votes.map((key, value) => MapEntry(key, value.name)),
       };
 
   // Update the votes map (e.g., add or reverse a user's vote)
-  void updateVote(String userId, String voteValue) {
+  void updateVote(String userId, FactVote voteValue) {
     votes[userId] = voteValue;
   }
 
@@ -75,10 +89,10 @@ class Fact {
     String? desc,
     DateTime? createdTimestamp,
     DateTime? lastUpdatedTimestamp,
-    Map<String, List<String>>? referenceObjects,
+    Map<ReferenceObjectType, List<String>>? referenceObjects,
     String? parentIssueId,
     String? supportingContext,
-    Map<String, String>? votes,
+    Map<String, FactVote>? votes,
   }) {
     return Fact(
       factId: factId ?? this.factId,
@@ -86,10 +100,13 @@ class Fact {
       desc: desc ?? this.desc,
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
-      referenceObjects: referenceObjects ?? this.referenceObjects,
+      referenceObjects: referenceObjects ??
+          this
+              .referenceObjects
+              .map((key, value) => MapEntry(key, List<String>.from(value))),
       parentIssueId: parentIssueId ?? this.parentIssueId,
       supportingContext: supportingContext ?? this.supportingContext,
-      votes: votes ?? this.votes,
+      votes: votes ?? Map<String, FactVote>.from(this.votes),
     );
   }
 }

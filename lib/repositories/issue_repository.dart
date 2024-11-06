@@ -6,13 +6,6 @@ import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/issue.dart';
 import 'package:guide_solve/models/solution.dart';
 
-enum ReferenceObjectType {
-  issue,
-  hypothesis,
-  solution,
-  fact,
-}
-
 class IssueRepository {
   // Get collection of issues
   final CollectionReference _issuesCollection =
@@ -286,11 +279,14 @@ SUBCOLLECTION FUNCTIONS
       authorId: authorId, // Use ownerId from AuthState
       desc: factDesc,
       referenceObjects: {
-        refObjectType.toString(): [refObjectId],
+        refObjectType: [refObjectId],
       },
       supportingContext: factContext,
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),
+      votes: {
+        authorId: FactVote.agree
+      }, // Initialize with a vote from the author
     );
     try {
       // Reference to the solutions subcollection

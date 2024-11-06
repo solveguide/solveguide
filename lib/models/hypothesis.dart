@@ -19,6 +19,7 @@ class Hypothesis {
     this.spinoffIssueId,
     this.rank = 0,
     this.votes = const {}, // Initialize with an empty map
+    this.factIds = const {},
   });
 
   // Create a Hypothesis from a Map
@@ -37,6 +38,9 @@ class Hypothesis {
           (key, value) =>
               MapEntry(key, HypothesisVote.values.byName(value as String)),
         ),
+        factIds: (json['factIds'] as Map<String, String>? ?? {}).map(
+          (key, value) => MapEntry(key, value),
+        ),
       );
 
   String? hypothesisId;
@@ -49,6 +53,8 @@ class Hypothesis {
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
   Map<String, HypothesisVote> votes; // Vote Map: userId -> vote
+  Map<String, String>
+      factIds; // Map of the newest authorId to factId associated with this hypothesis
 
   // Convert a Hypothesis to a Map
   Map<String, dynamic> toJson() => {
@@ -62,6 +68,7 @@ class Hypothesis {
         'createdTimestamp': createdTimestamp.toIso8601String(),
         'lastUpdatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
         'votes': votes.map((key, value) => MapEntry(key, value.name)),
+        'factIds': factIds.map((key, value) => MapEntry(key, value)),
       };
 
   // Add the copyWith method
@@ -76,6 +83,7 @@ class Hypothesis {
     DateTime? createdTimestamp,
     DateTime? lastUpdatedTimestamp,
     Map<String, HypothesisVote>? votes,
+    Map<String, String>? factIds,
   }) {
     return Hypothesis(
       hypothesisId: hypothesisId ?? this.hypothesisId,
@@ -88,6 +96,7 @@ class Hypothesis {
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
       votes: votes ?? Map<String, HypothesisVote>.from(this.votes),
+      factIds: factIds ?? Map<String, String>.from(this.factIds),
     );
   }
 
@@ -113,6 +122,13 @@ class HypothesisPerspective {
   HypothesisVote? getCurrentUserVote() {
     final voteEnum = hypothesis.votes[currentUserId];
     return voteEnum != null ? voteEnum : null;
+  }
+
+  /// Get the current user's factId.
+  String? getCurrentUserFactId() {
+    // Assuming factIds is a map of newest authorId to factId
+    final factId = hypothesis.factIds[currentUserId];
+    return factId; // Return null if no factId is found
   }
 
   /// Determine if all stakeholders have voted.
