@@ -21,7 +21,10 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<IssuesFetched>(_fetchIssues);
     on<NewIssueCreated>(_addNewIssue);
     on<FocusIssueSelected>(_onFocusIssueSelected);
-    on<FocusedIssueUpdated>(_onFocusedIssueUpdated);
+    on<IssueUpdatedFromDatabase>(_onIssueUpdatedFromDatabase);
+    on<HypothesesUpdatedFromDatabase>(_onHypothesesUpdatedFromDatabase);
+    on<SolutionsUpdatedFromDatabase>(_onSolutionsUpdatedFromDatabase);
+    on<FactsUpdatedFromDatabase>(_onFactsUpdatedFromDatabase);
     on<IssueDeletionRequested>(_onIssueDeletionRequested);
     //Issue Solving Events
     on<NewHypothesisCreated>(_newHypothesisCreated);
@@ -48,6 +51,11 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   Stream<List<Solution>>? _solutionsStream;
   Stream<List<Fact>>? _factsStream;
   Issue? focusedIssue;
+
+  StreamSubscription<Issue>? _focusedIssueSubscription;
+  StreamSubscription<List<Hypothesis>>? _hypothesisSubscription;
+  StreamSubscription<List<Solution>>? _solutionSubscription;
+  StreamSubscription<List<Fact>>? _factSubscription;
 
   String? _currentIssueId;
   String? _currentUserId;
@@ -125,114 +133,88 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     FocusIssueSelected event,
     Emitter<IssueState> emit,
   ) async {
-    _currentIssueId = event.issueId;
+    _currentIssueId = event.issue.issueId;
+    if (_currentIssueId == null) {
+      emit(const IssuesListFailure('No Issue Selected'));
+      return;
+    }
 
-    _focusedIssueStream =
-        await issueRepository.getFocusedIssueStream(event.issueId);
-    _hypothesesStream = await issueRepository.getHypotheses(event.issueId);
-    _solutionsStream = await issueRepository.getSolutions(event.issueId);
-    _factsStream = await issueRepository.getFacts(event.issueId);
+    //Focused Issue subscription
+    await _focusedIssueSubscription?.cancel();
+    await _hypothesisSubscription?.cancel();
+    await _solutionSubscription?.cancel();
+    await _factSubscription?.cancel();
 
-    focusedIssue = await issueRepository.getLatestValue(_focusedIssueStream!);
+    _focusedIssueSubscription =
+        issueRepository.getFocusedIssueStream(_currentIssueId!).listen(
+              (issue) => add(IssueUpdatedFromDatabase(issue)),
+            );
+    // Hypothesis subscription
+    _hypothesisSubscription =
+        issueRepository.getHypotheses(_currentIssueId!).listen(
+              (hypotheses) => add(HypothesesUpdatedFromDatabase(hypotheses)),
+            );
+
+    // Solutions subscription
+    _solutionSubscription =
+        issueRepository.getSolutions(_currentIssueId!).listen(
+              (solutions) => add(SolutionsUpdatedFromDatabase(solutions)),
+            );
+
+    // Facts subscription
+    _factSubscription = issueRepository.getFacts(_currentIssueId!).listen(
+          (facts) => add(FactsUpdatedFromDatabase(facts)),
+        );
 
     emit(
       IssueProcessState(
         stage: IssueProcessStage.wideningHypotheses,
-        hypothesesStream: _hypothesesStream,
-        solutionsStream: _solutionsStream,
+        issue: event.issue,
+        hypotheses: [],
+        solutions: [],
+        facts: [],
       ),
     );
   }
 
-  // Handle the new event when the focused issue is updated
-  Future<void> _onFocusedIssueUpdated(
-    FocusedIssueUpdated event,
+  void _onIssueUpdatedFromDatabase(
+    IssueUpdatedFromDatabase event,
     Emitter<IssueState> emit,
-  ) async {
-    final issue = event.focusedIssue;
+  ) {
+    final currentState = state as IssueProcessState;
+    emit(currentState.copyWith(issue: event.issue));
+  }
 
-    // Get the appropriate streams for the current issue
-    final hypothesesStream = issueRepository.getHypotheses(issue.issueId!);
-    final solutionsStream = issueRepository.getSolutions(issue.issueId!);
+  void _onHypothesesUpdatedFromDatabase(
+    HypothesesUpdatedFromDatabase event,
+    Emitter<IssueState> emit,
+  ) {
+    final currentState = state as IssueProcessState;
+    emit(currentState.copyWith(hypotheses: event.hypotheses));
+  }
 
-    final hypotheses = await hypothesesStream.first;
-    final solutions = await solutionsStream.first;
+  void _onSolutionsUpdatedFromDatabase(
+    SolutionsUpdatedFromDatabase event,
+    Emitter<IssueState> emit,
+  ) {
+    final currentState = state as IssueProcessState;
+    emit(currentState.copyWith(solutions: event.solutions));
+  }
 
-    final perspective =
-        issue.perspective(_currentUserId!, hypotheses, solutions);
-
-    IssueProcessStage stage;
-
-    if (issue.root.isEmpty && (await hypothesesStream.first).length < 4) {
-      stage = IssueProcessStage.wideningHypotheses;
-      emit(
-        IssueProcessState(
-          stage: stage,
-          hypothesesStream: hypothesesStream,
-          solutionsStream: solutionsStream,
-          perspective: perspective,
-        ),
-      );
-    } else if (issue.root.isEmpty) {
-      stage = IssueProcessStage.narrowingToRootCause;
-      emit(
-        IssueProcessState(
-          stage: stage,
-          hypothesesStream: hypothesesStream,
-          solutionsStream: solutionsStream,
-          perspective: perspective,
-        ),
-      );
-    } else if (issue.solve.isEmpty &&
-        (await solutionsStream.first).length < 4) {
-      stage = IssueProcessStage.wideningSolutions;
-      emit(
-        IssueProcessState(
-          stage: stage,
-          hypothesesStream: hypothesesStream,
-          solutionsStream: solutionsStream,
-          perspective: perspective,
-        ),
-      );
-    } else if (issue.solve.isEmpty) {
-      stage = IssueProcessStage.narrowingToSolve;
-      emit(
-        IssueProcessState(
-          stage: stage,
-          hypothesesStream: hypothesesStream,
-          solutionsStream: solutionsStream,
-          perspective: perspective,
-        ),
-      );
-    } else {
-      // Handle other stages and emit the appropriate state
-      emit(
-        const IssueProcessState(stage: IssueProcessStage.solveSummaryReview),
-      );
-    }
+  void _onFactsUpdatedFromDatabase(
+    FactsUpdatedFromDatabase event,
+    Emitter<IssueState> emit,
+  ) {
+    final currentState = state as IssueProcessState;
+    emit(currentState.copyWith(facts: event.facts));
   }
 
   FutureOr<void> _onFocusIssueNavigationRequested(
     FocusIssueNavigationRequested event,
     Emitter<IssueState> emit,
   ) async {
-    final stage = event.stage;
-
-    _focusedIssueStream =
-        await issueRepository.getFocusedIssueStream(focusedIssue!.issueId!);
-    _hypothesesStream =
-        await issueRepository.getHypotheses(focusedIssue!.issueId!);
-    _solutionsStream =
-        await issueRepository.getSolutions(focusedIssue!.issueId!);
-    _factsStream = await issueRepository.getFacts(focusedIssue!.issueId!);
-
-    focusedIssue = await issueRepository.getLatestValue(_focusedIssueStream!);
-
-    emit(
-      IssueProcessState(
-        stage: stage,
-      ),
-    );
+    final currentState = state as IssueProcessState;
+    emit(currentState.copyWith(stage: event.stage));
   }
 
   Future<void> _newHypothesisCreated(
@@ -353,7 +335,6 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     try {
       // Ensure the Bloc state is of type IssueProcessState
       if (state is! IssueProcessState) return;
-      final currentState = state as IssueProcessState;
 
       // Ensure current issue ID and hypothesis are available
       if (_currentIssueId == null)
@@ -373,22 +354,6 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       // Update Firestore with the new hypothesis state
       await issueRepository.updateHypothesis(
           _currentIssueId!, updatedHypothesis);
-
-      // Re-emit the IssueProcessState to trigger UI updates
-      emit(
-        IssueProcessState(
-          stage: currentState.stage,
-          hypothesesStream: _hypothesesStream,
-          solutionsStream: _solutionsStream,
-          perspective: currentState.perspective,
-        ),
-      );
-
-      // Handle navigation if necessary after updating the vote
-      if (event.voteValue == HypothesisVote.root) {
-        add(FocusIssueNavigationRequested(
-            stage: IssueProcessStage.narrowingToRootCause));
-      }
     } catch (e) {
       // Handle errors and emit failure state if necessary
       emit(IssuesListFailure('Failed to submit vote: ${e.toString()}'));
@@ -645,6 +610,10 @@ void _onFocusSolveScopeSubmitted(
   */
   @override
   Future<void> close() {
+    _focusedIssueSubscription?.cancel();
+    _hypothesisSubscription?.cancel();
+    _solutionSubscription?.cancel();
+    _factSubscription?.cancel();
     return super.close();
   }
 

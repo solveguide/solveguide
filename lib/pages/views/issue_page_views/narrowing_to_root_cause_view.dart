@@ -5,7 +5,6 @@ import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/fact.dart';
 import 'package:guide_solve/models/hypothesis.dart';
-import 'package:guide_solve/models/issue.dart';
 
 class NarrowingToRootCauseView extends StatelessWidget {
   NarrowingToRootCauseView({
@@ -17,274 +16,230 @@ class NarrowingToRootCauseView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
-    final currentUserId = issueBloc.currentUserId!;
-
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        children: [
-          StreamBuilder<Issue>(
-              stream: issueBloc.focusedIssueStream,
-              builder: (context, issueSnapshot) {
-                if (issueSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (issueSnapshot.hasError) {
-                  return const Center(child: Text('Error loading issue.'));
-                }
-                if (!issueSnapshot.hasData) {
-                  return const Center(child: Text('No issue data available.'));
-                }
-                final focusedIssue = issueSnapshot.data!;
-                return Expanded(
-                  child: Column(
-                    children: [
-                      //Issue Status & Navigation
-                      ProcessStatusBar(),
-                      const SizedBox(height: AppSpacing.lg),
-                      // Consensus IssueOwner noticed the seedStatement
-                      SizedBox(
-                        width: 575,
-                        child: Text(
-                          '${focusedIssue.ownerId} noticed:',
-                          style: UITextStyle.overline,
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xxxs),
-                      ShadCard(
-                        width: 600,
-                        title: Text(
-                          focusedIssue.seedStatement,
-                          style: UITextStyle.headline6,
-                        ),
-                        backgroundColor: AppColors.consensus,
-                        child: _possibleRootsList(
-                          context,
-                          currentUserId,
-                          issueBloc,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
+      child: BlocBuilder<IssueBloc, IssueState>(
+        builder: (context, state) {
+          // Ensure the state is the specific IssueProcessState type
+          if (state is! IssueProcessState) {
+            return Center(child: Text('$state'));
+          }
+          final currentUserId = context.read<IssueBloc>().currentUserId!;
 
-                      const SizedBox(height: AppSpacing.md),
-                      // Widening Options so far (Hypotheses list)
-                      _hypothesisList(
-                        context,
-                        currentUserId,
-                        issueBloc,
-                      ),
-                    ],
+          final focusedIssue = state.issue;
+          final hypotheses = state.hypotheses;
+
+          // Calculate and sort ranks for the hypotheses
+          for (final hypothesis in hypotheses) {
+            final perspective = hypothesis.perspective(
+              currentUserId,
+              focusedIssue.invitedUserIds!,
+            );
+            hypothesis.rank = perspective.calculateNarrowingRank();
+          }
+          hypotheses.sort((a, b) => b.rank.compareTo(a.rank));
+          return Column(children: [
+            Expanded(
+              child: Column(
+                children: [
+                  //Issue Status & Navigation
+                  ProcessStatusBar(),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Consensus IssueOwner noticed the seedStatement
+                  SizedBox(
+                    width: 575,
+                    child: Text(
+                      '${focusedIssue.ownerId} noticed:',
+                      style: UITextStyle.overline,
+                      textAlign: TextAlign.left,
+                    ),
                   ),
-                );
-              }),
-        ],
+                  const SizedBox(height: AppSpacing.xxxs),
+                  ShadCard(
+                    width: 600,
+                    title: Text(
+                      focusedIssue.seedStatement,
+                      style: UITextStyle.headline6,
+                    ),
+                    backgroundColor: AppColors.consensus,
+                    child: _possibleRootsList(
+                      context,
+                      currentUserId,
+                      hypotheses,
+                      state.issue.invitedUserIds!,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  const SizedBox(height: AppSpacing.md),
+                  // Widening Options so far (Hypotheses list)
+                  _hypothesisList(
+                    context,
+                    currentUserId,
+                    hypotheses,
+                  ),
+                ],
+              ),
+            )
+          ]);
+        },
       ),
     );
   }
-}
 
-Widget _possibleRootsList(
-    BuildContext context, String currentUserId, IssueBloc issueBloc) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: ShadCard(
-        padding: EdgeInsets.all(AppSpacing.xs),
-        description: Text("is a symptom of the root issue. . ."),
-        backgroundColor: AppColors.public,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 80),
-            child: StreamBuilder<List<Hypothesis>>(
-              stream: issueBloc.hypothesesStream,
-              builder: (context, hypothesesSnapshot) {
-                if (hypothesesSnapshot.hasError) {
-                  return const Center(
-                    child: Text('Error loading root theories'),
-                  );
-                }
-                if (!hypothesesSnapshot.hasData) {
-                  return const Center(
-                    child: Text('No Root Issue candidates available'),
-                  );
-                }
-                final hypotheses = hypothesesSnapshot.data!
-                    .where((hypothesis) => hypothesis
-                        .perspective(currentUserId,
-                            issueBloc.focusedIssue!.invitedUserIds!)
-                        .allOtherStakeholdersAgree())
-                    .toList();
+  Widget _possibleRootsList(
+    BuildContext context,
+    String currentUserId,
+    List<Hypothesis> hypotheses,
+    List<String> invitedUserIds,
+  ) {
+    // Filter for hypotheses where all stakeholders agree
+    final possibleRoots = hypotheses
+        .where((hypothesis) => hypothesis
+            .perspective(currentUserId, invitedUserIds)
+            .allOtherStakeholdersAgree())
+        .toList();
 
-                // Calculate rank for each hypothesis using
-                // Perspective and update rank value
-                for (final hypothesis in hypotheses) {
-                  final perspective = hypothesis.perspective(
-                    currentUserId,
-                    issueBloc.focusedIssue!.invitedUserIds!,
-                  );
-                  hypothesis.rank = perspective.calculateConsensusRank();
-                }
-                // Sort hypotheses based on rank in
-                // descending order (higher rank first)
-                hypotheses.sort(
-                  (a, b) => b.rank.compareTo(a.rank),
-                );
+    // Display list of possible root hypotheses
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: ShadCard(
+          padding: EdgeInsets.all(AppSpacing.xs),
+          description: Text("is a symptom of the root issue. . ."),
+          backgroundColor: AppColors.public,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 80),
+              child: ListView.builder(
+                itemCount: possibleRoots.length,
+                itemBuilder: (context, index) {
+                  final hypothesis = possibleRoots[index];
+                  final currentUserVote = hypothesis
+                      .perspective(currentUserId, invitedUserIds)
+                      .getCurrentUserVote();
+                  final descLength = hypothesis.desc.length;
 
-                return ListView.builder(
-                  itemCount: hypotheses.length,
-                  itemBuilder: (context, index) {
-                    final hypothesis = hypotheses[index];
-                    final currentUserVote = hypothesis
-                        .perspective(currentUserId,
-                            issueBloc.focusedIssue!.invitedUserIds!)
-                        .getCurrentUserVote();
-                    final descLength = hypothesis.desc.length;
-                    return Padding(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
-                      child: ShadCard(
-                        padding: EdgeInsets.all(AppSpacing.xxs),
-                        title: Text(
-                          hypothesis.desc
-                              .substring(0, descLength < 50 ? descLength : 49),
-                          style: UITextStyle.subtitle1,
-                        ),
-                        backgroundColor: AppColors.consensus,
-                        trailing: ShadCheckbox(
-                          value: currentUserVote == HypothesisVote.root
-                              ? true
-                              : false,
-                          onChanged: (v) => context.read<IssueBloc>().add(
+                  return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+                    child: ShadCard(
+                      padding: EdgeInsets.all(AppSpacing.xxs),
+                      title: Text(
+                        hypothesis.desc
+                            .substring(0, descLength < 50 ? descLength : 49),
+                        style: UITextStyle.subtitle1,
+                      ),
+                      backgroundColor: AppColors.public,
+                      trailing: ShadCheckbox(
+                        value: currentUserVote == HypothesisVote.root,
+                        onChanged: (v) {
+                          context.read<IssueBloc>().add(
                                 HypothesisVoteSubmitted(
                                   voteValue: v == true
                                       ? HypothesisVote.root
                                       : HypothesisVote.agree,
                                   hypothesisId: hypothesis.hypothesisId!,
                                 ),
-                              ),
-                        ),
+                              );
+                        },
                       ),
-                    );
-                  },
-                );
-              },
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _hypothesisList(
-    BuildContext context, String currentUserId, IssueBloc issueBloc) {
-  final TextEditingController _textController = TextEditingController();
-  return Expanded(
-    child: StreamBuilder<List<Hypothesis>>(
-      stream: issueBloc.hypothesesStream,
-      builder: (context, hypothesesSnapshot) {
-        if (hypothesesSnapshot.hasError) {
-          return const Center(
-            child: Text('Error loading hypotheses'),
-          );
-        }
-        if (!hypothesesSnapshot.hasData) {
-          return const Center(
-            child: Text('Submit a root issue theory.'),
-          );
-        }
-        final hypotheses = hypothesesSnapshot.data!;
-
-        // Calculate rank for each hypothesis using
-        // Perspective and update rank value
-        for (final hypothesis in hypotheses) {
-          final perspective = hypothesis.perspective(
-            currentUserId,
-            issueBloc.focusedIssue!.invitedUserIds!,
-          );
-          hypothesis.rank = perspective.calculateNarrowingRank();
-        }
-        // Sort hypotheses based on rank in
-        // descending order (higher rank first)
-        hypotheses.sort(
-          (a, b) => b.rank.compareTo(a.rank),
-        );
-
-        return Align(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1000),
-            child: ListView.builder(
-              itemCount: hypotheses.length,
-              itemBuilder: (context, index) {
-                final hypothesis = hypotheses[index];
-                final currentUserVote = hypothesis
-                    .perspective(
-                        currentUserId, issueBloc.focusedIssue!.invitedUserIds!)
-                    .getCurrentUserVote();
-                final everyoneElseAgrees = hypothesis
-                    .perspective(
-                        currentUserId, issueBloc.focusedIssue!.invitedUserIds!)
-                    .allOtherStakeholdersAgree();
-                final conflict = hypothesis
-                    .perspective(
-                        currentUserId, issueBloc.focusedIssue!.invitedUserIds!)
-                    .isCurrentUserInConflict();
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
-                  child: Tappable(
-                    onTap: () {
-                      if (hypothesis.factIds[currentUserId] == null) {
-                        showCreateFactDialog(context, issueBloc, hypothesis,
-                            currentUserVote, _textController);
-                      } else {
-                        showVoteFactDialog(context, issueBloc, hypothesis,
-                            currentUserVote, _textController);
-                      }
-                    },
-                    child: ShadCard(
-                      title: Text(
-                        hypothesis.desc,
-                        style: UITextStyle.subtitle1,
-                      ),
-                      backgroundColor: currentUserVote == HypothesisVote.spinoff
-                          ? AppColors.conflictLight
-                          : everyoneElseAgrees
-                              ? AppColors.consensus
-                              : AppColors.public,
-                      border: conflict
-                          ? Border(
-                              top: BorderSide(
-                                color: AppColors.conflict,
-                                width: 3,
-                              ),
-                              right: BorderSide(
-                                color: AppColors.conflict,
-                                width: 3,
-                              ))
-                          : null,
-                      trailing: NarrowToRootSegmentButton(
-                        hypothesis: hypothesis,
-                        currentUserId: currentUserId,
-                        invitedUserIds: issueBloc.focusedIssue!.invitedUserIds!,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+  Widget _hypothesisList(
+      BuildContext context, String currentUserId, List<Hypothesis> hypotheses) {
+    final TextEditingController _textController = TextEditingController();
+    final currentState = context.read<IssueBloc>().state as IssueProcessState;
+    if (hypotheses.isEmpty) {
+      // Display message if there are no hypotheses
+      return Center(
+        child: Tappable(
+          onTap: () => {
+            context.read<IssueBloc>().add(FocusIssueNavigationRequested(
+                stage: IssueProcessStage.wideningHypotheses))
+          },
+          child: Text(
+            'Submit a root issue theory.',
+            style: UITextStyle.bodyText2,
+            textAlign: TextAlign.center,
           ),
-        );
-      },
-    ),
-  );
+        ),
+      );
+    }
+    return Expanded(
+        child: Align(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: ListView.builder(
+          itemCount: hypotheses.length,
+          itemBuilder: (context, index) {
+            final hypothesis = hypotheses[index];
+            final perspective = hypothesis.perspective(
+                currentUserId, currentState.issue.invitedUserIds!);
+            final currentUserVote = perspective.getCurrentUserVote();
+            final everyoneElseAgrees = perspective.allOtherStakeholdersAgree();
+            final conflict = perspective.isCurrentUserInConflict();
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+              child: Tappable(
+                onTap: () {
+                  if (hypothesis.factIds[currentUserId] == null) {
+                    showCreateFactDialog(context, currentState, hypothesis,
+                        currentUserVote, _textController);
+                  } else {
+                    showVoteFactDialog(context, currentState, hypothesis,
+                        currentUserVote, _textController);
+                  }
+                },
+                child: ShadCard(
+                  title: Text(
+                    hypothesis.desc,
+                    style: UITextStyle.subtitle1,
+                  ),
+                  backgroundColor: currentUserVote == HypothesisVote.spinoff
+                      ? AppColors.conflictLight
+                      : everyoneElseAgrees
+                          ? AppColors.consensus
+                          : AppColors.public,
+                  border: conflict
+                      ? Border(
+                          top: BorderSide(
+                            color: AppColors.conflict,
+                            width: 3,
+                          ),
+                          right: BorderSide(
+                            color: AppColors.conflict,
+                            width: 3,
+                          ))
+                      : null,
+                  trailing: NarrowToRootSegmentButton(
+                    hypothesis: hypothesis,
+                    currentUserId: currentUserId,
+                    invitedUserIds: currentState.issue.invitedUserIds!,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    ));
+  }
 }
 
 Future<bool?> showCreateFactDialog(
   BuildContext context,
-  IssueBloc issueBloc,
+  IssueProcessState currentState,
   Hypothesis hypothesis,
   HypothesisVote? currentUserVote,
   TextEditingController _textController,
@@ -308,7 +263,7 @@ Future<bool?> showCreateFactDialog(
               style: UITextStyle.subtitle2,
               children: [
                 TextSpan(
-                  text: ' ${issueBloc.focusedIssue!.seedStatement} ',
+                  text: ' ${currentState.issue.seedStatement} ',
                   style: UITextStyle.subtitle2.copyWith(
                       backgroundColor: AppColors.consensus,
                       fontWeight: FontWeight.bold),
@@ -328,7 +283,8 @@ Future<bool?> showCreateFactDialog(
                       fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text: currentUserVote == HypothesisVote.agree
+                  text: currentUserVote == HypothesisVote.agree ||
+                          currentUserVote == HypothesisVote.root
                       ? ' IS  '
                       : ' IS NOT  ',
                   style: UITextStyle.subtitle2.copyWith(
@@ -387,74 +343,54 @@ Future<bool?> showCreateFactDialog(
 
 Future<bool?> showVoteFactDialog(
   BuildContext context,
-  IssueBloc issueBloc,
+  IssueProcessState currentState,
   Hypothesis hypothesis,
   HypothesisVote? currentUserVote,
   TextEditingController _textController,
 ) {
   //Fact voting Dialog
   return showShadDialog<bool>(
-    context: context,
-    builder: (context) => ShadDialog(
-      title: const Text('Resolving Conflicts'),
-      description:
-          const Text("Opine on the reasoning of others to move forward."),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Divider(),
-          SizedBox(height: AppSpacing.xxlg),
-          StreamBuilder<List<Fact>>(
-            stream: issueBloc.factsStream,
-            builder: (context, factsSnapshot) {
-              if (factsSnapshot.hasError) {
-                return const Center(
-                  child: Text('Error loading facts'),
-                );
-              }
-              if (!factsSnapshot.hasData) {
-                return const Center(
-                  child: Text('No facts available.'),
-                );
-              }
-              final facts = factsSnapshot.data!
-                  .where((fact) => fact
-                      .referenceObjects[ReferenceObjectType.hypothesis]!
-                      .contains(hypothesis.hypothesisId))
-                  .toList();
-              if (facts.length > 0) {
-                return ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  child: ListView.builder(
-                    itemCount: facts.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.xxs),
-                        child: ShadCard(
-                          padding: EdgeInsets.all(AppSpacing.xxs),
-                          title: Text(
-                            facts[index].desc,
-                            style: UITextStyle.subtitle1,
-                          ),
-                          backgroundColor: AppColors.public,
-                          trailing: Icon(Icons.how_to_vote),
+      context: context,
+      builder: (context) {
+        final facts = currentState.facts
+            .where((fact) => fact
+                .referenceObjects[ReferenceObjectType.hypothesis]!
+                .contains(hypothesis.hypothesisId))
+            .toList();
+        return ShadDialog(
+          title: const Text('Resolving Conflicts'),
+          description:
+              const Text("Opine on the reasoning of others to move forward."),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Divider(),
+              SizedBox(height: AppSpacing.xxlg),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: ListView.builder(
+                  itemCount: facts.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+                      child: ShadCard(
+                        padding: EdgeInsets.all(AppSpacing.xxs),
+                        title: Text(
+                          facts[index].desc,
+                          style: UITextStyle.subtitle1,
                         ),
-                      );
-                    },
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: Text('No facts available.'),
-                );
-              }
-            },
-          )
-        ],
-      ),
-    ),
-  );
+                        backgroundColor: AppColors.public,
+                        trailing: Icon(Icons.how_to_vote),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      });
 }
 
 class NarrowToRootSegmentButton extends StatefulWidget {

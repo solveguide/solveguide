@@ -127,4 +127,10 @@ class Fact {
       votes: votes ?? Map<String, FactVote>.from(this.votes),
     );
   }
+
+  @override
+  String toString() {
+    //
+    return 'FactId: $factId';
+  }
 }

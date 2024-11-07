@@ -25,7 +25,7 @@ class IssuePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Start listening to the focused issue when the page is built
-    context.read<IssueBloc>().add(FocusIssueSelected(issueId: issueId));
+    //context.read<IssueBloc>().add(FocusIssueSelected(issue: issueId));
     return AppScaffold(
       releaseFocus: true,
       resizeToAvoidBottomInset: true,
@@ -45,8 +45,7 @@ class IssuePage extends StatelessWidget {
       body: BlocBuilder<IssueBloc, IssueState>(
         builder: (context, state) {
           if (state is IssueProcessState) {
-            final bloc = context.read<IssueBloc>();
-            final focusedIssue = bloc.focusedIssue;
+            final focusedIssue = state.issue;
             switch (state.stage) {
               case IssueProcessStage.wideningHypotheses:
                 return WideningHypothesesView(issueId: issueId);
@@ -59,12 +58,6 @@ class IssuePage extends StatelessWidget {
               case IssueProcessStage.narrowingToSolve:
                 return NarrowingToSolveView(issueId: issueId);
               case IssueProcessStage.scopingSolve:
-                // Add a null check for focusedIssue
-                if (focusedIssue == null) {
-                  return const Center(
-                    child: Text('No focused issue available for solving.'),
-                  );
-                }
                 return ScopingSolveView(
                   issueId: issueId,
                   solutionId: focusedIssue.solveSolutionId,
@@ -75,7 +68,7 @@ class IssuePage extends StatelessWidget {
           } else if (state is IssuesListFailure) {
             return Center(child: Text('Error: ${state.error}'));
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: Text('$state'));
           }
         },
       ),

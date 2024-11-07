@@ -100,6 +100,12 @@ class Hypothesis {
     );
   }
 
+  @override
+  String toString() {
+    //
+    return 'HypothesisId: $hypothesisId';
+  }
+
   // Perspective utility functions encapsulated within Hypothesis
   HypothesisPerspective perspective(
       String currentUserId, List<String> invitedUserIds) {

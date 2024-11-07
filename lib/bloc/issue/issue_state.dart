@@ -35,6 +35,10 @@ class IssueProcessState extends IssueState {
     this.hypothesesStream,
     this.solutionsStream,
     this.perspective,
+    required this.issue,
+    required this.hypotheses,
+    required this.solutions,
+    required this.facts,
   });
 
   final IssueProcessStage stage;
@@ -42,9 +46,38 @@ class IssueProcessState extends IssueState {
   final Stream<List<Solution>>? solutionsStream;
   final IssuePerspective? perspective;
 
+  final Issue issue;
+  final List<Hypothesis> hypotheses;
+  final List<Solution> solutions;
+  final List<Fact> facts;
+
   @override
-  List<Object?> get props =>
-      [stage, hypothesesStream, solutionsStream, perspective];
+  List<Object?> get props => [
+        stage,
+        issue,
+        hypotheses,
+        solutions,
+        facts,
+        hypothesesStream,
+        solutionsStream,
+        perspective
+      ];
+
+  IssueProcessState copyWith({
+    IssueProcessStage? stage,
+    Issue? issue,
+    List<Hypothesis>? hypotheses,
+    List<Solution>? solutions,
+    List<Fact>? facts,
+  }) {
+    return IssueProcessState(
+      stage: stage ?? this.stage,
+      issue: issue ?? this.issue,
+      hypotheses: hypotheses ?? this.hypotheses,
+      solutions: solutions ?? this.solutions,
+      facts: facts ?? this.facts,
+    );
+  }
 }
 
 enum IssueProcessStage {

@@ -163,6 +163,12 @@ class Solution {
     );
   }
 
+  @override
+  String toString() {
+    //
+    return 'SolutionId: $solutionId';
+  }
+
   // Perspective utility functions encapsulated within Hypothesis
   SolutionPerspective perspective(
       String currentUserId, List<String> invitedUserIds) {

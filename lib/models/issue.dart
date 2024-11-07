@@ -103,6 +103,12 @@ class Issue {
     );
   }
 
+  @override
+  String toString() {
+    //
+    return 'IssueId: $issueId';
+  }
+
   // Perspective for the issue
   IssuePerspective perspective(String currentUserId,
       List<Hypothesis> hypotheses, List<Solution> solutions) {

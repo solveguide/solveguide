@@ -147,6 +147,17 @@ class _DashboardPageState extends State<DashboardPage> {
                   SnackBar(content: Text(issueState.error)),
                 );
               }
+              if (issueState is IssueProcessState) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute<Widget>(
+                    builder: (context) => IssuePage(
+                      issueId: issueState.issue.issueId!,
+                    ),
+                  ),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
@@ -186,17 +197,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                   firstButton: () {
                                     BlocProvider.of<IssueBloc>(context).add(
                                       FocusIssueSelected(
-                                        issueId: issue.issueId!,
+                                        issue: issue,
                                       ),
-                                    );
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute<Widget>(
-                                        builder: (context) => IssuePage(
-                                          issueId: issue.issueId!,
-                                        ),
-                                      ),
-                                      (route) => false,
                                     );
                                   },
                                   secondButton: () {

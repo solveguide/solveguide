@@ -42,20 +42,36 @@ THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
 */
 final class FocusIssueSelected extends IssueEvent {
   const FocusIssueSelected({
-    required this.issueId,
+    required this.issue,
   });
-  final String issueId;
+  final Issue issue;
 
   @override
-  List<Object?> get props => [issueId];
+  List<Object?> get props => [issue];
 }
 
-class FocusedIssueUpdated extends IssueEvent {
-  const FocusedIssueUpdated(this.focusedIssue);
-  final Issue focusedIssue;
+class IssueUpdatedFromDatabase extends IssueEvent {
+  final Issue issue;
 
-  @override
-  List<Object?> get props => [focusedIssue];
+  IssueUpdatedFromDatabase(this.issue);
+}
+
+class HypothesesUpdatedFromDatabase extends IssueEvent {
+  final List<Hypothesis> hypotheses;
+
+  HypothesesUpdatedFromDatabase(this.hypotheses);
+}
+
+class SolutionsUpdatedFromDatabase extends IssueEvent {
+  final List<Solution> solutions;
+
+  SolutionsUpdatedFromDatabase(this.solutions);
+}
+
+class FactsUpdatedFromDatabase extends IssueEvent {
+  final List<Fact> facts;
+
+  FactsUpdatedFromDatabase(this.facts);
 }
 
 final class NewHypothesisCreated extends IssueEvent {
