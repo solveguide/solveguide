@@ -44,3 +44,15 @@ final class AppStarted extends AuthEvent {
 final class AnnonymousUserBlocked extends AuthEvent {
   const AnnonymousUserBlocked();
 }
+
+final class NewContactAdded extends AuthEvent {
+  const NewContactAdded({
+    required this.contactEmail,
+    required this.contactName,
+  });
+  final String contactEmail;
+  final String contactName;
+
+  @override
+  List<Object?> get props => [contactEmail, contactName];
+}

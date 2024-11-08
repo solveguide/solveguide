@@ -1,14 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:guide_solve/models/appUser.dart';
+import 'package:guide_solve/repositories/appUser_repository.dart';
 
 class AuthRepository {
   AuthRepository({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   final FirebaseAuth _firebaseAuth;
-  final CollectionReference _userCollection =
-      FirebaseFirestore.instance.collection('users');
+
+  final AppUserRepository _appUserRepository = AppUserRepository();
 // validate email
   bool isValidEmail(String email) {
     final emailRegExp = RegExp(
@@ -44,22 +43,7 @@ class AuthRepository {
       // Create new user in Firestore 'users' collection
       final user = userCredential.user;
       if (user != null) {
-        final privateAreaId = 'p${user.uid}';
-        final privateArea = IssueArea(
-            label: 'Private', userIds: [user.uid], issueAreaId: privateAreaId);
-
-        await _userCollection.doc(user.uid).set(
-          {
-            'userId': user.uid,
-            'email': email,
-            'username': email,
-            'createdTimestamp': DateTime.now(),
-            'lastLoginTimestamp': DateTime.now(),
-            'contacts': <String>[], // Explicitly typed as List<String>
-            'issueAreas': [privateArea.toJson()], // Add initial private area
-            'invitedContacts': <String>[], // Explicitly typed as List<String>
-          },
-        );
+        await _appUserRepository.createAppUser(user, email);
       }
 
       return user;
@@ -79,6 +63,16 @@ class AuthRepository {
         email: email,
         password: password,
       );
+      if (userCredential.user != null) {
+        final userId = userCredential.user!.uid;
+        if (await _appUserRepository.appUserExistsById(userId)) {
+          //update
+          _appUserRepository.updateAppUserById(userCredential.user!.uid);
+        } else {
+          _appUserRepository.createAppUser(userCredential.user!, email);
+        }
+      }
+
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       // Handle specific error codes if needed

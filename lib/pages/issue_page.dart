@@ -102,7 +102,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
       final currentUserId = authBloc.currentUserId;
       final currentAppUser =
           await context.read<AppUserRepository>().getUserById(currentUserId!);
-      final contacts = currentAppUser?.getContacts ?? [];
+      final contacts = currentAppUser?.getContacts ?? {};
 
       // Fetch the focused issue
       if (context.read<IssueBloc>().state is! IssueProcessState) {
@@ -116,7 +116,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
       final focusedIssue = currentState.issue;
 
       // Filter contacts not already invited
-      final availableContactIds = contacts.where((contactUserId) {
+      final availableContactIds = contacts.keys.where((contactUserId) {
         return !focusedIssue.invitedUserIds!.contains(contactUserId);
       }).toList();
 

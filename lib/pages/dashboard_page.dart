@@ -219,7 +219,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
               );
             } else {
-              return const Center(child: Text('Unexpected state: AuthBloc'));
+              return Center(
+                  child: Text('Unexpected state: AuthBloc $authState'));
             }
           },
         ),

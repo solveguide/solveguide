@@ -7,10 +7,10 @@ class AppUser {
     required this.username,
     required this.createdTimestamp,
     required this.lastLoginTimestamp,
-    List<String>? contacts,
+    Map<String, String>? contacts,
     List<String>? invitedContacts,
     List<IssueArea>? issueAreas,
-  })  : contacts = contacts ?? [],
+  })  : contacts = contacts ?? {},
         invitedContacts = invitedContacts ?? [],
         issueAreas = issueAreas ?? [];
 
@@ -19,7 +19,7 @@ class AppUser {
   final String username;
   final DateTime createdTimestamp;
   final DateTime lastLoginTimestamp;
-  List<String> contacts; // List of userIds that are contacts
+  Map<String, String> contacts; // List of userIds that are contacts
   List<String>
       invitedContacts; // List of emails for users invited but not registered
   List<IssueArea> issueAreas; // List of issue areas this user belongs to
@@ -30,7 +30,9 @@ class AppUser {
   String get getUsername => username;
   DateTime get getCreatedTimestamp => createdTimestamp;
   DateTime get getLastLoginTimestamp => lastLoginTimestamp;
-  List<String> get getContacts => contacts;
+  Map<String, String> get getContacts => contacts;
+  List<String> get getInvitedContacts => invitedContacts;
+  List<IssueArea> get getIssueAreas => issueAreas;
 
   // Getters for convenient access
 
@@ -44,7 +46,7 @@ class AppUser {
   int get totalIssueAreas => issueAreas.length;
 
   // Check if a user is in the contact list by their userId
-  bool isContact(String contactUserId) => contacts.contains(contactUserId);
+  bool isContact(String contactUserId) => contacts.containsKey(contactUserId);
 
   // Check if an email is in the invited contacts list
   bool isInvited(String email) => invitedContacts.contains(email);
@@ -52,6 +54,9 @@ class AppUser {
   // Get the list of issue area labels
   List<String> get issueAreaLabels =>
       issueAreas.map((area) => area.label).toList();
+
+  // Get the list of contactNames
+  List<String> get contactNames => contacts.values.toList();
 
   // Check if a user belongs to an issue area
   bool isUserInIssueArea(String issueAreaId, String userId) {
@@ -64,9 +69,9 @@ class AppUser {
   }
 
   // Add a new contact by userId
-  void addContact(String contactUserId) {
-    if (!contacts.contains(contactUserId)) {
-      contacts.add(contactUserId);
+  void addContact(String contactUserId, {String? contactName}) {
+    if (!contacts.containsKey(contactUserId)) {
+      contacts[contactUserId] = contactName ?? '';
     }
   }
 
@@ -108,13 +113,44 @@ class AppUser {
         username: json['username'] as String,
         createdTimestamp: (json['createdTimestamp'] as Timestamp).toDate(),
         lastLoginTimestamp: (json['lastLoginTimestamp'] as Timestamp).toDate(),
-        contacts: (json['contacts'] as List<dynamic>).cast<String>(),
+        contacts: Map<String, String>.from(json['contacts'] as Map),
         invitedContacts:
             (json['invitedContacts'] as List<dynamic>).cast<String>(),
         issueAreas: (json['issueAreas'] as List<dynamic>)
             .map((e) => IssueArea.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
+
+//toString method to provide a readable string representation of the User
+  @override
+  String toString() {
+    return 'AppUser($username)';
+  }
+
+  //copyWith method to create a new instance with updated values
+  AppUser copyWith({
+    String? userId,
+    String? email,
+    String? username,
+    DateTime? createdTimestamp,
+    DateTime? lastLoginTimestamp,
+    Map<String, String>? contacts,
+    List<String>? invitedContacts,
+    List<IssueArea>? issueAreas,
+  }) {
+    return AppUser(
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      username: username ?? this.username,
+      createdTimestamp: createdTimestamp ?? this.createdTimestamp,
+      lastLoginTimestamp: lastLoginTimestamp ?? this.lastLoginTimestamp,
+      contacts: contacts ?? Map<String, String>.from(this.contacts),
+      invitedContacts:
+          invitedContacts ?? List<String>.from(this.invitedContacts),
+      issueAreas:
+          issueAreas ?? this.issueAreas.map((e) => e.copyWith()).toList(),
+    );
+  }
 }
 
 class IssueArea {
@@ -127,6 +163,11 @@ class IssueArea {
   final String issueAreaId;
   final String label;
   List<String> userIds;
+
+  // Simple Getters for the mandatory fields
+  String get getIssueAreaId => issueAreaId;
+  String get getLabel => label;
+  List<String> get getUserIds => userIds;
 
   // Convert an IssueArea to a Map for Firebase
   Map<String, dynamic> toJson() => {
@@ -141,4 +182,14 @@ class IssueArea {
         label: json['label'] as String,
         userIds: (json['userIds'] as List<dynamic>).cast<String>(),
       );
+
+  // copyWith method to create a new instance with updated values
+  IssueArea copyWith({List<String>? userIds}) {
+    // Add this method
+    return IssueArea(
+      issueAreaId: issueAreaId,
+      label: label,
+      userIds: userIds ?? this.userIds,
+    );
+  }
 }

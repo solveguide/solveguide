@@ -5,6 +5,7 @@ import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/components/plain_button.dart';
+import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/login_page.dart';
 
@@ -17,6 +18,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentAppUser = context.read<AuthBloc>().currentAppUser!;
     return AppScaffold(
       releaseFocus: true,
       resizeToAvoidBottomInset: true,
@@ -52,26 +54,73 @@ class ProfilePage extends StatelessWidget {
           return Center(
             child: Column(
               children: [
-                //logo
-                logoTitle(10),
-                const SizedBox(
-                  height: 50,
+                // Logo
+                Tappable(
+                  onTap: () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute<Widget>(
+                      builder: (context) => const DashboardPage(),
+                    ),
+                    (route) => false,
+                  ),
+                  child: ShadCard(
+                    backgroundColor: AppColors.consensus,
+                    width: 300,
+                    child: logoTitle(10),
+                  ),
                 ),
-                //welcome message
-                const Text('Account Details'),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 50),
 
-                const SizedBox(
-                  height: 25,
+                // Welcome message
+                const Text(
+                  'Account Details',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 25),
 
-                const SizedBox(
-                  height: 10,
+                // Displaying email
+                Text(
+                  'Email: ${currentAppUser.email}',
+                  style: const TextStyle(fontSize: 16),
                 ),
+                const SizedBox(height: 10),
 
-                //sign out button
+                // Displaying username
+                Text(
+                  'Username: ${currentAppUser.username}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+
+                // Displaying total contacts count
+                Text(
+                  'Total Contacts: ${currentAppUser.contacts.length}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+
+                // Displaying total invited contacts count
+                Text(
+                  'Invited Contacts: ${currentAppUser.invitedContacts.length}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+
+                // Displaying issue area labels
+                const Text(
+                  'Issue Areas:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                ...currentAppUser.issueAreaLabels.map(
+                  (label) => Text(
+                    label,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 25),
+
+                // Sign out button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -83,15 +132,10 @@ class ProfilePage extends StatelessWidget {
                       },
                       text: 'Sign Out',
                     ),
-                    const SizedBox(
-                      width: 25,
-                    ),
+                    const SizedBox(width: 25),
                   ],
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
-                //not a member? register now
+                const SizedBox(height: 25),
               ],
             ),
           );

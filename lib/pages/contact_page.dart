@@ -63,8 +63,6 @@ class _ContactPageState extends State<ContactPage> {
 
     final contacts = _currentUser.contacts;
     final invitedContacts = _currentUser.invitedContacts;
-    final appUserRepository =
-        Provider.of<AppUserRepository>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -82,34 +80,13 @@ class _ContactPageState extends State<ContactPage> {
           if (contacts.isEmpty)
             const Text('You have no contacts yet.')
           else
-            ...contacts.map((userId) {
-              return FutureBuilder<AppUser?>(
-                future: appUserRepository.getUserById(userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const ListTile(
-                      leading: CircularProgressIndicator(),
-                      title: Text('Loading...'),
-                    );
-                  } else if (snapshot.hasError) {
-                    return ListTile(
-                      leading: const Icon(Icons.error),
-                      title: Text('Error: ${snapshot.error}'),
-                    );
-                  } else if (snapshot.hasData && snapshot.data != null) {
-                    final contactUser = snapshot.data!;
-                    return ListTile(
-                      leading: const Icon(Icons.person),
-                      title: Text(contactUser.username),
-                      subtitle: Text(contactUser.email),
-                    );
-                  } else {
-                    return const ListTile(
-                      leading: Icon(Icons.person),
-                      title: Text('User not found'),
-                    );
-                  }
-                },
+            ...contacts.entries.map((entry) {
+              //final userId = entry.key;
+              final contactName = entry.value;
+              return ListTile(
+                leading: const Icon(Icons.person),
+                title: Text(contactName),
+                //subtitle: Text('User ID: $userId'), // Display user ID if needed
               );
             }).toList(),
           const Divider(),
@@ -152,7 +129,7 @@ class _ContactPageState extends State<ContactPage> {
   }
 }
 
-// InviteContactDialog remains mostly the same, with minor adjustments
+// InviteContactDialog remains the same as before
 class InviteContactDialog extends StatefulWidget {
   const InviteContactDialog({required this.currentUserUid, super.key});
   final String currentUserUid;
