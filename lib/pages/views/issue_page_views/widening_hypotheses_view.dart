@@ -5,7 +5,6 @@ import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
-import 'package:guide_solve/repositories/appUser_repository.dart';
 
 class WideningHypothesesView extends StatelessWidget {
   WideningHypothesesView({
