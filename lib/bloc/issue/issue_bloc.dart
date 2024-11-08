@@ -34,6 +34,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<FocusRootConfirmed>(_onFocusRootConfirmed);
     on<NewSolutionCreated>(_onNewSolutionCreated);
     on<SolutionUpdated>(_onSolutionUpdated);
+    on<SolutionVoteSubmitted>(_onSolutionVoteSubmitted);
     on<FocusSolveConfirmed>(_focusSolveConfirmed);
     on<NewFactCreated>(_onNewFactCreated);
     on<FocusIssueNavigationRequested>(_onFocusIssueNavigationRequested);
@@ -335,13 +336,13 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     try {
       // Ensure the Bloc state is of type IssueProcessState
       if (state is! IssueProcessState) return;
+      final currentState = state as IssueProcessState;
 
       // Ensure current issue ID and hypothesis are available
       if (_currentIssueId == null)
         throw Exception('_currentIssueId is not set');
-      final currentHypothesis = await issueRepository.getHypothesisById(
-          _currentIssueId!, event.hypothesisId);
-      if (currentHypothesis == null) throw Exception('Hypothesis not found.');
+      final currentHypothesis = currentState.hypotheses
+          .firstWhere((h) => h.hypothesisId == event.hypothesisId);
 
       // Update the votes map with the new vote
       final updatedVotes =
@@ -436,6 +437,38 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       // No need to emit a new state; the UI will update via the stream
     } catch (error) {
       emit(IssuesListFailure(error.toString()));
+    }
+  }
+
+  Future<void> _onSolutionVoteSubmitted(
+    SolutionVoteSubmitted event,
+    Emitter<IssueState> emit,
+  ) async {
+    try {
+      // Ensure the Bloc state is of type IssueProcessState
+      if (state is! IssueProcessState) return;
+      final currentState = state as IssueProcessState;
+
+      // Ensure current issue ID and hypothesis are available
+      if (_currentIssueId == null) {
+        throw Exception('_currentIssueId is not set');
+      }
+
+      final currentSolution = currentState.solutions
+          .firstWhere((s) => s.solutionId == event.solutionId);
+
+      // Update the votes map with the new vote
+      final updatedVotes = Map<String, SolutionVote>.from(currentSolution.votes)
+        ..[_currentUserId!] = event.voteValue;
+
+      // Create a new hypothesis object with updated votes
+      final updatedSolution = currentSolution.copyWith(votes: updatedVotes);
+
+      // Update Firestore with the new hypothesis state
+      await issueRepository.updateSolution(_currentIssueId!, updatedSolution);
+    } catch (e) {
+      // Handle errors and emit failure state if necessary
+      emit(IssuesListFailure('Failed to submit vote: ${e.toString()}'));
     }
   }
 

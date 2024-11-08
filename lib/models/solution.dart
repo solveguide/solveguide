@@ -30,11 +30,7 @@ class ActionItem {
   }
 }
 
-enum SolutionVote {
-  solve,
-  agree,
-  disagree,
-}
+enum SolutionVote { solve, agree, disagree, failed }
 
 class Solution {
   // A map to store user votes (userId -> voteValue)
@@ -85,11 +81,13 @@ class Solution {
         createdTimestamp: DateTime.parse(json['createdTimestamp'] as String),
         lastUpdatedTimestamp:
             DateTime.parse(json['lastUpdatedTimestamp'] as String),
-        votes: Map<String, String>.from(
-          json['votes'] as Map<String, dynamic>? ?? {},
+        votes: (json['votes'] as Map<String, dynamic>? ?? {}).map(
+          (key, value) =>
+              MapEntry(key, SolutionVote.values.byName(value as String)),
         ),
-        factIds: (json['factIds'] as Map<String, String>? ?? {}).map(
-          (key, value) => MapEntry(key, value),
+        factIds: (json['factIds'] as Map<String, dynamic>? ?? {}).map(
+          (key, value) =>
+              MapEntry(key, value.toString()), // Convert values to String
         ),
       );
 
@@ -105,7 +103,7 @@ class Solution {
   DateTime? dueDate;
   final DateTime createdTimestamp;
   final DateTime lastUpdatedTimestamp;
-  Map<String, String> votes;
+  Map<String, SolutionVote> votes;
   Map<String, String>
       factIds; // Map of the newest authorId to factId associated with this hypothesis
 
@@ -123,7 +121,7 @@ class Solution {
         'dueDate': dueDate?.toIso8601String(),
         'createdTimestamp': createdTimestamp.toIso8601String(),
         'lastUpdatedTimestamp': lastUpdatedTimestamp.toIso8601String(),
-        'votes': votes, // Store the votes map
+        'votes': votes.map((key, value) => MapEntry(key, value.name)),
         'factIds': factIds.map((key, value) => MapEntry(key, value)),
       };
 
@@ -141,7 +139,7 @@ class Solution {
     DateTime? dueDate,
     DateTime? createdTimestamp,
     DateTime? lastUpdatedTimestamp,
-    Map<String, String>? votes,
+    Map<String, SolutionVote>? votes,
     Map<String, String>? factIds,
   }) {
     return Solution(
@@ -158,7 +156,7 @@ class Solution {
       dueDate: dueDate ?? this.dueDate,
       createdTimestamp: createdTimestamp ?? this.createdTimestamp,
       lastUpdatedTimestamp: lastUpdatedTimestamp ?? this.lastUpdatedTimestamp,
-      votes: votes ?? this.votes,
+      votes: votes ?? Map<String, SolutionVote>.from(this.votes),
       factIds: factIds ?? Map<String, String>.from(this.factIds),
     );
   }
@@ -185,8 +183,8 @@ class SolutionPerspective {
 
   /// Get the current user's vote.
   SolutionVote? getCurrentUserVote() {
-    final voteString = solution.votes[currentUserId];
-    return voteString != null ? SolutionVote.values.byName(voteString) : null;
+    final voteEnum = solution.votes[currentUserId];
+    return voteEnum != null ? voteEnum : null;
   }
 
   /// Get the current user's factId.
@@ -205,9 +203,17 @@ class SolutionPerspective {
 
   /// Determine if all other stakeholders voted agree or solve.
   bool allOtherStakeholdersAgree() {
+    // If there are no other stakeholders, return true.
+    if (invitedUserIds.length <= 1) {
+      final vote = getCurrentUserVote();
+      return vote == SolutionVote.agree || vote == SolutionVote.solve;
+    }
+    // Check if all stakeholders have voted
+    if (!allStakeholdersVoted()) return false;
+
     for (final entry in solution.votes.entries) {
       if (entry.key == currentUserId) continue;
-      final vote = SolutionVote.values.byName(entry.value);
+      final vote = entry.value;
       if (vote != SolutionVote.agree && vote != SolutionVote.solve) {
         return false;
       }
@@ -230,9 +236,8 @@ class SolutionPerspective {
     for (final entry in solution.votes.entries) {
       if (entry.key == currentUserId) continue;
 
-      final otherUserVote = SolutionVote.values.byName(entry.value);
-      final vote = SolutionVote.values.byName(currentUserVote);
-      if (_isConflict(vote, otherUserVote)) {
+      final otherUserVote = entry.value;
+      if (_isConflict(currentUserVote, otherUserVote)) {
         return true;
       }
     }

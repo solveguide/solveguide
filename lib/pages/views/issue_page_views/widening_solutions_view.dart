@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
-import 'package:guide_solve/models/hypothesis.dart';
 import 'package:guide_solve/models/solution.dart';
 
 class WideningSolutionsView extends StatelessWidget {
@@ -23,192 +22,273 @@ class WideningSolutionsView extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        children: [
-          BlocBuilder<IssueBloc, IssueState>(
-            builder: (context, state) {
-              if (state is IssueProcessState) {
-                final focusedIssue = issueBloc.focusedIssue;
-                if (focusedIssue == null) {
-                  return const Text('No root issue available...');
-                }
-                return Expanded(
-                  child: Column(
-                    children: [
-                      //Issue Status & Navigation
-                      ProcessStatusBar(),
-                      const SizedBox(height: AppSpacing.lg),
-                      // Consensus IssueOwner noticed the seedStatement
-                      SizedBox(
-                        width: 575,
-                        child: Text(
-                          'The agreed root issue:',
-                          style: UITextStyle.overline,
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xxxs),
-                      ShadCard(
-                        width: 600,
-                        title: Text(
-                          focusedIssue.root.isEmpty ? 'TBD' : focusedIssue.root,
-                          style: UITextStyle.headline6,
-                        ),
-                        backgroundColor: AppColors.consensus,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
+      child: BlocBuilder<IssueBloc, IssueState>(
+        builder: (context, state) {
+          // Ensure the state is the specific IssueProcessState type
+          if (state is! IssueProcessState) {
+            return Center(child: Text('$state'));
+          }
 
-                      // Widening User Input
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 800),
-                        child: ShadInput(
-                          controller: _textController,
-                          focusNode: _focusNode,
-                          placeholder:
-                              const Text('Enter possible solutions here.'),
-                          keyboardType: TextInputType.text,
-                          autofocus: true,
-                          minLines: 1,
-                          maxLines: 3,
-                          onSubmitted: (value) => {
-                            if (value.isNotEmpty)
-                              {
-                                context.read<IssueBloc>().add(
-                                      NewSolutionCreated(
-                                        newSolution: value,
-                                      ),
+          // Access the data directly from the state
+          final focusedIssue = state.issue;
+          final solutions = state.solutions;
+          final hypotheses = state.hypotheses;
+
+          // Calculate rank for each hypothesis
+          for (final solution in solutions) {
+            final perspective = solution.perspective(
+              currentUserId,
+              focusedIssue.invitedUserIds!,
+            );
+            solution.rank = perspective.calculateConsensusRank();
+          }
+
+          // Sort hypotheses based on rank in descending order
+          solutions.sort((a, b) => b.rank.compareTo(a.rank));
+          return Column(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    //Issue Status & Navigation
+                    ProcessStatusBar(),
+                    const SizedBox(height: AppSpacing.lg),
+                    // Consensus IssueOwner noticed the seedStatement
+                    SizedBox(
+                      width: 575,
+                      child: Text(
+                        'Agreed Root Issue:',
+                        style: UITextStyle.overline,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xxxs),
+                    ShadCard(
+                      width: 600,
+                      title: Text(
+                        focusedIssue
+                                .perspective(
+                                    currentUserId, hypotheses, solutions)
+                                .getConsensusRoot()
+                                ?.desc ??
+                            "No consensus root found",
+                        style: UITextStyle.headline6,
+                      ),
+                      backgroundColor: AppColors.consensus,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Widening User Input
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: ShadInput(
+                        controller: _textController,
+                        focusNode: _focusNode,
+                        placeholder: const Text('Enter solutions here.'),
+                        keyboardType: TextInputType.text,
+                        autofocus: true,
+                        minLines: 1,
+                        maxLines: 3,
+                        onSubmitted: (value) => {
+                          if (value.isNotEmpty)
+                            {
+                              context.read<IssueBloc>().add(
+                                    NewSolutionCreated(
+                                      newSolution: value,
                                     ),
-                              },
-                            _textController.clear(),
-                            _focusNode.requestFocus(),
-                          },
-                          suffix: ShadButton(
-                            width: 24,
-                            height: 24,
-                            padding: EdgeInsets.zero,
-                            backgroundColor: AppColors.public,
-                            decoration: const ShadDecoration(
-                              secondaryBorder: ShadBorder.none,
-                              secondaryFocusedBorder: ShadBorder.none,
-                            ),
-                            icon: const Icon(Icons.check),
-                            onPressed: () {
-                              if (_textController.text.isNotEmpty) {
-                                context.read<IssueBloc>().add(
-                                      NewSolutionCreated(
-                                        newSolution: _textController.text,
-                                      ),
-                                    );
-                                _textController.clear();
-                                _focusNode.requestFocus();
-                              }
+                                  ),
                             },
+                          _textController.clear(),
+                          _focusNode.requestFocus(),
+                        },
+                        suffix: ShadButton(
+                          width: 24,
+                          height: 24,
+                          padding: EdgeInsets.zero,
+                          backgroundColor: AppColors.public,
+                          decoration: const ShadDecoration(
+                            secondaryBorder: ShadBorder.none,
+                            secondaryFocusedBorder: ShadBorder.none,
                           ),
+                          icon: const Icon(Icons.check),
+                          onPressed: () {
+                            if (_textController.text.isNotEmpty) {
+                              context.read<IssueBloc>().add(
+                                    NewSolutionCreated(
+                                      newSolution: _textController.text,
+                                    ),
+                                  );
+                              _textController.clear();
+                              _focusNode.requestFocus();
+                            }
+                          },
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      // Widening Options so far (Hypotheses list)
-                      _solutionList(
-                        context,
-                        currentUserId,
-                        issueBloc,
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-        ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    // Widening Options so far (Hypotheses list)
+                    _solutionList(context, currentUserId, solutions,
+                        _textController, _focusNode),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 Widget _solutionList(
-    BuildContext context, String currentUserId, IssueBloc issueBloc) {
+    BuildContext context,
+    String currentUserId,
+    List<Solution> solutions,
+    TextEditingController textController,
+    FocusNode focusNode) {
+  if (solutions.isEmpty) {
+    // Display a message when there are no hypotheses
+    return Center(
+      child: Text(
+        'No solutions submitted yet. Start by adding one!',
+        style: UITextStyle.bodyText2,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   return Expanded(
-    child: BlocBuilder<IssueBloc, IssueState>(
-      builder: (context, state) {
-        if (state is IssueProcessState) {
-          final solutionsStream = state.solutionsStream;
+    child: Align(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: ListView.builder(
+          itemCount: solutions.length,
+          itemBuilder: (context, index) {
+            final solution = solutions[index];
+            final currentState =
+                context.read<IssueBloc>().state as IssueProcessState;
+            final currentUserVote = solution
+                .perspective(currentUserId, currentState.issue.invitedUserIds!)
+                .getCurrentUserVote();
+            final everyoneElseAgrees = solution
+                .perspective(currentUserId, currentState.issue.invitedUserIds!)
+                .allOtherStakeholdersAgree();
 
-          if (solutionsStream != null) {
-            return StreamBuilder<List<Solution>>(
-              stream: solutionsStream,
-              builder: (context, solutionsSnapshot) {
-                if (solutionsSnapshot.hasError) {
-                  return const Center(
-                    child: Text('Error loading solutions'),
-                  );
-                }
-                if (!solutionsSnapshot.hasData) {
-                  return const Center(
-                    child: Text('Submit a possible solution.'),
-                  );
-                }
-                final solutions = solutionsSnapshot.data!;
-
-                // Calculate rank for each hypothesis using
-                // Perspective and update rank value
-                for (final solution in solutions) {
-                  final perspective = solution.perspective(
-                    currentUserId,
-                    issueBloc.focusedIssue!.invitedUserIds!,
-                  );
-                  solution.rank = perspective.calculateConsensusRank();
-                }
-                // Sort solutions based on rank in
-                // descending order (higher rank first)
-                solutions.sort(
-                  (a, b) => b.rank.compareTo(a.rank),
-                );
-
-                return Align(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1000),
-                    child: ListView.builder(
-                      itemCount: solutions.length,
-                      itemBuilder: (context, index) {
-                        final solution = solutions[index];
-                        final currentUserVote = solution
-                            .perspective(currentUserId,
-                                issueBloc.focusedIssue!.invitedUserIds!)
-                            .getCurrentUserVote();
-                        final everyoneElseAgrees = solution
-                            .perspective(currentUserId,
-                                issueBloc.focusedIssue!.invitedUserIds!)
-                            .allOtherStakeholdersAgree();
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.xxs),
-                          child: ShadCard(
-                            title: Text(
-                              solution.desc,
-                              style: UITextStyle.subtitle1,
-                            ),
-                            backgroundColor:
-                                currentUserVote == HypothesisVote.spinoff
-                                    ? AppColors.conflictLight
-                                    : everyoneElseAgrees
-                                        ? AppColors.consensus
-                                        : AppColors.public,
-                          ),
-                        );
-                      },
-                    ),
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+              child: ShadCard(
+                title: Tappable(
+                  child: Text(
+                    solution.desc,
+                    style: UITextStyle.subtitle1,
                   ),
-                );
-              },
+                  onLongPress: () {
+                    textController.text = solution.desc;
+                    focusNode.requestFocus();
+                  },
+                ),
+                backgroundColor: currentUserVote == SolutionVote.failed
+                    ? AppColors.conflictLight
+                    : everyoneElseAgrees
+                        ? AppColors.consensus
+                        : AppColors.public,
+                trailing: WidenSolutionsSegmentButton(
+                  solution: solution,
+                  currentUserId: currentUserId,
+                  invitedUserIds: currentState.issue.invitedUserIds!,
+                ),
+              ),
             );
-          }
-        }
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+          },
+        ),
+      ),
     ),
   );
+}
+
+class WidenSolutionsSegmentButton extends StatefulWidget {
+  const WidenSolutionsSegmentButton({
+    required this.solution,
+    required this.currentUserId,
+    required this.invitedUserIds,
+    super.key,
+  });
+
+  final Solution solution;
+  final String currentUserId;
+  final List<String> invitedUserIds;
+
+  @override
+  State<WidenSolutionsSegmentButton> createState() =>
+      _WidenSolutionsSegmentButtonState();
+}
+
+class _WidenSolutionsSegmentButtonState
+    extends State<WidenSolutionsSegmentButton> {
+  SolutionVote? currentUserVote;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the current vote
+    currentUserVote = widget.solution.votes[widget.currentUserId];
+  }
+
+  void _handleVote(SolutionVote value) {
+    context.read<IssueBloc>().add(
+          SolutionVoteSubmitted(
+            voteValue: value,
+            solutionId: widget.solution.solutionId!,
+          ),
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final solution = widget.solution;
+
+    // Use the latest vote from the hypothesis instead of local state
+    final currentUserVote = solution.votes[widget.currentUserId];
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SegmentedButton<SolutionVote>(
+          segments: [
+            ButtonSegment<SolutionVote>(
+                value: SolutionVote.disagree,
+                label: const Text('Disagree'),
+                tooltip: 'Disagree with this solution.'),
+            ButtonSegment<SolutionVote>(
+                value: SolutionVote.agree,
+                label: const Text('Agree'),
+                tooltip: 'Agree that this solution could be effective.'),
+          ],
+          selected: currentUserVote != null ? {currentUserVote} : {},
+          multiSelectionEnabled: false,
+          emptySelectionAllowed: true,
+          showSelectedIcon: false,
+          onSelectionChanged: (Set<SolutionVote> newSelection) {
+            if (newSelection.isNotEmpty) {
+              final selectedVote = newSelection.first;
+              _handleVote(selectedVote);
+            }
+          },
+          style: SegmentedButton.styleFrom(
+            padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            maximumSize: const Size(40, 20),
+            textStyle: const TextStyle(fontSize: 11),
+            backgroundColor:
+                currentUserVote == null ? AppColors.private : AppColors.public,
+            selectedBackgroundColor: currentUserVote == SolutionVote.agree
+                ? AppColors.consensus
+                : currentUserVote == SolutionVote.solve
+                    ? AppColors.consensus
+                    : currentUserVote == SolutionVote.disagree
+                        ? AppColors.conflictLight
+                        : AppColors.private,
+          ),
+        ),
+      ],
+    );
+  }
 }

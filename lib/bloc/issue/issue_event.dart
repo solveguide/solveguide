@@ -158,7 +158,7 @@ class SolutionVoteSubmitted extends IssueEvent {
     required this.voteValue,
   });
   final String solutionId;
-  final String voteValue;
+  final SolutionVote voteValue;
 
   @override
   List<Object?> get props => [solutionId, voteValue];

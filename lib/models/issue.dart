@@ -179,6 +179,24 @@ class IssuePerspective {
     });
   }
 
+  /// Returns the consensus root Hypothesis if it exists, otherwise null.
+  Hypothesis? getConsensusRoot() {
+    if (hasConsensusRoot()) {
+      return hypotheses.firstWhere(
+        (hypothesis) {
+          final invitedUserIds = issue.invitedUserIds;
+          return invitedUserIds != null &&
+              invitedUserIds.every(
+                (userId) => hypothesis.votes[userId] == HypothesisVote.root,
+              );
+        },
+      );
+    } else {
+      // Return null if no consensus root is found
+      return null;
+    }
+  }
+
   /// Check if the current user has voted on all solutions.
   bool hasCurrentUserVotedOnAllSolutions() {
     return solutions
@@ -221,5 +239,23 @@ class IssuePerspective {
       return invitedUserIds!
           .every((userId) => solution.votes[userId] == SolutionVote.solve.name);
     });
+  }
+
+  /// Returns the consensus root Hypothesis if it exists, otherwise null.
+  Solution? getConsensusSolve() {
+    if (hasConsensusSolve()) {
+      return solutions.firstWhere(
+        (solution) {
+          final invitedUserIds = issue.invitedUserIds;
+          return invitedUserIds != null &&
+              invitedUserIds.every(
+                (userId) => solution.votes[userId] == SolutionVote.solve,
+              );
+        },
+      );
+    } else {
+      // Return null if no consensus root is found
+      return null;
+    }
   }
 }
