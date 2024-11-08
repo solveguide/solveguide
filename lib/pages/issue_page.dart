@@ -105,16 +105,15 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
       final contacts = currentAppUser?.getContacts ?? [];
 
       // Fetch the focused issue
-      final issueBloc = context.read<IssueBloc>();
-      final focusedIssue = issueBloc.focusedIssue;
-
-      if (focusedIssue == null) {
+      if (context.read<IssueBloc>().state is! IssueProcessState) {
         setState(() {
           _errorMessage = 'No focused issue available.';
           _isLoading = false;
         });
         return;
       }
+      final currentState = context.read<IssueBloc>().state as IssueProcessState;
+      final focusedIssue = currentState.issue;
 
       // Filter contacts not already invited
       final availableContactIds = contacts.where((contactUserId) {
