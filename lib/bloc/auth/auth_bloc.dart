@@ -22,6 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   String? _currentUserId;
 
   String? get currentUserId => _currentUserId;
+  AuthRepository get authRepository => _authRepository;
 
   Future<void> _onAppStarted(
     AppStarted event,

@@ -228,8 +228,8 @@ class IssuePerspective {
 
   /// Check if the current user has voted "solve" on any solution.
   bool hasCurrentUserVotedSolve() {
-    return solutions.any(
-        (solution) => solution.votes[currentUserId] == SolutionVote.solve.name);
+    return solutions
+        .any((solution) => solution.votes[currentUserId] == SolutionVote.solve);
   }
 
   /// Check if the issue has a consensus solve.
@@ -237,7 +237,7 @@ class IssuePerspective {
     return solutions.any((solution) {
       final invitedUserIds = issue.invitedUserIds;
       return invitedUserIds!
-          .every((userId) => solution.votes[userId] == SolutionVote.solve.name);
+          .every((userId) => solution.votes[userId] == SolutionVote.solve);
     });
   }
 

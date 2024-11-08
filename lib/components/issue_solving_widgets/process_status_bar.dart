@@ -104,6 +104,7 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
                             perspective.numberOfSolutionsInConflict() > 0;
                         isDisabled = !perspective.hasConsensusRoot();
                         isCompleted = perspective.hasConsensusSolve();
+
                         break;
                       default:
                         hasConflict = false;
@@ -128,7 +129,7 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
                             color: isDisabled
                                 ? AppColors.grey
                                 : isCompleted
-                                    ? theme.primaryColorLight
+                                    ? AppColors.consensus
                                     : theme.scaffoldBackgroundColor,
                             border: Border.all(
                               color: hasConflict
@@ -180,6 +181,40 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
               ),
             ],
           ),
+          if (perspective.hasConsensusSolve())
+            SizedBox(
+              height: AppSpacing.xxs,
+            ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            if (perspective.hasConsensusSolve())
+              Tappable(
+                onTap: () => context.read<IssueBloc>().add(
+                    FocusIssueNavigationRequested(
+                        stage: IssueProcessStage.solveSummaryReview)),
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                  padding: const EdgeInsets.all(AppSpacing.xxs),
+                  decoration: BoxDecoration(
+                    color: AppColors.consensus,
+                    border: Border.all(
+                      color: AppColors.blue,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.horizontal(
+                      left: const Radius.circular(100),
+                      right: const Radius.circular(100),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: 150,
+                    child: Center(
+                        child: Text('Solve Summary',
+                            style: UITextStyle.labelSmall)),
+                  ),
+                ),
+              ),
+          ]),
           if (_isInstructionalCardVisible)
             SizedBox(
               height: AppSpacing.md,
