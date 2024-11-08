@@ -58,6 +58,10 @@ class AppUser {
   // Get the list of contactNames
   List<String> get contactNames => contacts.values.toList();
 
+  //given userId return the contact name
+  String? getContactName(String userId) =>
+      contacts[userId]; // Return null if not found
+
   // Check if a user belongs to an issue area
   bool isUserInIssueArea(String issueAreaId, String userId) {
     final issueArea = issueAreas.firstWhere(

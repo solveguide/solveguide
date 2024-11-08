@@ -1,9 +1,11 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/hypothesis.dart';
+import 'package:guide_solve/repositories/appUser_repository.dart';
 
 class WideningHypothesesView extends StatelessWidget {
   WideningHypothesesView({
@@ -19,6 +21,10 @@ class WideningHypothesesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final issueBloc = context.read<IssueBloc>(); // Get the Bloc instance
     final currentUserId = issueBloc.currentUserId!;
+    final currentAppUserContacts = context
+        .read<AuthBloc>()
+        .currentAppUser!
+        .contacts; // Get the current user
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -56,7 +62,7 @@ class WideningHypothesesView extends StatelessWidget {
                     SizedBox(
                       width: 575,
                       child: Text(
-                        '${focusedIssue.ownerId} noticed:',
+                        '${currentAppUserContacts[focusedIssue.ownerId]} noticed:',
                         style: UITextStyle.overline,
                         textAlign: TextAlign.left,
                       ),

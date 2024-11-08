@@ -1,6 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
 import 'package:guide_solve/components/issue_solving_widgets/process_status_bar.dart';
 import 'package:guide_solve/models/fact.dart';
@@ -25,6 +26,10 @@ class NarrowingToRootCauseView extends StatelessWidget {
             return Center(child: Text('$state'));
           }
           final currentUserId = context.read<IssueBloc>().currentUserId!;
+          final currentAppUserContacts = context
+              .read<AuthBloc>()
+              .currentAppUser!
+              .contacts; // Get the current user
 
           final focusedIssue = state.issue;
           final hypotheses = state.hypotheses;
@@ -49,7 +54,7 @@ class NarrowingToRootCauseView extends StatelessWidget {
                   SizedBox(
                     width: 575,
                     child: Text(
-                      '${focusedIssue.ownerId} noticed:',
+                      '${currentAppUserContacts[focusedIssue.ownerId]} noticed:',
                       style: UITextStyle.overline,
                       textAlign: TextAlign.left,
                     ),
