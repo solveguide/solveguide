@@ -95,6 +95,7 @@ class IssueRepository {
     String spinoffHypothesis,
     String ownerId,
   ) async {
+    //create new Issue with core data
     final newIssue = Issue(
       label: spinoffHypothesis,
       seedStatement: oldIssue.seedStatement,
@@ -102,14 +103,55 @@ class IssueRepository {
       ownerId: ownerId, // Use ownerId from AuthState
       createdTimestamp: oldIssue.createdTimestamp,
       lastUpdatedTimestamp: DateTime.now(),
-      root: oldIssue.root,
-      solve: oldIssue.solve,
-      invitedUserIds: oldIssue.invitedUserIds,
+      invitedUserIds: List<String>.from(oldIssue.invitedUserIds ?? [ownerId]),
     );
     try {
-      final docRef = await _issuesCollection.add(newIssue.toJson());
-      await docRef.update({'issueId': docRef.id});
-      return docRef.id;
+      //update new Issue with generated ID
+      final newDocRef = await _issuesCollection.add(newIssue.toJson());
+      await newDocRef.update({'issueId': newDocRef.id});
+
+      //Copy hypotheses subcollection
+      final hypothesesQuery = await _issuesCollection
+          .doc(oldIssue.issueId)
+          .collection('hypotheses')
+          .where('desc', isNotEqualTo: spinoffHypothesis)
+          .get();
+      for (var hypothesisDoc in hypothesesQuery.docs) {
+        final hypothesis = Hypothesis.fromJson(hypothesisDoc.data());
+        final newHypothesis = hypothesis.copyWith(
+          parentIssueId: newDocRef.id, // Update to the new issue ID
+        );
+        await newDocRef.collection('hypotheses').add(newHypothesis.toJson());
+      }
+
+      //Copy solutions subcollection
+      final solutionsQuery = await _issuesCollection
+          .doc(oldIssue.issueId)
+          .collection('solutions')
+          .get();
+      for (var solutionDoc in solutionsQuery.docs) {
+        final solution = Solution.fromJson(solutionDoc.data());
+        final newSolution = solution.copyWith(
+          parentIssueId: newDocRef.id, // Update to the new issue ID
+        );
+        await newDocRef.collection('solutions').add(newSolution.toJson());
+      }
+
+      //Copy facts subcollection
+      final factsQuery = await _issuesCollection
+          .doc(oldIssue.issueId)
+          .collection('facts')
+          .get();
+      for (var factDoc in factsQuery.docs) {
+        final fact = Fact.fromJson(factDoc.data());
+        final newFact = fact.copyWith(
+          parentIssueId: newDocRef.id, // Update to the new issue ID
+        );
+        await newDocRef.collection('facts').add(newFact.toJson());
+      }
+
+      //return
+      return newDocRef.id;
     } catch (error) {
       throw Exception('Failed to spinoff Issue: $error');
     }
@@ -221,6 +263,7 @@ SUBCOLLECTION FUNCTIONS
     final newHypothesis = Hypothesis(
       ownerId: ownerId, // Use ownerId from AuthState
       desc: hypothesisDesc,
+      parentIssueId: issueId,
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),
     );
@@ -249,6 +292,7 @@ SUBCOLLECTION FUNCTIONS
     final newSolution = Solution(
       ownerId: ownerId, // Use ownerId from AuthState
       desc: solutionDesc,
+      parentIssueId: issueId,
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),
     );
@@ -282,6 +326,7 @@ SUBCOLLECTION FUNCTIONS
       referenceObjects: {
         refObjectType: [refObjectId],
       },
+      parentIssueId: issueId,
       supportingContext: factContext,
       createdTimestamp: DateTime.now(),
       lastUpdatedTimestamp: DateTime.now(),
