@@ -19,7 +19,8 @@ class AppUser {
   final String username;
   final DateTime createdTimestamp;
   final DateTime lastLoginTimestamp;
-  Map<String, String> contacts; // List of userIds that are contacts
+  Map<String, String>
+      contacts; // <userId, contactName> Map of users that are contacts
   List<String>
       invitedContacts; // List of emails for users invited but not registered
   List<IssueArea> issueAreas; // List of issue areas this user belongs to
@@ -37,7 +38,7 @@ class AppUser {
   // Getters for convenient access
 
   // Get the total number of contacts
-  int get totalContacts => contacts.length;
+  int get totalContacts => contacts.length - 1;
 
   // Get the total number of invited contacts
   int get totalInvitedContacts => invitedContacts.length;

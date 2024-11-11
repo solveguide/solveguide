@@ -131,12 +131,29 @@ class NarrowingToRootCauseView extends StatelessWidget {
                         const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
                     child: ShadCard(
                       padding: EdgeInsets.all(AppSpacing.xxs),
-                      title: Text(
-                        hypothesis.desc
-                            .substring(0, descLength < 50 ? descLength : 49),
-                        style: UITextStyle.subtitle1,
+                      title: Tooltip(
+                        message: hypothesis.desc,
+                        child: Text(
+                          hypothesis.desc
+                              .substring(0, descLength < 50 ? descLength : 49),
+                          style: UITextStyle.subtitle1,
+                        ),
                       ),
                       backgroundColor: AppColors.public,
+                      border: Border(
+                        top: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                        bottom: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                        left: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                      ),
                       trailing: ShadCheckbox(
                         value: currentUserVote == HypothesisVote.root,
                         onChanged: (v) {

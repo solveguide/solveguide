@@ -268,15 +268,13 @@ class SolutionPerspective {
 
     // Assign points to each type of vote
     final solvePoints =
-        consensusVotes.where((vote) => vote == SolutionVote.solve.name).length *
+        consensusVotes.where((vote) => vote == SolutionVote.solve).length *
             numberOfStakeholders;
     final agreePoints =
-        consensusVotes.where((vote) => vote == SolutionVote.agree.name).length *
-            2;
-    final disagreePoints = consensusVotes
-            .where((vote) => vote == SolutionVote.disagree.name)
-            .length *
-        -1;
+        consensusVotes.where((vote) => vote == SolutionVote.agree).length * 2;
+    final disagreePoints =
+        consensusVotes.where((vote) => vote == SolutionVote.disagree).length *
+            -1;
 
     // Total points to determine the rank
     final totalPoints = solvePoints + agreePoints + disagreePoints;
@@ -289,7 +287,7 @@ class SolutionPerspective {
     final currentUserVote = getCurrentUserVote();
     final consensusVotes = solution.votes.values;
     final solveCount =
-        consensusVotes.where((vote) => vote == SolutionVote.solve.name).length;
+        consensusVotes.where((vote) => vote == SolutionVote.solve).length;
 
     // Assign the primary rank value
     int primaryRank;

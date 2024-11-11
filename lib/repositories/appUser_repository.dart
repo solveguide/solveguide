@@ -21,7 +21,7 @@ class AppUserRepository {
           'username': email,
           'createdTimestamp': DateTime.now(),
           'lastLoginTimestamp': DateTime.now(),
-          'contacts': <String, String>{}, // Initialized as an empty Map
+          'contacts': {user.uid: "You"}, // Initialized in include self
           'issueAreas': [privateArea.toJson()], // Add initial private area
           'invitedContacts': <String>[], // Explicitly typed as List<String>
         },
