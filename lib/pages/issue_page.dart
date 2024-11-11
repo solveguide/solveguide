@@ -43,6 +43,12 @@ class IssuePage extends StatelessWidget {
       ),
       drawer: const MyNavigationDrawer(),
       body: BlocBuilder<IssueBloc, IssueState>(
+        buildWhen: (previous, current) {
+          // Only rebuild if the stage changes, for example
+          return current is! IssueProcessState ||
+              (previous is IssueProcessState &&
+                  previous.stage != current.stage);
+        },
         builder: (context, state) {
           if (state is IssueProcessState) {
             final focusedIssue = state.issue;

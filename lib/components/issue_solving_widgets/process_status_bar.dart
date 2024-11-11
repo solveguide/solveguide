@@ -223,17 +223,17 @@ class _ProcessStatusBarState extends State<ProcessStatusBar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (_isInstructionalCardVisible)
-                DecoratedContainer(
-                  child: SizedBox(
-                    width: 450,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.xlg),
-                      child: InstructionBody(
-                        currentStage: (context.read<IssueBloc>().state
-                                as IssueProcessState)
-                            .stage,
-                        perspective: perspective,
-                      ),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: 350,
+                  ),
+                  child: DecoratedContainer(
+                    padding: EdgeInsets.all(AppSpacing.xlg),
+                    child: InstructionBody(
+                      currentStage:
+                          (context.read<IssueBloc>().state as IssueProcessState)
+                              .stage,
+                      perspective: perspective,
                     ),
                   ),
                 ),

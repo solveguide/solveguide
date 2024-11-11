@@ -28,6 +28,10 @@ class WideningHypothesesView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: BlocBuilder<IssueBloc, IssueState>(
+        buildWhen: (previous, current) {
+          // Only rebuild when the text controller is empty, so it won’t clear typed text on state updates
+          return _textController.text.isEmpty;
+        },
         builder: (context, state) {
           // Ensure the state is the specific IssueProcessState type
           if (state is! IssueProcessState) {
