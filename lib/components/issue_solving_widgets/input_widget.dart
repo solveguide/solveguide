@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 
 class InputWidget extends StatelessWidget {
+  const InputWidget({
+    required this.controller,
+    required this.onSubmitted,
+    super.key,
+    this.focusNode,
+    this.labelText,
+    this.hintText,
+  });
+
   final TextEditingController controller;
   final VoidCallback onSubmitted;
   final FocusNode? focusNode;
   final String? labelText;
   final String? hintText;
 
-  const InputWidget({
-    super.key,
-    required this.controller,
-    required this.onSubmitted,
-    this.focusNode,
-    this.labelText,
-    this.hintText,
-  });
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 750,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: TextFormField(
         controller: controller,
         focusNode: focusNode,

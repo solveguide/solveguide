@@ -1,259 +1,207 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_solving_widgets/confirmation_widget.dart';
-import 'package:guide_solve/components/issue_solving_widgets/edit_hypothesis_dialog.dart';
-import 'package:guide_solve/components/issue_solving_widgets/help_text_widget.dart';
-import 'package:guide_solve/components/issue_solving_widgets/input_widget.dart';
-import 'package:guide_solve/components/issue_solving_widgets/resortable_list_widget.dart';
-import 'package:guide_solve/components/issue_solving_widgets/solution_scoping_widget.dart';
-import 'package:guide_solve/components/issue_solving_widgets/solve_summary.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
-import 'package:guide_solve/models/hypothesis.dart';
-import 'package:guide_solve/models/issue.dart';
-import 'package:guide_solve/models/solution.dart';
-import 'package:guide_solve/pages/home_page.dart';
+import 'package:guide_solve/models/appUser.dart';
+import 'package:guide_solve/pages/views/issue_page_views/issue_page_views.dart';
+import 'package:guide_solve/repositories/appUser_repository.dart';
 
 class IssuePage extends StatelessWidget {
-  final Issue issue;
+  const IssuePage({required this.issueId, super.key});
 
-  IssuePage({super.key, required this.issue});
+  final String issueId;
 
-  final TextEditingController textController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-
-  void _showHypothesisEditDialog(
-      BuildContext context, Hypothesis hypothesis, int index) {
-    showDialog(
+  void _showInviteDialog(BuildContext context, String issueId) {
+    showDialog<void>(
       context: context,
       builder: (context) {
-        return EditItemDialog(
-          item: hypothesis,
-          onSave: (updatedHypothesis) {
-            BlocProvider.of<IssueBloc>(context, listen: false).add(
-              HypothesisUpdated(
-                index: index,
-                updatedHypothesis: updatedHypothesis,
-              ),
-            );
-          },
-          onCreateSeparateIssue: (hypothesis) {
-            final authState =
-                BlocProvider.of<AuthBloc>(context, listen: false).state;
-            if (authState is AuthSuccess) {
-              BlocProvider.of<IssueBloc>(context, listen: false).add(
-                CreateSeparateIssueFromHypothesis(
-                  index: index,
-                  hypothesis: hypothesis,
-                  newIssuePrioritized: false,
-                ),
-              );
-            } else {
-              BlocProvider.of<AuthBloc>(context, listen: false)
-                  .add(const AnnonymousUserBlocked());
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void _showSolutionEditDialog(
-      BuildContext context, Solution solution, int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return EditItemDialog(
-          item: solution,
-          onSave: (updatedSolution) {
-            BlocProvider.of<IssueBloc>(context, listen: false).add(
-              SolutionUpdated(
-                index: index,
-                updatedSolution: updatedSolution,
-              ),
-            );
-          },
-        );
+        return InviteUserDialog(issueId: issueId);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = BlocProvider.of<AuthBloc>(context, listen: false).state;
-
-    if (authState is! AuthSuccess) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false);
-    }
-
-    // if (authState is AuthInitial) {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content:
-    //             const Text("Register your email to save this issue and more."),
-    //         action: SnackBarAction(
-    //           label: "Register here!",
-    //           onPressed: () => Navigator.push(
-    //             context,
-    //             MaterialPageRoute(
-    //               builder: (context) => LoginPage(),
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //     );
-    //   });
-    // }
-
-    return Scaffold(
-      backgroundColor: Colors.orange[50],
+    // Start listening to the focused issue when the page is built
+    //context.read<IssueBloc>().add(FocusIssueSelected(issue: issueId));
+    return AppScaffold(
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: Colors.orange[50],
-        title: const Text("Issue in Focus"),
-        actions: const [
-          HelpTextWidget(helpText: "This is where you solve the issue."),
+        title: const Text('Issue in Focus'),
+        actions: [
+          // Add the icon button here
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            onPressed: () {
+              _showInviteDialog(context, issueId);
+            },
+          ),
         ],
       ),
       drawer: const MyNavigationDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // ConfirmationWidget with BlocBuilder
-            BlocBuilder<IssueBloc, IssueState>(
-              builder: (context, state) {
-                if (state is IssuesListFailure) {
-                  return Center(child: Text('Error: ${state.error}'));
-                } else if (state is IssueInFocusSolved) {
-                  return SolveSummaryWidget(issue: state.focusedIssue);
-                } else if (state is IssueInFocusSolutionIdentified) {
-                  return SolutionScopingWidget(
-                    issue: state.focusedIssue,
-                    onSubmitted: (updatedSolution) {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(
-                          FocusSolveScopeSubmitted(
-                              confirmedSolve: updatedSolution));
-                    },
-                    focusNode: _focusNode,
-                  );
-                } else if (state is IssueInFocusInitial) {
-                  return ConfirmationWidget(
-                    issue: state.focusedIssue,
-                    testSubject: TestSubject.hypothesis,
-                    onConfirm: () {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(
-                          FocusRootConfirmed(
-                              confirmedRoot:
-                                  state.focusedIssue.hypotheses[0].desc));
-                    },
-                  );
-                } else if (state is IssueInFocusRootIdentified) {
-                  return ConfirmationWidget(
-                    issue: state.focusedIssue,
-                    testSubject: TestSubject.solution,
-                    onConfirm: () {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(
-                          FocusSolveConfirmed(
-                              confirmedSolve:
-                                  state.focusedIssue.solutions[0].desc));
-                    },
-                  );
-                } else {
-                  return const Center(
-                      child: Text(
-                          "Unexpected state: IssueBloc")); // or handle other states as needed
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            // InputWidget with BlocBuilder
-            BlocBuilder<IssueBloc, IssueState>(builder: (context, state) {
-              if (state is IssueInFocusInitial) {
-                _focusNode.requestFocus();
-                return InputWidget(
-                  controller: textController,
-                  focusNode: _focusNode,
-                  onSubmitted: () {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(
-                        NewHypothesisCreated(
-                            newHypothesis: textController.text));
-                    textController.clear();
-                  },
-                  labelText: 'New Root Theories',
-                  hintText: 'Enter root theories here.',
+      body: BlocBuilder<IssueBloc, IssueState>(
+        builder: (context, state) {
+          if (state is IssueProcessState) {
+            final focusedIssue = state.issue;
+            switch (state.stage) {
+              case IssueProcessStage.wideningHypotheses:
+                return WideningHypothesesView(issueId: issueId);
+              case IssueProcessStage.establishingFacts:
+                return EstablishingFactsView(issueId: issueId);
+              case IssueProcessStage.narrowingToRootCause:
+                return NarrowingToRootCauseView(issueId: issueId);
+              case IssueProcessStage.wideningSolutions:
+                return WideningSolutionsView(issueId: issueId);
+              case IssueProcessStage.narrowingToSolve:
+                return NarrowingToSolveView(issueId: issueId);
+              case IssueProcessStage.scopingSolve:
+                return ScopingSolveView(
+                  issueId: issueId,
+                  solutionId: focusedIssue.solveSolutionId,
                 );
-              } else if (state is IssueInFocusRootIdentified) {
-                _focusNode.requestFocus();
-                return InputWidget(
-                  controller: textController,
-                  focusNode: _focusNode,
-                  onSubmitted: () {
-                    BlocProvider.of<IssueBloc>(context, listen: false).add(
-                        NewSolutionCreated(newSolution: textController.text));
-                    textController.clear();
-                  },
-                  labelText: 'Possible Solutions',
-                  hintText: 'Enter possible solutions here.',
-                );
-              } else {
-                return Container(); // or handle other states as needed
-              }
-            }),
-            const SizedBox(height: 20),
-            // ResortableListWidget with BlocBuilder
-            BlocBuilder<IssueBloc, IssueState>(
-              builder: (context, state) {
-                if (state is IssueInFocusInitial) {
-                  return ResortableListWidget<Hypothesis>(
-                    items: state.focusedIssue.hypotheses,
-                    getItemDescription: (hypothesis) => hypothesis.desc,
-                    onReorder: (oldIndex, newIndex) {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(
-                        HypothesisListResorted(
-                          items: state.focusedIssue.hypotheses,
-                          oldIndex: oldIndex,
-                          newIndex: newIndex,
-                        ),
-                      );
-                    },
-                    onEdit: (index, hypothesis) {
-                      _showHypothesisEditDialog(context, hypothesis, index);
-                    },
-                    onDelete: (index, hypothesis) {
-                      // Add delete logic here
-                    },
-                  );
-                } else if (state is IssueInFocusRootIdentified) {
-                  return ResortableListWidget<Solution>(
-                    items: state.focusedIssue.solutions,
-                    getItemDescription: (solution) => solution.desc,
-                    onReorder: (oldIndex, newIndex) {
-                      BlocProvider.of<IssueBloc>(context, listen: false).add(
-                        SolutionListResorted(
-                          items: state.focusedIssue.solutions,
-                          oldIndex: oldIndex,
-                          newIndex: newIndex,
-                        ),
-                      );
-                    },
-                    onEdit: (index, solution) {
-                      _showSolutionEditDialog(context, solution, index);
-                    },
-                    onDelete: (index, solution) {
-                      // Add delete logic here
-                    },
-                  );
-                } else {
-                  return Container(); // or handle other states as needed
-                }
-              },
-            ),
-          ],
+              case IssueProcessStage.solveSummaryReview:
+                return SolveSummaryReviewView(issueId: issueId);
+            }
+          } else if (state is IssuesListFailure) {
+            return Center(child: Text('Error: ${state.error}'));
+          } else {
+            return Center(child: Text('$state'));
+          }
+        },
+      ),
+    );
+  }
+}
+
+class InviteUserDialog extends StatefulWidget {
+  final String issueId;
+
+  const InviteUserDialog({required this.issueId, Key? key}) : super(key: key);
+
+  @override
+  _InviteUserDialogState createState() => _InviteUserDialogState();
+}
+
+class _InviteUserDialogState extends State<InviteUserDialog> {
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<AppUser> _availableContacts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAvailableContacts();
+  }
+
+  Future<void> _fetchAvailableContacts() async {
+    try {
+      final authBloc = context.read<AuthBloc>();
+      final currentUserId = authBloc.currentUserId;
+      final currentAppUser =
+          await context.read<AppUserRepository>().getUserById(currentUserId!);
+      final contacts = currentAppUser?.getContacts ?? {};
+
+      // Fetch the focused issue
+      if (context.read<IssueBloc>().state is! IssueProcessState) {
+        setState(() {
+          _errorMessage = 'No focused issue available.';
+          _isLoading = false;
+        });
+        return;
+      }
+      final currentState = context.read<IssueBloc>().state as IssueProcessState;
+      final focusedIssue = currentState.issue;
+
+      // Filter contacts not already invited
+      final availableContactIds = contacts.keys.where((contactUserId) {
+        return !focusedIssue.invitedUserIds!.contains(contactUserId);
+      }).toList();
+
+      // Fetch AppUser data for each contact
+      final appUserRepository = context.read<AppUserRepository>();
+      List<AppUser> contactUsers = [];
+      for (var userId in availableContactIds) {
+        final user = await appUserRepository.getUserById(userId);
+        if (user != null) {
+          contactUsers.add(user);
+        }
+      }
+
+      setState(() {
+        _availableContacts = contactUsers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load contacts.';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _inviteUser(AppUser selectedUser) {
+    final issueBloc = context.read<IssueBloc>();
+
+    issueBloc.add(AddUserToIssueEvent(
+      issueId: widget.issueId,
+      userId: selectedUser.userId,
+    ));
+
+    Navigator.of(context).pop();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content:
+              Text('${selectedUser.username} has been added to the issue.')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const AlertDialog(
+        content: SizedBox(
+          height: 100,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return AlertDialog(
+        title: const Text('Error'),
+        content: Text(_errorMessage!),
+      );
+    }
+
+    if (_availableContacts.isEmpty) {
+      return const AlertDialog(
+        title: Text('No Contacts'),
+        content: Text('You have no contacts to invite.'),
+      );
+    }
+
+    return AlertDialog(
+      title: const Text('Invite a Contact'),
+      content: SizedBox(
+        width: 300,
+        child: ShadSelect<AppUser>(
+          placeholder: const Text('Select a contact'),
+          options: _availableContacts.map((contact) {
+            return ShadOption<AppUser>(
+              value: contact,
+              child: Text(contact.username),
+            );
+          }).toList(),
+          selectedOptionBuilder: (context, selectedUser) {
+            return Text(selectedUser.username);
+          },
+          onChanged: (AppUser selectedUser) {
+            _inviteUser(selectedUser);
+          },
         ),
       ),
     );

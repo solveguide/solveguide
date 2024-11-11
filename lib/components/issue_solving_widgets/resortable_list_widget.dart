@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 
 class ResortableListWidget<T> extends StatelessWidget {
+  const ResortableListWidget({
+    required this.items,
+    required this.getItemDescription,
+    required this.onReorder,
+    super.key,
+    this.onEdit,
+    this.onDelete,
+  });
+
   final List<T> items;
   final String Function(T) getItemDescription;
   final void Function(int oldIndex, int newIndex) onReorder;
   final void Function(int index, T item)? onEdit;
   final void Function(int index, T item)? onDelete;
 
-  const ResortableListWidget({
-    super.key,
-    required this.items,
-    required this.getItemDescription,
-    required this.onReorder,
-    this.onEdit,
-    this.onDelete,
-  });
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          maxWidth: 1000.0,
+          maxWidth: 1000,
         ),
         child: ReorderableListView.builder(
           itemCount: items.length,
@@ -29,10 +29,10 @@ class ResortableListWidget<T> extends StatelessWidget {
             final item = items[index];
             return Card(
               key: ValueKey(item),
-              elevation: 2.0,
+              elevation: 2,
               margin: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 5.0,
+                vertical: 8,
+                horizontal: 5,
               ),
               child: ListTile(
                 tileColor: Theme.of(context).colorScheme.tertiary,
