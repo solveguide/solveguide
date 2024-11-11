@@ -260,11 +260,19 @@ class _WidenHypothesesSegmentButtonState
                 value: HypothesisVote.disagree,
                 label: const Text('Disagree'),
                 tooltip: 'Disagree with this hypothesis.'),
-            ButtonSegment<HypothesisVote>(
-                value: HypothesisVote.agree,
-                label: const Text('Agree'),
-                tooltip:
-                    'Agree that this hypothesis could be part of the issue.'),
+            if (currentUserVote != HypothesisVote.root) ...[
+              ButtonSegment<HypothesisVote>(
+                  value: HypothesisVote.agree,
+                  label: const Text('Agree'),
+                  tooltip:
+                      'Agree that this hypothesis could be part of the issue.'),
+            ],
+            if (currentUserVote == HypothesisVote.root) ...[
+              ButtonSegment<HypothesisVote>(
+                  value: HypothesisVote.root,
+                  label: const Text('Root'),
+                  tooltip: 'Selected as Root Issue.'),
+            ]
           ],
           selected: currentUserVote != null ? {currentUserVote} : {},
           multiSelectionEnabled: false,

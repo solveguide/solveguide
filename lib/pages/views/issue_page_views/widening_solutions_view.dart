@@ -262,10 +262,19 @@ class _WidenSolutionsSegmentButtonState
                 value: SolutionVote.disagree,
                 label: const Text('Disagree'),
                 tooltip: 'Disagree with this solution.'),
-            ButtonSegment<SolutionVote>(
-                value: SolutionVote.agree,
-                label: const Text('Agree'),
-                tooltip: 'Agree that this solution could be effective.'),
+            if (currentUserVote != SolutionVote.solve) ...[
+              ButtonSegment<SolutionVote>(
+                  value: SolutionVote.agree,
+                  label: const Text('Agree'),
+                  tooltip:
+                      'Agree that this solution could be part of the solution.'),
+            ],
+            if (currentUserVote == SolutionVote.solve) ...[
+              ButtonSegment<SolutionVote>(
+                  value: SolutionVote.solve,
+                  label: const Text('Solve'),
+                  tooltip: 'Selected as Solve.'),
+            ]
           ],
           selected: currentUserVote != null ? {currentUserVote} : {},
           multiSelectionEnabled: false,

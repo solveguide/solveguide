@@ -478,7 +478,9 @@ class _NarrowToRootSegmentButtonState extends State<NarrowToRootSegmentButton> {
                 if (currentUserVote != HypothesisVote.root) ...[
                   ButtonSegment<HypothesisVote>(
                       value: HypothesisVote.agree,
-                      label: const Text('Agree'),
+                      label: currentUserVote == HypothesisVote.root
+                          ? Text('Root')
+                          : Text('Agree'),
                       tooltip:
                           'Agree that this hypothesis could be part of the issue.'),
                 ],
@@ -486,7 +488,7 @@ class _NarrowToRootSegmentButtonState extends State<NarrowToRootSegmentButton> {
                   ButtonSegment<HypothesisVote>(
                       value: HypothesisVote.root,
                       label: const Text('Root'),
-                      tooltip: 'Select as Root Issue.'),
+                      tooltip: 'Selected as Root Issue.'),
                 ]
               ],
               selected: currentUserVote != null ? {currentUserVote!} : {},

@@ -490,7 +490,7 @@ class _NarrowToSolveSegmentButtonState
                   ButtonSegment<SolutionVote>(
                       value: SolutionVote.solve,
                       label: const Text('Solve'),
-                      tooltip: 'Select as Solve.'),
+                      tooltip: 'Selected as Solve.'),
                 ]
               ],
               selected: currentUserVote != null ? {currentUserVote!} : {},
