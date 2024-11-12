@@ -1,9 +1,11 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/components/my_navigation_drawer.dart';
 import 'package:guide_solve/components/plain_button.dart';
+import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/login_page.dart';
 
@@ -16,10 +18,12 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.orange[50],
+    final currentAppUser = context.read<AuthBloc>().currentAppUser!;
+    return AppScaffold(
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: Colors.orange[50],
+        //backgroundColor: Colors.orange[50],
         title: const Text('Your Account'),
       ),
       drawer: const MyNavigationDrawer(),
@@ -27,18 +31,20 @@ class ProfilePage extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthFailure) {
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LoginPage(),
-                ),
-                (route) => false);
+              context,
+              MaterialPageRoute<Widget>(
+                builder: (context) => LoginPage(),
+              ),
+              (route) => false,
+            );
           } else if (state is AuthInitial) {
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomePage(),
-                ),
-                (route) => false);
+              context,
+              MaterialPageRoute<Widget>(
+                builder: (context) => const HomePage(),
+              ),
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {
@@ -48,46 +54,88 @@ class ProfilePage extends StatelessWidget {
           return Center(
             child: Column(
               children: [
-                //logo
-                logoTitle(10),
-                const SizedBox(
-                  height: 50,
+                // Logo
+                Tappable(
+                  onTap: () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute<Widget>(
+                      builder: (context) => const DashboardPage(),
+                    ),
+                    (route) => false,
+                  ),
+                  child: ShadCard(
+                    backgroundColor: AppColors.consensus,
+                    width: 300,
+                    child: logoTitle(10),
+                  ),
                 ),
-                //welcome message
-                const Text("Account Details"),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 50),
 
-                const SizedBox(
-                  height: 25,
+                // Welcome message
+                const Text(
+                  'Account Details',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 25),
 
-                const SizedBox(
-                  height: 10,
+                // Displaying email
+                Text(
+                  'Email: ${currentAppUser.email}',
+                  style: const TextStyle(fontSize: 16),
                 ),
+                const SizedBox(height: 10),
 
-                //sign out button
+                // Displaying username
+                Text(
+                  'Username: ${currentAppUser.username}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+
+                // Displaying total contacts count
+                Text(
+                  'Total Contacts: ${currentAppUser.contacts.length}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+
+                // Displaying total invited contacts count
+                Text(
+                  'Invited Contacts: ${currentAppUser.invitedContacts.length}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+
+                // Displaying issue area labels
+                const Text(
+                  'Issue Areas:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                ...currentAppUser.issueAreaLabels.map(
+                  (label) => Text(
+                    label,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 25),
+
+                // Sign out button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     PlainButton(
                       onPressed: () {
-                        BlocProvider.of<AuthBloc>(context, listen: false).add(
+                        BlocProvider.of<AuthBloc>(context).add(
                           const AuthLogoutRequested(),
                         );
                       },
-                      text: "Sign Out",
+                      text: 'Sign Out',
                     ),
-                    const SizedBox(
-                      width: 25.0,
-                    ),
+                    const SizedBox(width: 25),
                   ],
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
-                //not a member? register now
+                const SizedBox(height: 25),
               ],
             ),
           );

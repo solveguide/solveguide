@@ -16,22 +16,20 @@ final class IssuesFetched extends IssueEvent {
 }
 
 final class NewIssueCreated extends IssueEvent {
-  final String seedStatement;
-
   const NewIssueCreated({
     required this.seedStatement,
   });
+  final String seedStatement;
 
   @override
   List<Object?> get props => [seedStatement];
 }
 
 final class IssueDeletionRequested extends IssueEvent {
-  final String issueId;
-
   const IssueDeletionRequested({
     required this.issueId,
   });
+  final String issueId;
 
   @override
   List<Object?> get props => [issueId];
@@ -43,140 +41,180 @@ THE FOLLOWING EVENTS ARE RELATED TO THE FOCUS ISSUE AND ISSUE SOLVING PROCESS
 
 */
 final class FocusIssueSelected extends IssueEvent {
-  final String issueID;
-
   const FocusIssueSelected({
-    required this.issueID,
+    required this.issue,
   });
+  final Issue issue;
 
   @override
-  List<Object?> get props => [issueID];
+  List<Object?> get props => [issue];
+}
+
+class IssueUpdatedFromDatabase extends IssueEvent {
+  final Issue issue;
+
+  IssueUpdatedFromDatabase(this.issue);
+}
+
+class HypothesesUpdatedFromDatabase extends IssueEvent {
+  final List<Hypothesis> hypotheses;
+
+  HypothesesUpdatedFromDatabase(this.hypotheses);
+}
+
+class SolutionsUpdatedFromDatabase extends IssueEvent {
+  final List<Solution> solutions;
+
+  SolutionsUpdatedFromDatabase(this.solutions);
+}
+
+class FactsUpdatedFromDatabase extends IssueEvent {
+  final List<Fact> facts;
+
+  FactsUpdatedFromDatabase(this.facts);
 }
 
 final class NewHypothesisCreated extends IssueEvent {
-  final String newHypothesis;
-
   const NewHypothesisCreated({
     required this.newHypothesis,
   });
+  final String newHypothesis;
 
   @override
   List<Object?> get props => [newHypothesis];
 }
 
 class HypothesisUpdated extends IssueEvent {
-  final int index;
-  final Hypothesis updatedHypothesis;
-
   const HypothesisUpdated({
-    required this.index,
-    required this.updatedHypothesis,
+    required this.hypothesisId,
+    required this.updatedDescription,
   });
+  final String hypothesisId;
+  final String updatedDescription;
 
   @override
-  List<Object?> get props => [index, updatedHypothesis];
+  List<Object?> get props => [hypothesisId, updatedDescription];
+}
+
+class HypothesisVoteSubmitted extends IssueEvent {
+  const HypothesisVoteSubmitted({
+    required this.hypothesisId,
+    required this.voteValue,
+  });
+  final String hypothesisId;
+  final HypothesisVote voteValue;
+
+  @override
+  List<Object?> get props => [hypothesisId, voteValue];
 }
 
 class CreateSeparateIssueFromHypothesis extends IssueEvent {
-  final int index;
-  final Hypothesis hypothesis;
-  final bool newIssuePrioritized;
-
   const CreateSeparateIssueFromHypothesis({
-    required this.index,
-    required this.hypothesis,
+    required this.hypothesisId,
     required this.newIssuePrioritized,
   });
+  final String hypothesisId;
+  final bool newIssuePrioritized;
 
   @override
-  List<Object?> get props => [index, hypothesis, newIssuePrioritized];
-}
-
-class HypothesisListResorted<T> extends IssueEvent {
-  final List<Hypothesis> items;
-  final int oldIndex;
-  final int newIndex;
-
-  const HypothesisListResorted({
-    required this.items,
-    required this.oldIndex,
-    required this.newIndex,
-  });
-
-  @override
-  List<Object?> get props => [items, oldIndex, newIndex];
+  List<Object?> get props => [hypothesisId, newIssuePrioritized];
 }
 
 final class FocusRootConfirmed extends IssueEvent {
-  final String confirmedRoot;
-
   const FocusRootConfirmed({
-    required this.confirmedRoot,
+    required this.confirmedRootHypothesisId,
   });
+  final String confirmedRootHypothesisId;
 
   @override
-  List<Object?> get props => [confirmedRoot];
+  List<Object?> get props => [confirmedRootHypothesisId];
 }
 
 final class NewSolutionCreated extends IssueEvent {
-  final String newSolution;
-
   const NewSolutionCreated({
     required this.newSolution,
   });
+  final String newSolution;
 
   @override
   List<Object?> get props => [newSolution];
 }
 
 class SolutionUpdated extends IssueEvent {
-  final int index;
-  final Solution updatedSolution;
-
   const SolutionUpdated({
-    required this.index,
-    required this.updatedSolution,
+    required this.solutionId,
+    required this.updatedDescription,
   });
+  final String solutionId;
+  final String updatedDescription;
 
   @override
-  List<Object?> get props => [index, updatedSolution];
+  List<Object?> get props => [solutionId, updatedDescription];
 }
 
-class SolutionListResorted<T> extends IssueEvent {
-  final List<Solution> items;
-  final int oldIndex;
-  final int newIndex;
-
-  const SolutionListResorted({
-    required this.items,
-    required this.oldIndex,
-    required this.newIndex,
+class SolutionVoteSubmitted extends IssueEvent {
+  const SolutionVoteSubmitted({
+    required this.solutionId,
+    required this.voteValue,
   });
+  final String solutionId;
+  final SolutionVote voteValue;
 
   @override
-  List<Object?> get props => [items, oldIndex, newIndex];
+  List<Object?> get props => [solutionId, voteValue];
 }
 
 final class FocusSolveScopeSubmitted extends IssueEvent {
-  final Solution confirmedSolve;
-
   const FocusSolveScopeSubmitted({
-    required this.confirmedSolve,
+    required this.solutionId,
   });
+  final String solutionId;
 
   @override
-  List<Object?> get props => [confirmedSolve];
+  List<Object?> get props => [solutionId];
 }
 
 final class FocusSolveConfirmed extends IssueEvent {
-  final String confirmedSolve;
-
-  const FocusSolveConfirmed({
-    required this.confirmedSolve,
-  });
+  const FocusSolveConfirmed({required this.solutionId});
+  final String solutionId;
 
   @override
-  List<Object?> get props => [confirmedSolve];
+  List<Object?> get props => [solutionId];
+}
+
+final class FocusIssueNavigationRequested extends IssueEvent {
+  const FocusIssueNavigationRequested({required this.stage});
+  final IssueProcessStage stage;
+
+  @override
+  List<Object?> get props => [stage];
+}
+
+final class NewFactCreated extends IssueEvent {
+  const NewFactCreated({
+    required this.newFact,
+    required this.newFactContext,
+    required this.referenceObjectId,
+    required this.referenceObjectType,
+  });
+  final String newFact; // The fact description
+  final String newFactContext; // Context or reasoning for the fact
+  final String referenceObjectId; // The ID of the object being referenced
+  final ReferenceObjectType referenceObjectType;
+
+  @override
+  List<Object?> get props =>
+      [newFact, newFactContext, referenceObjectId, referenceObjectType];
+}
+
+class AddUserToIssueEvent extends IssueEvent {
+  final String issueId;
+  final String userId;
+
+  const AddUserToIssueEvent({required this.issueId, required this.userId});
+
+  @override
+  List<Object?> get props => [issueId, userId];
 }
 
 /*
@@ -186,22 +224,20 @@ THE FOLLOWING EVENTS ARE RELATED TO THE SOLUTION PROVING & TRACKING PROCESS
 */
 
 final class SolveProvenByOwner extends IssueEvent {
-  final Issue issue;
-
   const SolveProvenByOwner({
     required this.issue,
   });
+  final Issue issue;
 
   @override
   List<Object?> get props => [issue];
 }
 
 final class SolveDisprovenByOwner extends IssueEvent {
-  final Issue issue;
-
   const SolveDisprovenByOwner({
     required this.issue,
   });
+  final Issue issue;
 
   @override
   List<Object?> get props => [issue];

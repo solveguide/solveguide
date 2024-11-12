@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 
-// Function to create a sideways narrow icon
-Widget narrowIcon() {
+// Function to create a sideways narrow icon with optional color
+Widget narrowIcon({double size = 24.0, Color? color}) {
   return Transform.rotate(
     angle: -1.5708, // 90 degrees in radians
-    child: const Icon(Icons.compress),
+    child: Icon(
+      Icons.compress,
+      size: size,
+      color: color, // Apply the optional color
+    ),
   );
 }
 
-// Function to create a sideways widen icon
-Widget widenIcon() {
+// Function to create a sideways widen icon with optional color
+Widget widenIcon({double size = 24.0, Color? color}) {
   return Transform.rotate(
     angle: -1.5708, // 90 degrees in radians
-    child: const Icon(Icons.expand),
+    child: Icon(
+      Icons.expand,
+      size: size,
+      color: color, // Apply the optional color
+    ),
   );
 }
 
@@ -30,14 +38,16 @@ Widget narrowInstructionText(String boldText, {String? text}) {
         TextSpan(
           text: boldText,
           style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black), // Ensure text color is set
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ), // Ensure text color is set
         ),
         if (text != null) ...[
           TextSpan(
             text: ' $text', // Added space for separation
             style: const TextStyle(
-                color: Colors.black), // Ensure text color is set
+              color: Colors.black,
+            ), // Ensure text color is set
           ),
         ],
       ],
@@ -59,14 +69,16 @@ Widget widenInstructionText(String boldText, {String? text}) {
         TextSpan(
           text: boldText,
           style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black), // Ensure text color is set
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ), // Ensure text color is set
         ),
         if (text != null) ...[
           TextSpan(
             text: ' $text', // Added space for separation
             style: const TextStyle(
-                color: Colors.black), // Ensure text color is set
+              color: Colors.black,
+            ), // Ensure text color is set
           ),
         ],
       ],

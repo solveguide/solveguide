@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class PlainButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String text;
-  final Color? color; // Optional color parameter
+  // Optional color parameter
 
   const PlainButton({
-    super.key,
     required this.onPressed,
     required this.text,
+    super.key,
     this.color, // Add color to the constructor
   });
+
+  final VoidCallback onPressed;
+  final String text;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
