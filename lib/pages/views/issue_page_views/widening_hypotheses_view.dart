@@ -73,9 +73,12 @@ class WideningHypothesesView extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xxxs),
                     ShadCard(
                       width: 600,
+                      padding: EdgeInsets.symmetric(
+                          vertical: AppSpacing.md, horizontal: AppSpacing.lg),
                       title: Text(
                         focusedIssue.seedStatement,
-                        style: UITextStyle.headline6,
+                        style: UITextStyle.subtitle1
+                            .copyWith(fontWeight: FontWeight.bold),
                       ),
                       backgroundColor: AppColors.consensus,
                     ),
@@ -179,6 +182,7 @@ Widget _hypothesisList(
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
               child: ShadCard(
+                padding: EdgeInsets.all(AppSpacing.lg),
                 title: Tappable(
                   child: Text(
                     hypothesis.desc,
@@ -251,55 +255,59 @@ class _WidenHypothesesSegmentButtonState
 
     // Use the latest vote from the hypothesis instead of local state
     final currentUserVote = hypothesis.votes[widget.currentUserId];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SegmentedButton<HypothesisVote>(
-          segments: [
-            ButtonSegment<HypothesisVote>(
-                value: HypothesisVote.disagree,
-                label: const Text('Disagree'),
-                tooltip: 'Disagree with this hypothesis.'),
-            if (currentUserVote != HypothesisVote.root) ...[
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpacing.md),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SegmentedButton<HypothesisVote>(
+            segments: [
               ButtonSegment<HypothesisVote>(
-                  value: HypothesisVote.agree,
-                  label: const Text('Agree'),
-                  tooltip:
-                      'Agree that this hypothesis could be part of the issue.'),
+                  value: HypothesisVote.disagree,
+                  label: const Text('Disagree'),
+                  tooltip: 'Disagree with this hypothesis.'),
+              if (currentUserVote != HypothesisVote.root) ...[
+                ButtonSegment<HypothesisVote>(
+                    value: HypothesisVote.agree,
+                    label: const Text('Agree'),
+                    tooltip:
+                        'Agree that this hypothesis could be part of the issue.'),
+              ],
+              if (currentUserVote == HypothesisVote.root) ...[
+                ButtonSegment<HypothesisVote>(
+                    value: HypothesisVote.root,
+                    label: const Text('Root'),
+                    tooltip: 'Selected as Root Issue.'),
+              ]
             ],
-            if (currentUserVote == HypothesisVote.root) ...[
-              ButtonSegment<HypothesisVote>(
-                  value: HypothesisVote.root,
-                  label: const Text('Root'),
-                  tooltip: 'Selected as Root Issue.'),
-            ]
-          ],
-          selected: currentUserVote != null ? {currentUserVote} : {},
-          multiSelectionEnabled: false,
-          emptySelectionAllowed: true,
-          showSelectedIcon: false,
-          onSelectionChanged: (Set<HypothesisVote> newSelection) {
-            if (newSelection.isNotEmpty) {
-              final selectedVote = newSelection.first;
-              _handleVote(selectedVote);
-            }
-          },
-          style: SegmentedButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            maximumSize: const Size(40, 20),
-            textStyle: const TextStyle(fontSize: 11),
-            backgroundColor:
-                currentUserVote == null ? AppColors.private : AppColors.public,
-            selectedBackgroundColor: currentUserVote == HypothesisVote.agree
-                ? AppColors.consensus
-                : currentUserVote == HypothesisVote.root
-                    ? AppColors.consensus
-                    : currentUserVote == HypothesisVote.disagree
-                        ? AppColors.conflictLight
-                        : AppColors.private,
+            selected: currentUserVote != null ? {currentUserVote} : {},
+            multiSelectionEnabled: false,
+            emptySelectionAllowed: true,
+            showSelectedIcon: false,
+            onSelectionChanged: (Set<HypothesisVote> newSelection) {
+              if (newSelection.isNotEmpty) {
+                final selectedVote = newSelection.first;
+                _handleVote(selectedVote);
+              }
+            },
+            style: SegmentedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+              maximumSize: const Size(40, 20),
+              textStyle: const TextStyle(fontSize: 11),
+              backgroundColor: currentUserVote == null
+                  ? AppColors.private
+                  : AppColors.public,
+              selectedBackgroundColor: currentUserVote == HypothesisVote.agree
+                  ? AppColors.consensus
+                  : currentUserVote == HypothesisVote.root
+                      ? AppColors.consensus
+                      : currentUserVote == HypothesisVote.disagree
+                          ? AppColors.conflictLight
+                          : AppColors.private,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -62,9 +62,12 @@ class NarrowingToRootCauseView extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xxxs),
                   ShadCard(
                     width: 600,
+                    padding: EdgeInsets.symmetric(
+                        vertical: AppSpacing.md, horizontal: AppSpacing.lg),
                     title: Text(
                       focusedIssue.seedStatement,
-                      style: UITextStyle.headline6,
+                      style: UITextStyle.subtitle1
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                     backgroundColor: AppColors.consensus,
                     child: _possibleRootsList(
@@ -74,8 +77,6 @@ class NarrowingToRootCauseView extends StatelessWidget {
                       state.issue.invitedUserIds!,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-
                   const SizedBox(height: AppSpacing.md),
                   // Widening Options so far (Hypotheses list)
                   _hypothesisList(
@@ -108,13 +109,13 @@ class NarrowingToRootCauseView extends StatelessWidget {
     // Display list of possible root hypotheses
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.xs),
         child: ShadCard(
-          padding: EdgeInsets.all(AppSpacing.xs),
+          padding: EdgeInsets.all(AppSpacing.md),
           description: Text("is a symptom of the root issue. . ."),
           backgroundColor: AppColors.public,
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 80),
               child: ListView.builder(
@@ -150,6 +151,10 @@ class NarrowingToRootCauseView extends StatelessWidget {
                           width: 2.0,
                         ),
                         left: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                        right: BorderSide(
                           color: AppColors.consensus,
                           width: 2.0,
                         ),
@@ -224,6 +229,7 @@ class NarrowingToRootCauseView extends StatelessWidget {
                   }
                 },
                 child: ShadCard(
+                  padding: EdgeInsets.all(AppSpacing.lg),
                   title: Text(
                     hypothesis.desc,
                     style: UITextStyle.subtitle1,
@@ -463,96 +469,99 @@ class _NarrowToRootSegmentButtonState extends State<NarrowToRootSegmentButton> {
   @override
   Widget build(BuildContext context) {
     currentUserVote = widget.hypothesis.votes[widget.currentUserId];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SegmentedButton<HypothesisVote>(
-              segments: [
-                ButtonSegment<HypothesisVote>(
-                    value: HypothesisVote.disagree,
-                    label: const Text('Disagree'),
-                    tooltip: 'Disagree with this hypothesis.'),
-                if (currentUserVote != HypothesisVote.root) ...[
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpacing.md),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SegmentedButton<HypothesisVote>(
+                segments: [
                   ButtonSegment<HypothesisVote>(
-                      value: HypothesisVote.agree,
-                      label: currentUserVote == HypothesisVote.root
-                          ? Text('Root')
-                          : Text('Agree'),
-                      tooltip:
-                          'Agree that this hypothesis could be part of the issue.'),
+                      value: HypothesisVote.disagree,
+                      label: const Text('Disagree'),
+                      tooltip: 'Disagree with this hypothesis.'),
+                  if (currentUserVote != HypothesisVote.root) ...[
+                    ButtonSegment<HypothesisVote>(
+                        value: HypothesisVote.agree,
+                        label: currentUserVote == HypothesisVote.root
+                            ? Text('Root')
+                            : Text('Agree'),
+                        tooltip:
+                            'Agree that this hypothesis could be part of the issue.'),
+                  ],
+                  if (currentUserVote == HypothesisVote.root) ...[
+                    ButtonSegment<HypothesisVote>(
+                        value: HypothesisVote.root,
+                        label: const Text('Root'),
+                        tooltip: 'Selected as Root Issue.'),
+                  ]
                 ],
-                if (currentUserVote == HypothesisVote.root) ...[
-                  ButtonSegment<HypothesisVote>(
-                      value: HypothesisVote.root,
-                      label: const Text('Root'),
-                      tooltip: 'Selected as Root Issue.'),
-                ]
-              ],
-              selected: currentUserVote != null ? {currentUserVote!} : {},
-              multiSelectionEnabled: false,
-              showSelectedIcon: false,
-              emptySelectionAllowed: true,
-              onSelectionChanged: (Set<HypothesisVote> newSelection) {
-                if (newSelection.isNotEmpty) {
-                  final selectedVote = newSelection.first;
-                  _handleVote(selectedVote);
-                }
-              },
-              style: ButtonStyle(
-                padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                  EdgeInsets.symmetric(
-                      horizontal: 2, vertical: 2), // Adjust padding
+                selected: currentUserVote != null ? {currentUserVote!} : {},
+                multiSelectionEnabled: false,
+                showSelectedIcon: false,
+                emptySelectionAllowed: true,
+                onSelectionChanged: (Set<HypothesisVote> newSelection) {
+                  if (newSelection.isNotEmpty) {
+                    final selectedVote = newSelection.first;
+                    _handleVote(selectedVote);
+                  }
+                },
+                style: ButtonStyle(
+                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                    EdgeInsets.symmetric(
+                        horizontal: 2, vertical: 2), // Adjust padding
+                  ),
+                  minimumSize: WidgetStateProperty.all<Size>(
+                    const Size(40, 20), // Reduce the minimum size of the button
+                  ),
+                  textStyle: WidgetStateProperty.all<TextStyle>(
+                    const TextStyle(fontSize: 11), // Adjust font size if needed
+                  ),
+                  backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                    (states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return currentUserVote == HypothesisVote.agree
+                            ? AppColors.consensus
+                            : currentUserVote == HypothesisVote.root
+                                ? AppColors.consensus
+                                : AppColors.conflictLight;
+                      }
+                      return AppColors.public;
+                    },
+                  ),
+                  //padding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
-                minimumSize: WidgetStateProperty.all<Size>(
-                  const Size(40, 20), // Reduce the minimum size of the button
-                ),
-                textStyle: WidgetStateProperty.all<TextStyle>(
-                  const TextStyle(fontSize: 11), // Adjust font size if needed
-                ),
-                backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-                  (states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return currentUserVote == HypothesisVote.agree
-                          ? AppColors.consensus
-                          : currentUserVote == HypothesisVote.root
-                              ? AppColors.consensus
-                              : AppColors.conflictLight;
-                    }
-                    return AppColors.public;
-                  },
-                ),
-                //padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(width: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // if (currentUserVote == 'disagree')
-            //   Tooltip(
-            //     message: 'Modify this hypothesis.',
-            //     child: ShadButton(
-            //       width: 24,
-            //       height: 24,
-            //       padding: EdgeInsets.zero,
-            //       backgroundColor: AppColors.public,
-            //       foregroundColor: AppColors.black,
-            //       decoration: const ShadDecoration(
-            //         secondaryBorder: ShadBorder.none,
-            //         secondaryFocusedBorder: ShadBorder.none,
-            //       ),
-            //       icon: const Icon(Icons.arrow_upward),
-            //       onPressed: _modifyHypothesis,
-            //     ),
-            //   ),
-          ],
-        ),
-      ],
+            ],
+          ),
+          const SizedBox(width: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // if (currentUserVote == 'disagree')
+              //   Tooltip(
+              //     message: 'Modify this hypothesis.',
+              //     child: ShadButton(
+              //       width: 24,
+              //       height: 24,
+              //       padding: EdgeInsets.zero,
+              //       backgroundColor: AppColors.public,
+              //       foregroundColor: AppColors.black,
+              //       decoration: const ShadDecoration(
+              //         secondaryBorder: ShadBorder.none,
+              //         secondaryFocusedBorder: ShadBorder.none,
+              //       ),
+              //       icon: const Icon(Icons.arrow_upward),
+              //       onPressed: _modifyHypothesis,
+              //     ),
+              //   ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
