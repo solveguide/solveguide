@@ -63,9 +63,12 @@ class NarrowingToSolveView extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xxxs),
                   ShadCard(
                     width: 600,
+                    padding: EdgeInsets.symmetric(
+                        vertical: AppSpacing.md, horizontal: AppSpacing.lg),
                     title: Text(
                       agreedRoot,
-                      style: UITextStyle.headline6,
+                      style: UITextStyle.subtitle1
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                     backgroundColor: AppColors.consensus,
                     child: _possibleSolvesList(
@@ -110,13 +113,13 @@ class NarrowingToSolveView extends StatelessWidget {
     // Display list of possible root hypotheses
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.xs),
         child: ShadCard(
           padding: EdgeInsets.all(AppSpacing.xs),
           description: Text("is best solved by . . ."),
           backgroundColor: AppColors.public,
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 80),
               child: ListView.builder(
@@ -133,12 +136,33 @@ class NarrowingToSolveView extends StatelessWidget {
                         const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
                     child: ShadCard(
                       padding: EdgeInsets.all(AppSpacing.xxs),
-                      title: Text(
-                        solution.desc
-                            .substring(0, descLength < 50 ? descLength : 49),
-                        style: UITextStyle.subtitle1,
+                      title: Tooltip(
+                        message: solution.desc,
+                        child: Text(
+                          solution.desc
+                              .substring(0, descLength < 50 ? descLength : 49),
+                          style: UITextStyle.subtitle1,
+                        ),
                       ),
                       backgroundColor: AppColors.public,
+                      border: Border(
+                        top: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                        bottom: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                        left: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                        right: BorderSide(
+                          color: AppColors.consensus,
+                          width: 2.0,
+                        ),
+                      ),
                       trailing: ShadCheckbox(
                         value: currentUserVote == SolutionVote.solve,
                         onChanged: (v) {
@@ -209,6 +233,7 @@ class NarrowingToSolveView extends StatelessWidget {
                   }
                 },
                 child: ShadCard(
+                  padding: EdgeInsets.all(AppSpacing.lg),
                   title: Text(
                     solution.desc,
                     style: UITextStyle.subtitle1,
@@ -450,94 +475,97 @@ class _NarrowToSolveSegmentButtonState
   @override
   Widget build(BuildContext context) {
     currentUserVote = widget.solution.votes[widget.currentUserId];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SegmentedButton<SolutionVote>(
-              segments: [
-                ButtonSegment<SolutionVote>(
-                    value: SolutionVote.disagree,
-                    label: const Text('Disagree'),
-                    tooltip: 'Disagree with this solution.'),
-                if (currentUserVote != SolutionVote.solve) ...[
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpacing.md),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SegmentedButton<SolutionVote>(
+                segments: [
                   ButtonSegment<SolutionVote>(
-                      value: SolutionVote.agree,
-                      label: const Text('Agree'),
-                      tooltip:
-                          'Agree that this solution could be part of the solution.'),
+                      value: SolutionVote.disagree,
+                      label: const Text('Disagree'),
+                      tooltip: 'Disagree with this solution.'),
+                  if (currentUserVote != SolutionVote.solve) ...[
+                    ButtonSegment<SolutionVote>(
+                        value: SolutionVote.agree,
+                        label: const Text('Agree'),
+                        tooltip:
+                            'Agree that this solution could be part of the solution.'),
+                  ],
+                  if (currentUserVote == SolutionVote.solve) ...[
+                    ButtonSegment<SolutionVote>(
+                        value: SolutionVote.solve,
+                        label: const Text('Solve'),
+                        tooltip: 'Selected as Solve.'),
+                  ]
                 ],
-                if (currentUserVote == SolutionVote.solve) ...[
-                  ButtonSegment<SolutionVote>(
-                      value: SolutionVote.solve,
-                      label: const Text('Solve'),
-                      tooltip: 'Select as Solve.'),
-                ]
-              ],
-              selected: currentUserVote != null ? {currentUserVote!} : {},
-              multiSelectionEnabled: false,
-              showSelectedIcon: false,
-              emptySelectionAllowed: true,
-              onSelectionChanged: (Set<SolutionVote> newSelection) {
-                if (newSelection.isNotEmpty) {
-                  final selectedVote = newSelection.first;
-                  _handleVote(selectedVote);
-                }
-              },
-              style: ButtonStyle(
-                padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                  EdgeInsets.symmetric(
-                      horizontal: 2, vertical: 2), // Adjust padding
+                selected: currentUserVote != null ? {currentUserVote!} : {},
+                multiSelectionEnabled: false,
+                showSelectedIcon: false,
+                emptySelectionAllowed: true,
+                onSelectionChanged: (Set<SolutionVote> newSelection) {
+                  if (newSelection.isNotEmpty) {
+                    final selectedVote = newSelection.first;
+                    _handleVote(selectedVote);
+                  }
+                },
+                style: ButtonStyle(
+                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                    EdgeInsets.symmetric(
+                        horizontal: 2, vertical: 2), // Adjust padding
+                  ),
+                  minimumSize: WidgetStateProperty.all<Size>(
+                    const Size(40, 20), // Reduce the minimum size of the button
+                  ),
+                  textStyle: WidgetStateProperty.all<TextStyle>(
+                    const TextStyle(fontSize: 11), // Adjust font size if needed
+                  ),
+                  backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                    (states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return currentUserVote == SolutionVote.agree
+                            ? AppColors.consensus
+                            : currentUserVote == SolutionVote.solve
+                                ? AppColors.consensus
+                                : AppColors.conflictLight;
+                      }
+                      return AppColors.public;
+                    },
+                  ),
+                  //padding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
-                minimumSize: WidgetStateProperty.all<Size>(
-                  const Size(40, 20), // Reduce the minimum size of the button
-                ),
-                textStyle: WidgetStateProperty.all<TextStyle>(
-                  const TextStyle(fontSize: 11), // Adjust font size if needed
-                ),
-                backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-                  (states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return currentUserVote == SolutionVote.agree
-                          ? AppColors.consensus
-                          : currentUserVote == SolutionVote.solve
-                              ? AppColors.consensus
-                              : AppColors.conflictLight;
-                    }
-                    return AppColors.public;
-                  },
-                ),
-                //padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(width: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // if (currentUserVote == 'disagree')
-            //   Tooltip(
-            //     message: 'Modify this hypothesis.',
-            //     child: ShadButton(
-            //       width: 24,
-            //       height: 24,
-            //       padding: EdgeInsets.zero,
-            //       backgroundColor: AppColors.public,
-            //       foregroundColor: AppColors.black,
-            //       decoration: const ShadDecoration(
-            //         secondaryBorder: ShadBorder.none,
-            //         secondaryFocusedBorder: ShadBorder.none,
-            //       ),
-            //       icon: const Icon(Icons.arrow_upward),
-            //       onPressed: _modifyHypothesis,
-            //     ),
-            //   ),
-          ],
-        ),
-      ],
+            ],
+          ),
+          const SizedBox(width: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // if (currentUserVote == 'disagree')
+              //   Tooltip(
+              //     message: 'Modify this hypothesis.',
+              //     child: ShadButton(
+              //       width: 24,
+              //       height: 24,
+              //       padding: EdgeInsets.zero,
+              //       backgroundColor: AppColors.public,
+              //       foregroundColor: AppColors.black,
+              //       decoration: const ShadDecoration(
+              //         secondaryBorder: ShadBorder.none,
+              //         secondaryFocusedBorder: ShadBorder.none,
+              //       ),
+              //       icon: const Icon(Icons.arrow_upward),
+              //       onPressed: _modifyHypothesis,
+              //     ),
+              //   ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

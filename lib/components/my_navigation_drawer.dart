@@ -3,7 +3,6 @@ import 'package:guide_solve/components/logo.dart';
 import 'package:guide_solve/pages/contact_page.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';
-import 'package:guide_solve/pages/proven_solved_issues_page.dart';
 
 class MyNavigationDrawer extends StatelessWidget {
   const MyNavigationDrawer({super.key});
@@ -42,23 +41,23 @@ class MyNavigationDrawer extends StatelessWidget {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 50),
-                child: ListTile(
-                  title: const Text('S O L V E S'),
-                  leading: const Icon(Icons.person),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute<Widget>(
-                        builder: (context) => const ProvenSolvesPage(),
-                      ),
-                      (route) => false,
-                    );
-                  },
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 50),
+              //   child: ListTile(
+              //     title: const Text('S O L V E S'),
+              //     leading: const Icon(Icons.person),
+              //     onTap: () {
+              //       Navigator.pop(context);
+              //       Navigator.pushAndRemoveUntil(
+              //         context,
+              //         MaterialPageRoute<Widget>(
+              //           builder: (context) => const ProvenSolvesPage(),
+              //         ),
+              //         (route) => false,
+              //       );
+              //     },
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: ListTile(

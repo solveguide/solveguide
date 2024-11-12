@@ -41,6 +41,7 @@ class Solution {
     required this.createdTimestamp,
     required this.lastUpdatedTimestamp,
     this.solutionId,
+    this.parentIssueId,
     this.isSolve = false,
     this.rank = 0,
     List<String>? provenIssueIds,
@@ -61,6 +62,7 @@ class Solution {
         solutionId: json['solutionId'] as String?,
         ownerId: json['ownerId'] as String,
         desc: json['desc'] as String,
+        parentIssueId: json['parentIssueId'] as String?,
         isSolve: json['isSolve'] as bool? ?? false,
         rank: json['rank'] as int? ?? 0,
         provenIssueIds: (json['provenIssueIds'] as List<dynamic>?)
@@ -94,6 +96,7 @@ class Solution {
   String? solutionId;
   final String ownerId; // ID of the user who owns the solution
   final String desc;
+  final String? parentIssueId; // ID of the parent issue
   bool isSolve;
   int rank;
   List<String>? provenIssueIds;
@@ -112,6 +115,7 @@ class Solution {
         'solutionId': solutionId,
         'ownerId': ownerId,
         'desc': desc,
+        'parentIssueId': parentIssueId,
         'isSolve': isSolve,
         'rank': rank,
         'provenIssueIds': provenIssueIds,
@@ -130,6 +134,7 @@ class Solution {
     String? solutionId,
     String? ownerId,
     String? desc,
+    String? parentIssueId,
     bool? isSolve,
     int? rank,
     List<String>? provenIssueIds,
@@ -146,6 +151,7 @@ class Solution {
       solutionId: solutionId ?? this.solutionId,
       ownerId: ownerId ?? this.ownerId,
       desc: desc ?? this.desc,
+      parentIssueId: parentIssueId ?? this.parentIssueId,
       isSolve: isSolve ?? this.isSolve,
       rank: rank ?? this.rank,
       provenIssueIds: provenIssueIds ?? this.provenIssueIds,
@@ -262,15 +268,13 @@ class SolutionPerspective {
 
     // Assign points to each type of vote
     final solvePoints =
-        consensusVotes.where((vote) => vote == SolutionVote.solve.name).length *
+        consensusVotes.where((vote) => vote == SolutionVote.solve).length *
             numberOfStakeholders;
     final agreePoints =
-        consensusVotes.where((vote) => vote == SolutionVote.agree.name).length *
-            2;
-    final disagreePoints = consensusVotes
-            .where((vote) => vote == SolutionVote.disagree.name)
-            .length *
-        -1;
+        consensusVotes.where((vote) => vote == SolutionVote.agree).length * 2;
+    final disagreePoints =
+        consensusVotes.where((vote) => vote == SolutionVote.disagree).length *
+            -1;
 
     // Total points to determine the rank
     final totalPoints = solvePoints + agreePoints + disagreePoints;
@@ -283,7 +287,7 @@ class SolutionPerspective {
     final currentUserVote = getCurrentUserVote();
     final consensusVotes = solution.votes.values;
     final solveCount =
-        consensusVotes.where((vote) => vote == SolutionVote.solve.name).length;
+        consensusVotes.where((vote) => vote == SolutionVote.solve).length;
 
     // Assign the primary rank value
     int primaryRank;

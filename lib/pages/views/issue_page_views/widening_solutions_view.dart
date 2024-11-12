@@ -23,6 +23,10 @@ class WideningSolutionsView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: BlocBuilder<IssueBloc, IssueState>(
+        buildWhen: (previous, current) {
+          // Only rebuild when the text controller is empty, so it won’t clear typed text on state updates
+          return _textController.text.isEmpty;
+        },
         builder: (context, state) {
           // Ensure the state is the specific IssueProcessState type
           if (state is! IssueProcessState) {
@@ -65,6 +69,8 @@ class WideningSolutionsView extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xxxs),
                     ShadCard(
                       width: 600,
+                      padding: EdgeInsets.symmetric(
+                          vertical: AppSpacing.md, horizontal: AppSpacing.lg),
                       title: Text(
                         focusedIssue
                                 .perspective(
@@ -72,7 +78,8 @@ class WideningSolutionsView extends StatelessWidget {
                                 .getConsensusRoot()
                                 ?.desc ??
                             "No consensus root found",
-                        style: UITextStyle.headline6,
+                        style: UITextStyle.subtitle1
+                            .copyWith(fontWeight: FontWeight.bold),
                       ),
                       backgroundColor: AppColors.consensus,
                     ),
@@ -177,6 +184,7 @@ Widget _solutionList(
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
               child: ShadCard(
+                padding: EdgeInsets.all(AppSpacing.lg),
                 title: Tappable(
                   child: Text(
                     solution.desc,
@@ -249,46 +257,59 @@ class _WidenSolutionsSegmentButtonState
 
     // Use the latest vote from the hypothesis instead of local state
     final currentUserVote = solution.votes[widget.currentUserId];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SegmentedButton<SolutionVote>(
-          segments: [
-            ButtonSegment<SolutionVote>(
-                value: SolutionVote.disagree,
-                label: const Text('Disagree'),
-                tooltip: 'Disagree with this solution.'),
-            ButtonSegment<SolutionVote>(
-                value: SolutionVote.agree,
-                label: const Text('Agree'),
-                tooltip: 'Agree that this solution could be effective.'),
-          ],
-          selected: currentUserVote != null ? {currentUserVote} : {},
-          multiSelectionEnabled: false,
-          emptySelectionAllowed: true,
-          showSelectedIcon: false,
-          onSelectionChanged: (Set<SolutionVote> newSelection) {
-            if (newSelection.isNotEmpty) {
-              final selectedVote = newSelection.first;
-              _handleVote(selectedVote);
-            }
-          },
-          style: SegmentedButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            maximumSize: const Size(40, 20),
-            textStyle: const TextStyle(fontSize: 11),
-            backgroundColor:
-                currentUserVote == null ? AppColors.private : AppColors.public,
-            selectedBackgroundColor: currentUserVote == SolutionVote.agree
-                ? AppColors.consensus
-                : currentUserVote == SolutionVote.solve
-                    ? AppColors.consensus
-                    : currentUserVote == SolutionVote.disagree
-                        ? AppColors.conflictLight
-                        : AppColors.private,
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpacing.md),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SegmentedButton<SolutionVote>(
+            segments: [
+              ButtonSegment<SolutionVote>(
+                  value: SolutionVote.disagree,
+                  label: const Text('Disagree'),
+                  tooltip: 'Disagree with this solution.'),
+              if (currentUserVote != SolutionVote.solve) ...[
+                ButtonSegment<SolutionVote>(
+                    value: SolutionVote.agree,
+                    label: const Text('Agree'),
+                    tooltip:
+                        'Agree that this solution could be part of the solution.'),
+              ],
+              if (currentUserVote == SolutionVote.solve) ...[
+                ButtonSegment<SolutionVote>(
+                    value: SolutionVote.solve,
+                    label: const Text('Solve'),
+                    tooltip: 'Selected as Solve.'),
+              ]
+            ],
+            selected: currentUserVote != null ? {currentUserVote} : {},
+            multiSelectionEnabled: false,
+            emptySelectionAllowed: true,
+            showSelectedIcon: false,
+            onSelectionChanged: (Set<SolutionVote> newSelection) {
+              if (newSelection.isNotEmpty) {
+                final selectedVote = newSelection.first;
+                _handleVote(selectedVote);
+              }
+            },
+            style: SegmentedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+              maximumSize: const Size(40, 20),
+              textStyle: const TextStyle(fontSize: 11),
+              backgroundColor: currentUserVote == null
+                  ? AppColors.private
+                  : AppColors.public,
+              selectedBackgroundColor: currentUserVote == SolutionVote.agree
+                  ? AppColors.consensus
+                  : currentUserVote == SolutionVote.solve
+                      ? AppColors.consensus
+                      : currentUserVote == SolutionVote.disagree
+                          ? AppColors.conflictLight
+                          : AppColors.private,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

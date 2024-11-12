@@ -61,7 +61,8 @@ class _ContactPageState extends State<ContactPage> {
       return Center(child: Text(_errorMessage!));
     }
 
-    final contacts = _currentUser.contacts;
+    final Map<String, String> contacts = Map.from(_currentUser.contacts)
+      ..remove(_currentUser.userId);
     final invitedContacts = _currentUser.invitedContacts;
 
     return Scaffold(

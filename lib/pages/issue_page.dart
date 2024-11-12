@@ -43,6 +43,12 @@ class IssuePage extends StatelessWidget {
       ),
       drawer: const MyNavigationDrawer(),
       body: BlocBuilder<IssueBloc, IssueState>(
+        buildWhen: (previous, current) {
+          // Only rebuild if the stage changes, for example
+          return current is! IssueProcessState ||
+              (previous is IssueProcessState &&
+                  previous.stage != current.stage);
+        },
         builder: (context, state) {
           if (state is IssueProcessState) {
             final focusedIssue = state.issue;
@@ -102,7 +108,13 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
       final currentUserId = authBloc.currentUserId;
       final currentAppUser =
           await context.read<AppUserRepository>().getUserById(currentUserId!);
-      final contacts = currentAppUser?.getContacts ?? {};
+      late final Map<String, String> contacts;
+      if (currentAppUser != null) {
+        contacts = Map.from(currentAppUser.contacts)
+          ..remove(currentAppUser.userId);
+      } else {
+        contacts = {};
+      }
 
       // Fetch the focused issue
       if (context.read<IssueBloc>().state is! IssueProcessState) {

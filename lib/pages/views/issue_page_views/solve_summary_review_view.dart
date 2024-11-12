@@ -39,151 +39,165 @@ class SolveSummaryReviewView extends StatelessWidget {
               state.solutions.where((sol) => sol != consensusSolve).toList();
           final facts = state.facts;
 
-          return Column(
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    // Process Status
-                    ProcessStatusBar(),
-                    const SizedBox(height: AppSpacing.lg),
+          return AppConstrainedScrollView(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Process Status
+                      ProcessStatusBar(),
+                      const SizedBox(height: AppSpacing.lg),
 
-                    // Solution Summary Card
-                    Center(
-                      child: ShadCard(
-                        width: 1000,
-                        backgroundColor: AppColors.consensus,
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        title: Center(
-                          child: Text(
-                            'Solution Summary',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: AppSpacing.md),
-                            _buildSummaryRow('Agreed Solution:',
-                                consensusSolve?.desc ?? "No solution selected"),
-                            const SizedBox(height: AppSpacing.sm),
-                            _buildSummaryRow('Addressing Root Issue:',
-                                consensusRoot?.desc ?? "No root selected"),
-                            const SizedBox(height: AppSpacing.sm),
-                            _buildSummaryRow(
-                                'Identified from:', issue.seedStatement),
-                            const SizedBox(height: AppSpacing.md),
-
-                            // Segmented Button for Solve Outcome
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SolveOutcomeSegmentedButton(issue: issue),
-                              ],
+                      // Solution Summary Card
+                      Center(
+                        child: ShadCard(
+                          width: 1000,
+                          backgroundColor: AppColors.consensus,
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          title: Center(
+                            child: Text(
+                              'Solution Summary',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // Alternative Hypotheses and Solutions Card
-                    Center(
-                      child: ShadCard(
-                        width: 1000,
-                        backgroundColor: AppColors.public,
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        title: Center(
-                          child: Text(
-                            'Considerations',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: AppSpacing.md),
+                              _buildSummaryRow(
+                                  'Agreed Solution:',
+                                  consensusSolve?.desc ??
+                                      "No solution selected"),
+                              const SizedBox(height: AppSpacing.sm),
+                              _buildSummaryRow('Addressing Root Issue:',
+                                  consensusRoot?.desc ?? "No root selected"),
+                              const SizedBox(height: AppSpacing.sm),
+                              _buildSummaryRow(
+                                  'Identified from:', issue.seedStatement),
+                              const SizedBox(height: AppSpacing.md),
+
+                              // Segmented Button for Solve Outcome
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    'Root Issues',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  ...otherHypotheses
-                                      .map((hypothesis) => Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: AppSpacing.sm),
-                                            child: Text(
-                                              hypothesis.desc,
-                                              style: UITextStyle.bodyText2,
-                                            ),
-                                          )),
+                                  SolveOutcomeSegmentedButton(issue: issue),
                                 ],
                               ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Solutions',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  ...otherSolutions.map((solution) => Padding(
-                                        padding: const EdgeInsets.only(
-                                            bottom: AppSpacing.sm),
-                                        child: Text(
-                                          solution.desc,
-                                          style: UITextStyle.bodyText2,
-                                        ),
-                                      )),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // Facts Card
-                    Center(
-                      child: ShadCard(
-                        width: 1000,
-                        backgroundColor: AppColors.public,
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        title: Center(
-                          child: Text(
-                            'Supporting Facts',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                            ],
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: facts
-                              .map((fact) => Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: AppSpacing.sm),
-                                    child: Text(
-                                      fact.desc,
-                                      style: UITextStyle.bodyText2,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Alternative Hypotheses and Solutions Card
+                      Center(
+                        child: ShadCard(
+                          width: 1000,
+                          backgroundColor: AppColors.public,
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          title: Center(
+                            child: Text(
+                              'Considerations',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: AppSpacing.sm,
                                     ),
-                                  ))
-                              .toList(),
+                                    Text(
+                                      'Root Issues',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    ...otherHypotheses
+                                        .map((hypothesis) => Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: AppSpacing.sm),
+                                              child: Text(
+                                                hypothesis.desc,
+                                                style: UITextStyle.bodyText2,
+                                              ),
+                                            )),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: AppSpacing.sm,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: AppSpacing.sm,
+                                    ),
+                                    Text(
+                                      'Solutions',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    ...otherSolutions.map((solution) => Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: AppSpacing.sm),
+                                          child: Text(
+                                            solution.desc,
+                                            style: UITextStyle.bodyText2,
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Facts Card
+                      Center(
+                        child: ShadCard(
+                          width: 1000,
+                          backgroundColor: AppColors.public,
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          title: Center(
+                            child: Text(
+                              'Supporting Facts',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: facts
+                                .map((fact) => Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: AppSpacing.sm),
+                                      child: Text(
+                                        fact.desc,
+                                        style: UITextStyle.bodyText2,
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),

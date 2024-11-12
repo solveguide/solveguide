@@ -14,6 +14,7 @@ class Hypothesis {
     required this.createdTimestamp,
     required this.lastUpdatedTimestamp,
     this.hypothesisId,
+    this.parentIssueId,
     this.isRoot = false,
     this.isSpinoffIssue = false,
     this.spinoffIssueId,
@@ -27,6 +28,7 @@ class Hypothesis {
         hypothesisId: json['hypothesisId'] as String?,
         ownerId: json['ownerId'] as String,
         desc: json['desc'] as String,
+        parentIssueId: json['parentIssueId'] as String?,
         isRoot: json['isRoot'] as bool? ?? false,
         isSpinoffIssue: json['isSpinoffIssue'] as bool? ?? false,
         spinoffIssueId: json['spinoffIssueId'] as String?,
@@ -46,6 +48,7 @@ class Hypothesis {
   String? hypothesisId;
   final String ownerId; // ID of the user who owns the hypothesis
   final String desc;
+  final String? parentIssueId; // ID of the parent issue
   bool isRoot;
   bool isSpinoffIssue;
   String? spinoffIssueId;
@@ -61,6 +64,7 @@ class Hypothesis {
         'hypothesisId': hypothesisId,
         'ownerId': ownerId,
         'desc': desc,
+        'parentIssueId': parentIssueId,
         'isRoot': isRoot,
         'isSpinoffIssue': isSpinoffIssue,
         'spinoffIssueId': spinoffIssueId,
@@ -76,6 +80,7 @@ class Hypothesis {
     String? hypothesisId,
     String? ownerId,
     String? desc,
+    String? parentIssueId,
     bool? isRoot,
     bool? isSpinoffIssue,
     String? spinoffIssueId,
@@ -89,6 +94,7 @@ class Hypothesis {
       hypothesisId: hypothesisId ?? this.hypothesisId,
       ownerId: ownerId ?? this.ownerId,
       desc: desc ?? this.desc,
+      parentIssueId: parentIssueId ?? this.parentIssueId,
       isRoot: isRoot ?? this.isRoot,
       isSpinoffIssue: isSpinoffIssue ?? this.isSpinoffIssue,
       spinoffIssueId: spinoffIssueId ?? this.spinoffIssueId,

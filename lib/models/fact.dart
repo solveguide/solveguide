@@ -72,7 +72,7 @@ class Fact {
   final DateTime lastUpdatedTimestamp; // Timestamp for the last update
   final Map<ReferenceObjectType, List<String>>
       referenceObjects; // Map of reference types to their IDs
-  final String? parentIssueId; // ID of the parent issue, optional
+  final String? parentIssueId; // ID of the parent issue
   final String? supportingContext; // Additional context for the fact
   Map<String, FactVote> votes;
 
