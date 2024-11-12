@@ -192,18 +192,23 @@ class _DashboardPageState extends State<DashboardPage> {
                               itemCount: issuesList.length,
                               itemBuilder: (context, index) {
                                 final issue = issuesList[index];
-                                return IssueTile(
-                                  issue: issue,
-                                  firstButton: () {
-                                    BlocProvider.of<IssueBloc>(context).add(
-                                      FocusIssueSelected(
-                                        issue: issue,
-                                      ),
-                                    );
-                                  },
-                                  secondButton: () {
-                                    _deleteIssue(issue.issueId!, issue.label);
-                                  },
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: AppSpacing.xs,
+                                      horizontal: AppSpacing.md),
+                                  child: IssueTile(
+                                    issue: issue,
+                                    firstButton: () {
+                                      BlocProvider.of<IssueBloc>(context).add(
+                                        FocusIssueSelected(
+                                          issue: issue,
+                                        ),
+                                      );
+                                    },
+                                    secondButton: () {
+                                      _deleteIssue(issue.issueId!, issue.label);
+                                    },
+                                  ),
                                 );
                               },
                             ),
