@@ -70,8 +70,10 @@ class AppUserRepository {
     var cleanEmail = email.toLowerCase();
     // Add this method
     try {
-      final querySnapshot =
-          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
+      final querySnapshot = await _userCollection
+          .where('email', isEqualTo: cleanEmail)
+          .limit(1)
+          .get();
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       throw Exception('Failed to check if user exists: $e');
@@ -96,8 +98,10 @@ class AppUserRepository {
     var cleanEmail = email.toLowerCase();
     // Add this method
     try {
-      final querySnapshot =
-          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
+      final querySnapshot = await _userCollection
+          .where('email', isEqualTo: cleanEmail)
+          .limit(1)
+          .get();
       if (querySnapshot.docs.isNotEmpty) {
         final docSnapshot = querySnapshot.docs.first;
         final data = docSnapshot.data();
@@ -133,8 +137,10 @@ class AppUserRepository {
     var cleanEmail = email.toLowerCase();
     try {
       // Query the userCollection for a document where the email field matches the provided email string
-      final querySnapshot =
-          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
+      final querySnapshot = await _userCollection
+          .where('email', isEqualTo: cleanEmail)
+          .limit(1)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         final docSnapshot = querySnapshot.docs.first;
@@ -185,8 +191,10 @@ class AppUserRepository {
       final currentUser = AppUser.fromJson(data as Map<String, dynamic>);
 
       // Search for the user by email in the userCollection
-      final querySnapshot =
-          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
+      final querySnapshot = await _userCollection
+          .where('email', isEqualTo: cleanEmail)
+          .limit(1)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // User exists, add them to the current user's contacts list
