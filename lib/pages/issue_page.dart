@@ -154,12 +154,12 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
     }
   }
 
-  void _inviteUser(AppUser selectedUser) {
+  void _inviteUser(AppUser? selectedUser) {
     final issueBloc = context.read<IssueBloc>();
 
     issueBloc.add(AddUserToIssueEvent(
       issueId: widget.issueId,
-      userId: selectedUser.userId,
+      userId: selectedUser!.userId,
     ));
 
     Navigator.of(context).pop();
@@ -211,7 +211,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
           selectedOptionBuilder: (context, selectedUser) {
             return Text(selectedUser.username);
           },
-          onChanged: (AppUser selectedUser) {
+          onChanged: (AppUser? selectedUser) {
             _inviteUser(selectedUser);
           },
         ),
