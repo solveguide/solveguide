@@ -17,7 +17,7 @@ class AppUserRepository {
       await _userCollection.doc(user.uid).set(
         {
           'userId': user.uid,
-          'email': email,
+          'email': email.toLowerCase(),
           'username': email,
           'createdTimestamp': DateTime.now(),
           'lastLoginTimestamp': DateTime.now(),
@@ -67,10 +67,11 @@ class AppUserRepository {
 
   /// 2. AppUserExists
   Future<bool> appUserExistsByEmail(String email) async {
+    var cleanEmail = email.toLowerCase();
     // Add this method
     try {
       final querySnapshot =
-          await _userCollection.where('email', isEqualTo: email).limit(1).get();
+          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       throw Exception('Failed to check if user exists: $e');
@@ -92,10 +93,11 @@ class AppUserRepository {
 
   /// 3. Get AppUser by Email
   Future<AppUser?> getAppUserByEmail(String email) async {
+    var cleanEmail = email.toLowerCase();
     // Add this method
     try {
       final querySnapshot =
-          await _userCollection.where('email', isEqualTo: email).limit(1).get();
+          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
       if (querySnapshot.docs.isNotEmpty) {
         final docSnapshot = querySnapshot.docs.first;
         final data = docSnapshot.data();
@@ -128,10 +130,11 @@ class AppUserRepository {
 
 // Fetch user data by email
   Future<AppUser?> getUserByEmail(String email) async {
+    var cleanEmail = email.toLowerCase();
     try {
       // Query the userCollection for a document where the email field matches the provided email string
       final querySnapshot =
-          await _userCollection.where('email', isEqualTo: email).limit(1).get();
+          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         final docSnapshot = querySnapshot.docs.first;
@@ -166,6 +169,7 @@ class AppUserRepository {
 
 // Invite a new contact by email or add to contacts if the user already exists
   Future<void> inviteContact(String email, String currentUserUid) async {
+    var cleanEmail = email.toLowerCase();
     try {
       // Get the current user's document reference
       final userRef = _userCollection.doc(currentUserUid);
@@ -182,7 +186,7 @@ class AppUserRepository {
 
       // Search for the user by email in the userCollection
       final querySnapshot =
-          await _userCollection.where('email', isEqualTo: email).limit(1).get();
+          await _userCollection.where('email', isEqualTo: cleanEmail).limit(1).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // User exists, add them to the current user's contacts list
@@ -207,14 +211,14 @@ class AppUserRepository {
         }
       } else {
         // User does not exist, add the email to the invitedContacts list
-        if (!currentUser.invitedContacts.contains(email)) {
-          currentUser.invitedContacts.add(email);
+        if (!currentUser.invitedContacts.contains(cleanEmail)) {
+          currentUser.invitedContacts.add(cleanEmail);
 
           // Update Firestore with the new invitedContacts list
           await userRef.update({
             'invitedContacts': currentUser.invitedContacts,
           });
-          print('Added $email to invited contacts.');
+          print('Added $cleanEmail to invited contacts.');
         } else {
           print('This email has already been invited.');
         }

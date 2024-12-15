@@ -184,7 +184,7 @@ class _InviteContactDialogState extends State<InviteContactDialog> {
                     _errorMessage = null;
                   });
                   try {
-                    final email = _emailController.text.trim();
+                    final email = _emailController.text.trim().toLowerCase();
                     if (email.isEmpty) {
                       throw Exception('Please enter an email address.');
                     }

@@ -19,7 +19,7 @@ class LoginPage extends StatelessWidget {
     void loginNow() {
       BlocProvider.of<AuthBloc>(context).add(
         AuthLoginRequested(
-          email: emailController.text.trim(),
+          email: emailController.text.trim().toLowerCase(),
           password: passwordController.text.trim(),
         ),
       );
@@ -121,7 +121,7 @@ class LoginPage extends StatelessWidget {
                       onPressed: () {
                         BlocProvider.of<AuthBloc>(context).add(
                           AuthLoginRequested(
-                            email: emailController.text.trim(),
+                            email: emailController.text.trim().toLowerCase(),
                             password: passwordController.text.trim(),
                           ),
                         );
@@ -135,7 +135,7 @@ class LoginPage extends StatelessWidget {
                       onPressed: () {
                         BlocProvider.of<AuthBloc>(context).add(
                           AuthRegisterRequested(
-                            email: emailController.text.trim(),
+                            email: emailController.text.trim().toLowerCase(),
                             password: passwordController.text.trim(),
                           ),
                         );

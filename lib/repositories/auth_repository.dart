@@ -33,17 +33,18 @@ class AuthRepository {
     String email,
     String password,
   ) async {
+    var cleanEmail = email.trim().toLowerCase();
     try {
       // Create User
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
+        email: cleanEmail,
         password: password,
       );
 
       // Create new user in Firestore 'users' collection
       final user = userCredential.user;
       if (user != null) {
-        await _appUserRepository.createAppUser(user, email);
+        await _appUserRepository.createAppUser(user, cleanEmail);
       }
 
       return user;
@@ -58,9 +59,10 @@ class AuthRepository {
     String email,
     String password,
   ) async {
+    var cleanEmail = email.trim().toLowerCase();
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
+        email: cleanEmail,
         password: password,
       );
       if (userCredential.user != null) {
@@ -69,7 +71,7 @@ class AuthRepository {
           //update
           _appUserRepository.updateAppUserById(userCredential.user!.uid);
         } else {
-          _appUserRepository.createAppUser(userCredential.user!, email);
+          _appUserRepository.createAppUser(userCredential.user!, cleanEmail);
         }
       }
 
