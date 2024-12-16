@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/issue_tile.dart';
-import 'package:guide_solve/components/my_navigation_drawer.dart';
+import 'package:guide_solve/src/components/issue_tile.dart';
+import 'package:guide_solve/src/components/my_navigation_drawer.dart';
 import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
 

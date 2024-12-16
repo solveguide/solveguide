@@ -2,7 +2,7 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/components/narrow_wide.dart';
+import 'package:guide_solve/src/components/narrow_wide.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class ProcessStatusBar extends StatefulWidget {

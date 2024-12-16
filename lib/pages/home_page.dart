@@ -5,9 +5,9 @@ import 'package:app_ui/app_ui.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:guide_solve/components/logo.dart';
-import 'package:guide_solve/components/narrow_wide.dart';
-import 'package:guide_solve/pages/login_page.dart';
+import 'package:guide_solve/src/auth/view/login_view.dart';
+import 'package:guide_solve/src/components/logo.dart';
+import 'package:guide_solve/src/components/narrow_wide.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   void goToLoginPage() {
     Navigator.push(
       context,
-      MaterialPageRoute<Widget>(builder: (context) => LoginPage()),
+      MaterialPageRoute<Widget>(builder: (context) => LoginView()),
     );
   }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:guide_solve/components/logo.dart';
+import 'package:guide_solve/src/components/logo.dart';
 import 'package:guide_solve/pages/contact_page.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';

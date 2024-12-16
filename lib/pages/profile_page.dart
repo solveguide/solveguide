@@ -2,12 +2,12 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
-import 'package:guide_solve/components/logo.dart';
-import 'package:guide_solve/components/my_navigation_drawer.dart';
-import 'package:guide_solve/components/plain_button.dart';
+import 'package:guide_solve/src/auth/view/login_view.dart';
+import 'package:guide_solve/src/components/logo.dart';
+import 'package:guide_solve/src/components/my_navigation_drawer.dart';
+import 'package:guide_solve/src/components/plain_button.dart';
 import 'package:guide_solve/pages/dashboard_page.dart';
 import 'package:guide_solve/pages/home_page.dart';
-import 'package:guide_solve/pages/login_page.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
@@ -33,7 +33,7 @@ class ProfilePage extends StatelessWidget {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute<Widget>(
-                builder: (context) => LoginPage(),
+                builder: (context) => LoginView(),
               ),
               (route) => false,
             );

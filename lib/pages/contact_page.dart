@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:guide_solve/components/my_navigation_drawer.dart';
+import 'package:guide_solve/src/components/my_navigation_drawer.dart';
 import 'package:guide_solve/models/appUser.dart';
 import 'package:guide_solve/repositories/appUser_repository.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';

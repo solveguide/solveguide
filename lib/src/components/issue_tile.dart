@@ -6,7 +6,7 @@ Any issue that is not currently in focus will be displayed using this issue tile
 
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:guide_solve/components/core.dart';
+import 'package:guide_solve/src/components/core.dart';
 import 'package:guide_solve/models/issue.dart';
 
 class IssueTile extends StatefulWidget {
