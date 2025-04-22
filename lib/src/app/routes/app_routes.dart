@@ -5,7 +5,8 @@ enum AppRoutes {
   dashboard('/dashboard'),
   login('/login'),
   issue('/issue'),
-  profile('/profile');
+  profile('/profile'),
+  magicLogin('/magic-login');
 
   const AppRoutes(this.route);
 

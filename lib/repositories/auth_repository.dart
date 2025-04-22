@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:guide_solve/config/environment.dart';
 import 'package:guide_solve/repositories/appUser_repository.dart';
 
 class AuthRepository {
@@ -82,8 +83,45 @@ class AuthRepository {
     }
   }
 
-// sign out
+  Future<void> sendMagicLink(String email) async {
+    try {
+      await _firebaseAuth.sendSignInLinkToEmail(
+        email: email,
+        actionCodeSettings: ActionCodeSettings(
+          url: Uri.encodeFull(EnvironmentConfig.magicLinkRedirectUrl),
+          handleCodeInApp: true,
+          linkDomain: EnvironmentConfig.linkDomain,
+        ),
+      );
+    } catch (e) {
+      throw Exception('Failed to send magic link: $e');
+    }
+  }
 
+  Future<User> verifyMagicLinkWithEmail(String magicLink, String email) async {
+    try {
+      // Check if the magic link is valid
+      final bool isValidLink =
+          await _firebaseAuth.isSignInWithEmailLink(magicLink);
+      if (!isValidLink) {
+        throw Exception('isValidLink = FALSE');
+      }
+
+      // Sign in the user with the email and magic link
+      final UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailLink(
+        email: email,
+        emailLink: magicLink,
+      );
+
+      // Return the authenticated user
+      return userCredential.user!;
+    } catch (e) {
+      throw Exception('Failed to verify magic link: $e');
+    }
+  }
+
+// sign out
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }

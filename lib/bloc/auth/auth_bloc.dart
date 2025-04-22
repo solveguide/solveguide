@@ -20,6 +20,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AnnonymousUserBlocked>(_onAnnonymousUserBlocked);
     on<NewContactAdded>(_onNewContactAdded);
+    on<AuthMagicLinkRequested>(_onMagicLinkRequested);
+    on<AuthMagicLinkVerifiedWithEmail>(_onMagicLinkVerifiedWithEmail);
   }
   final AuthRepository _authRepository;
   final AppUserRepository _appUserRepository = AppUserRepository();
@@ -66,6 +68,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _currentAppUser = await _appUserRepository.getAppUserById(user.uid);
     } catch (error) {
       emit(AuthFailure(error.toString()));
+    }
+  }
+
+  Future<void> _onMagicLinkRequested(
+    AuthMagicLinkRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+    try {
+      await _authRepository.sendMagicLink(event.email);
+      emit(const AuthWaitingOnMagicLinkClick()); // Emit a waiting state
+    } catch (error) {
+      emit(AuthFailure(error.toString()));
+    }
+  }
+
+  Future<void> _onMagicLinkVerifiedWithEmail(
+    AuthMagicLinkVerifiedWithEmail event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+    try {
+      final user = await _authRepository.verifyMagicLinkWithEmail(
+          event.magicLink, event.email);
+      emit(AuthSuccess(uid: user.uid));
+    } catch (error) {
+      if (error.toString().contains('email required')) {
+        emit(const AuthMagicLinkNeedsEmail());
+      } else {
+        emit(AuthFailure(error.toString()));
+      }
     }
   }
 

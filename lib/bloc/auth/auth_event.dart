@@ -21,6 +21,26 @@ final class AuthLoginRequested extends AuthEvent {
   List<Object?> get props => [email, password];
 }
 
+final class AuthMagicLinkRequested extends AuthEvent {
+  const AuthMagicLinkRequested({required this.email});
+
+  final String email;
+
+  @override
+  List<Object?> get props => [email];
+}
+
+class AuthMagicLinkVerifiedWithEmail extends AuthEvent {
+  const AuthMagicLinkVerifiedWithEmail(
+      {required this.magicLink, required this.email});
+
+  final String magicLink;
+  final String email;
+
+  @override
+  List<Object?> get props => [magicLink, email];
+}
+
 final class AuthLogoutRequested extends AuthEvent {
   const AuthLogoutRequested();
 }

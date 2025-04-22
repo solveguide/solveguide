@@ -1,5 +1,19 @@
 {
   "projects": {
     "default": "guidesolveapp"
-  }
+  },
+  "targets": {
+    "guidesolveapp": {
+      "hosting": {
+        "www": [
+          "guidesolveapp"
+        ],
+        "app": [
+          "guidesolveapp-app"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }

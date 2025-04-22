@@ -3,14 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guide_solve/bloc/auth/auth_bloc.dart';
 import 'package:guide_solve/bloc/issue/issue_bloc.dart';
-import 'package:guide_solve/pages/dashboard_page.dart';
-import 'package:guide_solve/pages/home_page.dart';
-import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/repositories/appUser_repository.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 import 'package:guide_solve/repositories/issue_repository.dart';
-import 'package:guide_solve/src/auth/view/login_view.dart';
 import 'package:provider/provider.dart';
+import 'package:guide_solve/src/app/routes/routes.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,6 +17,7 @@ class MyApp extends StatelessWidget {
     // Create single instances of repositories
     final authRepository = AuthRepository();
     final issueRepository = IssueRepository();
+    final router = AppRouter().router;
 
     return MultiProvider(
       providers: [
@@ -40,7 +38,7 @@ class MyApp extends StatelessWidget {
           create: (context) => IssueBloc(issueRepository, authRepository),
         ),
       ],
-      child: ShadApp.material(
+      child: ShadApp.materialRouter(
         debugShowCheckedModeBanner: false,
         title: 'Solve Guide',
         themeMode: ThemeMode.light,
@@ -62,20 +60,7 @@ class MyApp extends StatelessWidget {
             ),
           );
         },
-        home: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            if (state is AuthSuccess) {
-              return const DashboardPage();
-            } else {
-              return const HomePage();
-            }
-          },
-        ),
-        routes: {
-          '/dashboard': (context) => const DashboardPage(),
-          '/login': (context) => LoginView(),
-          '/profile': (context) => ProfilePage(),
-        },
+        routerConfig: router,
       ),
     );
   }

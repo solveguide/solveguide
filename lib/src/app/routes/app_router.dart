@@ -5,10 +5,11 @@ import 'package:guide_solve/pages/home_page.dart';
 import 'package:guide_solve/pages/profile_page.dart';
 import 'package:guide_solve/src/app/routes/routes.dart';
 import 'package:guide_solve/src/auth/auth.dart';
+import 'package:guide_solve/src/auth/view/magic_login_view.dart';
 
 class AppRouter {
   final router = GoRouter(
-    initialLocation: AppRoutes.home.route,
+    initialLocation: AppRoutes.magicLogin.route,
     routes: [
       GoRoute(
         path: AppRoutes.home.route,
@@ -34,6 +35,16 @@ class AppRouter {
         path: AppRoutes.login.route,
         name: AppRoutes.login.name,
         builder: (context, state) => LoginView(),
+      ),
+      GoRoute(
+        path: AppRoutes.magicLogin.route,
+        name: AppRoutes.magicLogin.name,
+        builder: (context, state) {
+          final magicLink = state.uri.toString();
+          print('Full URL: ${state.uri}');
+          print('Query Parameters: ${state.uri.queryParameters}');
+          return MagicLoginView(magicLink: magicLink);
+        },
       ),
     ],
   );

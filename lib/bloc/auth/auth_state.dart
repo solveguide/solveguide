@@ -31,3 +31,17 @@ final class AuthFailure extends AuthState {
 final class AuthLoading extends AuthState {
   const AuthLoading();
 }
+
+final class AuthWaitingOnMagicLinkClick extends AuthState {
+  const AuthWaitingOnMagicLinkClick();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthMagicLinkNeedsEmail extends AuthState {
+  const AuthMagicLinkNeedsEmail();
+
+  @override
+  List<Object?> get props => [];
+}
