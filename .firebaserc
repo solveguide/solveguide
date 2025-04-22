@@ -1,5 +1,12 @@
 {
   "projects": {
     "default": "guidesolveapp"
+  },
+  "targets": {
+    "guidesolveapp": {
+      "hosting": {
+        "app": ["guidesolveapp-app"]
+      }
+    }
   }
 }
