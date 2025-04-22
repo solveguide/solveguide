@@ -5,8 +5,12 @@
   "targets": {
     "guidesolveapp": {
       "hosting": {
-        "app": ["guidesolveapp"]
+        "app": [
+          "solveguideapp"
+        ]
       }
     }
-  }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
