@@ -1,20 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:guide_solve/repositories/appUser_repository.dart';
 
 class AuthRepository {
-  final FirebaseAuth _firebaseAuth;
   AuthRepository({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+
+  final FirebaseAuth _firebaseAuth;
+
+  final AppUserRepository _appUserRepository = AppUserRepository();
 // validate email
   bool isValidEmail(String email) {
     final emailRegExp = RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    );
     return emailRegExp.hasMatch(email);
   }
 
 // send verification email
   Future<void> sendEmailVerification() async {
     try {
-      User? user = _firebaseAuth.currentUser;
+      final user = _firebaseAuth.currentUser;
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
@@ -25,14 +30,23 @@ class AuthRepository {
 
 // register
   Future<User?> registerWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.createUserWithEmailAndPassword(
+      // Create User
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user;
+
+      // Create new user in Firestore 'users' collection
+      final user = userCredential.user;
+      if (user != null) {
+        await _appUserRepository.createAppUser(user, email);
+      }
+
+      return user;
     } on FirebaseAuthException catch (e) {
       // Handle specific error codes if needed
       throw Exception(e.message);
@@ -41,13 +55,24 @@ class AuthRepository {
 
 // sign in
   Future<User?> signInWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      if (userCredential.user != null) {
+        final userId = userCredential.user!.uid;
+        if (await _appUserRepository.appUserExistsById(userId)) {
+          //update
+          _appUserRepository.updateAppUserById(userCredential.user!.uid);
+        } else {
+          _appUserRepository.createAppUser(userCredential.user!, email);
+        }
+      }
+
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       // Handle specific error codes if needed
@@ -71,19 +96,22 @@ class AuthRepository {
       if (currentUser != null) {
         return currentUser;
       } else {
-        throw "current user is null";
+        throw Exception('The current user is null');
       }
     } catch (error) {
-      throw (error.toString());
+      throw Exception('Failed to get current user: $error');
     }
   }
 
   Future<String?> getUserUid() async {
     try {
       final user = _firebaseAuth.currentUser;
-      return user?.uid;
+      if (user == null) {
+        throw Exception('User is not logged in');
+      }
+      return user.uid;
     } catch (e) {
-      throw (e.toString());
+      throw Exception('Failed to get user UID: $e');
     }
   }
 }

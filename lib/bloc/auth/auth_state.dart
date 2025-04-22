@@ -13,18 +13,16 @@ final class AuthInitial extends AuthState {
 }
 
 final class AuthSuccess extends AuthState {
-  final String uid;
-
   const AuthSuccess({required this.uid});
+  final String uid;
 
   @override
   List<Object?> get props => [uid];
 }
 
 final class AuthFailure extends AuthState {
-  final String error;
-
   const AuthFailure(this.error);
+  final String error;
 
   @override
   List<Object?> get props => [error];

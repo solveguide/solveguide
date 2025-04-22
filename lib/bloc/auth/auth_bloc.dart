@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guide_solve/models/appUser.dart';
+import 'package:guide_solve/repositories/appUser_repository.dart';
 import 'package:guide_solve/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository _authRepository;
-
   AuthBloc({required AuthRepository authRepository})
       : _authRepository = authRepository,
         super(const AuthInitial()) {
@@ -19,7 +19,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AnnonymousUserBlocked>(_onAnnonymousUserBlocked);
+    on<NewContactAdded>(_onNewContactAdded);
   }
+  final AuthRepository _authRepository;
+  final AppUserRepository _appUserRepository = AppUserRepository();
+  String? _currentUserId;
+  AppUser? _currentAppUser;
+
+  String? get currentUserId => _currentUserId;
+  AppUser? get currentAppUser => _currentAppUser;
+  AuthRepository get authRepository => _authRepository;
 
   Future<void> _onAppStarted(
     AppStarted event,
@@ -27,6 +36,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       final currentUser = await _authRepository.getCurrentUser();
+      _currentUserId = currentUser.uid;
+      _currentAppUser =
+          await _appUserRepository.getAppUserById(currentUser.uid);
       emit(AuthSuccess(uid: currentUser.uid));
     } catch (error) {
       emit(const AuthInitial());
@@ -46,8 +58,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     try {
       final user = await _authRepository.signInWithEmailAndPassword(
-          event.email, event.password);
+        event.email,
+        event.password,
+      );
       emit(AuthSuccess(uid: user!.uid));
+      _currentUserId = user.uid;
+      _currentAppUser = await _appUserRepository.getAppUserById(user.uid);
     } catch (error) {
       emit(AuthFailure(error.toString()));
     }
@@ -80,20 +96,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     try {
       final user = await _authRepository.registerWithEmailAndPassword(
-          event.email, event.password);
+        event.email,
+        event.password,
+      );
       emit(AuthSuccess(uid: user!.uid));
+      _currentUserId = user.uid;
+      _currentAppUser = await _appUserRepository.getAppUserById(user.uid);
     } catch (error) {
       emit(AuthFailure(error.toString()));
     }
   }
 
-  void _onAnnonymousUserBlocked(
-      AnnonymousUserBlocked event, Emitter<AuthState> emit) async {
+  Future<void> _onAnnonymousUserBlocked(
+    AnnonymousUserBlocked event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       final currentUser = await _authRepository.getCurrentUser();
       emit(AuthSuccess(uid: currentUser.uid));
     } catch (error) {
       emit(const AuthInitial());
     }
+  }
+
+  FutureOr<void> _onNewContactAdded(
+    NewContactAdded event,
+    Emitter<AuthState> emit,
+  ) {
+    //Check for valid email
+    //Check if AppUser already exists with email
+    //Yes? ->
+    //get existing userId,
+    //contactName will be (event.contactName ? AppUser.username ? event.email)
+    //Add to current user's Contact map <userId, event.contactName>
+    //add current user to existing users contact map
+
+    //No? ->
+    //Add email to current users invitedContacts list,
+    //create a mailto: link that the current user can send,
   }
 }
