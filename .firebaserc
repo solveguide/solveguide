@@ -5,7 +5,7 @@
   "targets": {
     "guidesolveapp": {
       "hosting": {
-        "app": ["guidesolveapp-app"]
+        "app": ["guidesolveapp"]
       }
     }
   }
